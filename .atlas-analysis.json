@@ -1,0 +1,264 @@
+{
+  "projectType": "frontend",
+  "projectName": "Angular Components",
+  "projectDescription": "Component infrastructure and Material Design components for Angular applications",
+  "theme": "linden",
+  "primaryColor": "#3f51b5",
+  "lightColor": "#7986cb",
+  "darkColor": "#303f9f",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Getting Started",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Essentials",
+            "pages": [
+              "essentials/theming",
+              "essentials/typography",
+              "essentials/accessibility",
+              "essentials/schematics"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Material Components",
+        "groups": [
+          {
+            "group": "Form Controls",
+            "pages": [
+              "components/autocomplete",
+              "components/checkbox",
+              "components/datepicker",
+              "components/form-field",
+              "components/input",
+              "components/radio",
+              "components/select",
+              "components/slider",
+              "components/slide-toggle",
+              "components/timepicker"
+            ]
+          },
+          {
+            "group": "Navigation",
+            "pages": [
+              "components/menu",
+              "components/sidenav",
+              "components/toolbar",
+              "components/tabs"
+            ]
+          },
+          {
+            "group": "Layout",
+            "pages": [
+              "components/card",
+              "components/divider",
+              "components/expansion",
+              "components/grid-list",
+              "components/list",
+              "components/stepper",
+              "components/tree"
+            ]
+          },
+          {
+            "group": "Buttons & Indicators",
+            "pages": [
+              "components/button",
+              "components/button-toggle",
+              "components/badge",
+              "components/chips",
+              "components/icon",
+              "components/progress-bar",
+              "components/progress-spinner"
+            ]
+          },
+          {
+            "group": "Popups & Modals",
+            "pages": [
+              "components/bottom-sheet",
+              "components/dialog",
+              "components/snack-bar",
+              "components/tooltip"
+            ]
+          },
+          {
+            "group": "Data Table",
+            "pages": [
+              "components/table",
+              "components/sort",
+              "components/paginator"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CDK",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "cdk/overview"
+            ]
+          },
+          {
+            "group": "Common Behaviors",
+            "pages": [
+              "cdk/a11y",
+              "cdk/bidi",
+              "cdk/clipboard",
+              "cdk/drag-drop",
+              "cdk/layout",
+              "cdk/observers",
+              "cdk/overlay",
+              "cdk/platform",
+              "cdk/portal",
+              "cdk/scrolling",
+              "cdk/text-field"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "cdk/accordion",
+              "cdk/dialog",
+              "cdk/listbox",
+              "cdk/menu",
+              "cdk/stepper",
+              "cdk/table",
+              "cdk/tree"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "cdk/coercion",
+              "cdk/collections",
+              "cdk/keycodes",
+              "cdk/testing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Additional Packages",
+        "groups": [
+          {
+            "group": "ARIA",
+            "pages": [
+              "aria/overview",
+              "aria/accordion",
+              "aria/combobox",
+              "aria/grid",
+              "aria/listbox",
+              "aria/menu",
+              "aria/tabs",
+              "aria/toolbar",
+              "aria/tree"
+            ]
+          },
+          {
+            "group": "Google Maps",
+            "pages": [
+              "google-maps/overview",
+              "google-maps/installation",
+              "google-maps/map",
+              "google-maps/markers",
+              "google-maps/overlays"
+            ]
+          },
+          {
+            "group": "YouTube Player",
+            "pages": [
+              "youtube-player/overview",
+              "youtube-player/installation",
+              "youtube-player/api"
+            ]
+          },
+          {
+            "group": "Date Adapters",
+            "pages": [
+              "adapters/date-fns",
+              "adapters/luxon",
+              "adapters/moment"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Customization",
+            "pages": [
+              "guides/custom-form-field",
+              "guides/custom-stepper",
+              "guides/theming-components"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "guides/component-harnesses",
+              "guides/testing-strategies"
+            ]
+          },
+          {
+            "group": "Migration",
+            "pages": [
+              "guides/breaking-changes",
+              "guides/migration-guides"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "guides/contributing",
+              "guides/coding-standards",
+              "guides/dev-environment"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "40+ Material Design UI components",
+    "Component Development Kit (CDK) for custom components",
+    "Accessible headless directives with @angular/aria",
+    "Comprehensive theming system with prebuilt themes",
+    "Built-in accessibility and internationalization",
+    "Angular CLI schematics for scaffolding",
+    "Google Maps and YouTube Player integrations",
+    "Multiple date adapter libraries (date-fns, Luxon, Moment)",
+    "Comprehensive testing utilities and component harnesses",
+    "TypeScript support with full type definitions"
+  ],
+  "publicApiSurface": [
+    "@angular/material - MatButton, MatCard, MatDialog, MatTable, MatFormField, MatInput, MatSelect, MatCheckbox, MatRadio",
+    "@angular/material - MatDatepicker, MatTimepicker, MatSlider, MatSlideToggle, MatAutocomplete, MatChips",
+    "@angular/material - MatMenu, MatSidenav, MatToolbar, MatTabs, MatStepper, MatTree",
+    "@angular/material - MatIcon, MatBadge, MatProgressBar, MatProgressSpinner, MatTooltip, MatSnackBar",
+    "@angular/material - MatExpansion, MatGridList, MatList, MatDivider, MatPaginator, MatSort",
+    "@angular/cdk/a11y - FocusTrap, LiveAnnouncer, FocusMonitor, HighContrastModeDetector",
+    "@angular/cdk/overlay - Overlay, OverlayRef, OverlayConfig, ConnectedPosition",
+    "@angular/cdk/drag-drop - DragDrop, CdkDragDrop, CdkDrag, CdkDropList",
+    "@angular/cdk/portal - Portal, ComponentPortal, TemplatePortal, PortalOutlet",
+    "@angular/cdk/scrolling - VirtualScrollViewport, ScrollDispatcher, CdkScrollable",
+    "@angular/cdk/table - CdkTable, CdkRow, CdkCell, DataSource",
+    "@angular/cdk/stepper - CdkStepper, CdkStep, StepperSelectionEvent",
+    "@angular/cdk/dialog - Dialog, DialogRef, DialogConfig",
+    "@angular/cdk/testing - ComponentHarness, TestElement, HarnessLoader",
+    "@angular/aria - AccordionPanel, AccordionTrigger, Combobox, Grid, Listbox, Menu",
+    "@angular/google-maps - GoogleMap, MapMarker, MapInfoWindow, MapPolygon",
+    "@angular/youtube-player - YouTubePlayer"
+  ]
+}
