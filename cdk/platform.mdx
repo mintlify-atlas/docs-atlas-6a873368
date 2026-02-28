@@ -1,0 +1,350 @@
+---
+title: Platform
+description: Detect browser, OS, and platform capabilities
+---
+
+The `@angular/cdk/platform` package provides utilities for detecting the current platform, browser, and operating system.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {PlatformModule} from '@angular/cdk/platform';
+```
+
+## Platform Service
+
+Detect browser and platform information.
+
+### Basic Usage
+
+```typescript
+import {Component, inject, OnInit} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Component({
+  selector: 'app-platform-detector',
+  template: `
+    <div *ngIf="platform.isBrowser">
+      <p>Browser: {{ getBrowserName() }}</p>
+      <p>OS: {{ getOSName() }}</p>
+    </div>
+  `,
+})
+export class PlatformDetector implements OnInit {
+  platform = inject(Platform);
+
+  ngOnInit() {
+    console.log('Is Browser:', this.platform.isBrowser);
+    console.log('Is iOS:', this.platform.IOS);
+    console.log('Is Android:', this.platform.ANDROID);
+  }
+
+  getBrowserName(): string {
+    if (this.platform.EDGE) return 'Edge';
+    if (this.platform.FIREFOX) return 'Firefox';
+    if (this.platform.SAFARI) return 'Safari';
+    if (this.platform.BLINK) return 'Chrome/Chromium';
+    return 'Unknown';
+  }
+
+  getOSName(): string {
+    if (this.platform.IOS) return 'iOS';
+    if (this.platform.ANDROID) return 'Android';
+    return 'Desktop';
+  }
+}
+```
+
+## Platform Detection Properties
+
+### Environment
+
+```typescript
+platform.isBrowser  // Running in browser (vs SSR)
+```
+
+### Browsers
+
+```typescript
+platform.EDGE      // Microsoft Edge
+platform.TRIDENT   // Internet Explorer
+platform.BLINK     // Chrome, Opera, Edge (Chromium)
+platform.WEBKIT    // Safari
+platform.FIREFOX   // Firefox
+platform.SAFARI    // Safari browser
+```
+
+### Operating Systems
+
+```typescript
+platform.IOS       // iPhone, iPad, iPod
+platform.ANDROID   // Android devices
+```
+
+## Practical Examples
+
+### Browser-Specific Features
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Component({
+  selector: 'app-browser-features',
+  template: `
+    <div *ngIf="supportsFeature">
+      Feature is supported!
+    </div>
+  `,
+})
+export class BrowserFeatures {
+  platform = inject(Platform);
+  supportsFeature: boolean;
+
+  ngOnInit() {
+    // Check for specific browser features
+    if (this.platform.WEBKIT) {
+      // Safari-specific code
+      this.supportsFeature = this.checkWebKitFeature();
+    } else if (this.platform.BLINK) {
+      // Chrome-specific code
+      this.supportsFeature = this.checkBlinkFeature();
+    }
+  }
+
+  private checkWebKitFeature(): boolean {
+    // Safari-specific check
+    return true;
+  }
+
+  private checkBlinkFeature(): boolean {
+    // Chrome-specific check
+    return true;
+  }
+}
+```
+
+### Mobile Detection
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Component({
+  selector: 'app-responsive-layout',
+  template: `
+    <div [class.mobile]="isMobile" [class.tablet]="isTablet">
+      <ng-container *ngIf="isMobile">
+        Mobile layout
+      </ng-container>
+      <ng-container *ngIf="!isMobile">
+        Desktop layout
+      </ng-container>
+    </div>
+  `,
+})
+export class ResponsiveLayout {
+  platform = inject(Platform);
+
+  get isMobile(): boolean {
+    return this.platform.IOS || this.platform.ANDROID;
+  }
+
+  get isTablet(): boolean {
+    // Simple tablet detection (can be enhanced)
+    return this.isMobile && window.innerWidth >= 768;
+  }
+}
+```
+
+### Server-Side Rendering
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Component({
+  selector: 'app-ssr-safe',
+  template: `<div>{{ message }}</div>`,
+})
+export class SSRSafe {
+  platform = inject(Platform);
+  message: string;
+
+  ngOnInit() {
+    if (this.platform.isBrowser) {
+      // Browser-only code
+      this.message = `Screen size: ${window.innerWidth}x${window.innerHeight}`;
+      
+      // Access browser APIs safely
+      this.setupBrowserFeatures();
+    } else {
+      // Server-side rendering
+      this.message = 'Rendered on server';
+    }
+  }
+
+  private setupBrowserFeatures() {
+    // localStorage, sessionStorage, etc.
+    localStorage.setItem('visited', 'true');
+  }
+}
+```
+
+### Touch vs Mouse Input
+
+```typescript
+import {Component, inject, HostListener} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Component({
+  selector: 'app-input-handler',
+  template: `
+    <div 
+      class="interactive"
+      [class.touch-device]="isTouchDevice"
+      (click)="handleClick()">
+      {{ isTouchDevice ? 'Tap' : 'Click' }} me
+    </div>
+  `,
+  styles: [`
+    .interactive { padding: 20px; }
+    .touch-device { padding: 30px; } /* Larger touch targets */
+  `]
+})
+export class InputHandler {
+  platform = inject(Platform);
+
+  get isTouchDevice(): boolean {
+    return this.platform.IOS || this.platform.ANDROID;
+  }
+
+  handleClick() {
+    if (this.isTouchDevice) {
+      console.log('Touch interaction');
+    } else {
+      console.log('Mouse interaction');
+    }
+  }
+}
+```
+
+## API Reference
+
+### Platform Service
+
+**Injectable**: `{providedIn: 'root'}`
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isBrowser` | `boolean` | Whether running in browser |
+| `EDGE` | `boolean` | Microsoft Edge browser |
+| `TRIDENT` | `boolean` | Internet Explorer |
+| `BLINK` | `boolean` | Blink engine (Chrome, Opera) |
+| `WEBKIT` | `boolean` | WebKit engine (Safari) |
+| `FIREFOX` | `boolean` | Firefox browser |
+| `SAFARI` | `boolean` | Safari browser |
+| `IOS` | `boolean` | iOS device |
+| `ANDROID` | `boolean` | Android device |
+
+## Helper Functions
+
+### getSupportedInputTypes
+
+Check supported input types:
+
+```typescript
+import {getSupportedInputTypes} from '@angular/cdk/platform';
+
+const supportedTypes = getSupportedInputTypes();
+if (supportedTypes.has('date')) {
+  // Use native date picker
+}
+```
+
+### supportsPassiveEventListeners
+
+Check for passive event listener support:
+
+```typescript
+import {supportsPassiveEventListeners} from '@angular/cdk/platform';
+
+if (supportsPassiveEventListeners()) {
+  element.addEventListener('scroll', handler, {passive: true});
+}
+```
+
+### supportsScrollBehavior
+
+Check for smooth scroll support:
+
+```typescript
+import {supportsScrollBehavior} from '@angular/cdk/platform';
+
+if (supportsScrollBehavior()) {
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+```
+
+## Best Practices
+
+1. **Use for capability detection** - Not browser sniffing
+2. **Progressive enhancement** - Feature detection over platform detection
+3. **SSR safety** - Always check `isBrowser` before using window/document
+4. **Test across platforms** - Don't assume behavior
+5. **Combine with BreakpointObserver** - For responsive layouts
+
+## Common Patterns
+
+### Safe Window Access
+
+```typescript
+if (this.platform.isBrowser) {
+  const width = window.innerWidth;
+  localStorage.setItem('key', 'value');
+}
+```
+
+### Platform-Specific Styling
+
+```typescript
+@Component({
+  host: {
+    '[class.ios]': 'platform.IOS',
+    '[class.android]': 'platform.ANDROID',
+    '[class.safari]': 'platform.SAFARI',
+  }
+})
+```
+
+### Feature Detection Service
+
+```typescript
+import {Injectable, inject} from '@angular/core';
+import {Platform} from '@angular/cdk/platform';
+
+@Injectable({providedIn: 'root'})
+export class FeatureDetection {
+  private platform = inject(Platform);
+
+  get supportsTouch(): boolean {
+    return this.platform.isBrowser && 'ontouchstart' in window;
+  }
+
+  get supportsWebGL(): boolean {
+    if (!this.platform.isBrowser) return false;
+    const canvas = document.createElement('canvas');
+    return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+  }
+}
+```
+
+## See Also
+
+- [BreakpointObserver](/cdk/layout)
+- [Angular Universal (SSR)](https://angular.dev/guide/ssr)
+- [MDN: Feature Detection](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection)

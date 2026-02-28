@@ -1,0 +1,470 @@
+---
+title: "Testing Strategies and Best Practices"
+description: "Comprehensive guide to testing Angular Material applications effectively"
+---
+
+Testing is a critical part of building robust Angular applications. This guide covers strategies and best practices for testing applications that use Angular Material components.
+
+## Testing Philosophy
+
+<CardGroup cols={2}>
+  <Card title="Test Behavior, Not Implementation" icon="user">
+    Focus on how users interact with your application, not internal details
+  </Card>
+  <Card title="Use Component Harnesses" icon="shield">
+    Leverage Material's harnesses to insulate tests from implementation changes
+  </Card>
+  <Card title="Write Maintainable Tests" icon="code">
+    Clear, readable tests that serve as documentation
+  </Card>
+  <Card title="Balance Coverage" icon="scale-balanced">
+    Mix unit, integration, and e2e tests appropriately
+  </Card>
+</CardGroup>
+
+## Test Types
+
+<Tabs>
+  <Tab title="Unit Tests">
+    Test individual components or services in isolation.
+
+    **When to Use:**
+    - Testing component logic
+    - Service functionality
+    - Pipes and directives
+    - Utility functions
+
+    **Tools:**
+    - Jasmine/Jest
+    - Angular TestBed
+    - Component harnesses
+  </Tab>
+
+  <Tab title="Integration Tests">
+    Test how components work together.
+
+    **When to Use:**
+    - Form workflows
+    - Component interactions
+    - Routing scenarios
+    - Complex UI behaviors
+
+    **Tools:**
+    - TestBed with multiple components
+    - Harnesses for Material components
+    - Router testing modules
+  </Tab>
+
+  <Tab title="E2E Tests">
+    Test the entire application from a user's perspective.
+
+    **When to Use:**
+    - Critical user journeys
+    - Multi-page workflows
+    - Authentication flows
+    - Production-like scenarios
+
+    **Tools:**
+    - Selenium WebDriver
+    - Playwright
+    - Cypress
+    - Material harnesses (Selenium)
+  </Tab>
+</Tabs>
+
+## Unit Testing with Material Components
+
+### Basic Setup
+
+```ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonHarness } from '@angular/material/button/testing';
+
+describe('MyComponent', () => {
+  let component: MyComponent;
+  let fixture: ComponentFixture<MyComponent>;
+  let loader: HarnessLoader;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MatButtonModule],
+      declarations: [MyComponent]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(MyComponent);
+    component = fixture.componentInstance;
+    loader = TestbedHarnessEnvironment.loader(fixture);
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+```
+
+### Testing Form Controls
+
+<AccordionGroup>
+  <Accordion title="Input Fields">
+    ```ts
+    import { MatInputHarness } from '@angular/material/input/testing';
+
+    it('should update value when input changes', async () => {
+      const input = await loader.getHarness(
+        MatInputHarness.with({ selector: '[name="username"]' })
+      );
+      
+      await input.setValue('john_doe');
+      expect(component.username).toBe('john_doe');
+      
+      expect(await input.getValue()).toBe('john_doe');
+    });
+
+    it('should show error for invalid input', async () => {
+      const input = await loader.getHarness(
+        MatInputHarness.with({ selector: '[name="email"]' })
+      );
+      
+      await input.setValue('invalid');
+      await input.blur();
+      
+      expect(await input.hasError('email')).toBe(true);
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Select Components">
+    ```ts
+    import { MatSelectHarness } from '@angular/material/select/testing';
+
+    it('should select an option', async () => {
+      const select = await loader.getHarness(MatSelectHarness);
+      
+      await select.open();
+      const options = await select.getOptions();
+      await options[1].click();
+      
+      expect(await select.getValueText()).toBe('Option 2');
+      expect(component.selectedValue).toBe('option2');
+    });
+
+    it('should filter options by text', async () => {
+      const select = await loader.getHarness(MatSelectHarness);
+      await select.open();
+      
+      const option = await select.getOption({ text: 'Specific Option' });
+      await option.click();
+      
+      expect(component.selectedValue).toBe('specific');
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Checkboxes and Radios">
+    ```ts
+    import { MatCheckboxHarness } from '@angular/material/checkbox/testing';
+    import { MatRadioGroupHarness } from '@angular/material/radio/testing';
+
+    it('should toggle checkbox', async () => {
+      const checkbox = await loader.getHarness(
+        MatCheckboxHarness.with({ label: 'Accept Terms' })
+      );
+      
+      expect(await checkbox.isChecked()).toBe(false);
+      await checkbox.check();
+      expect(await checkbox.isChecked()).toBe(true);
+      expect(component.termsAccepted).toBe(true);
+    });
+
+    it('should select radio option', async () => {
+      const radioGroup = await loader.getHarness(MatRadioGroupHarness);
+      const radios = await radioGroup.getRadioButtons();
+      
+      await radios[1].check();
+      expect(await radioGroup.getCheckedValue()).toBe('option2');
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Testing Dialogs
+
+```ts
+import { MatDialogHarness } from '@angular/material/dialog/testing';
+
+it('should open and close dialog', async () => {
+  // Get document root loader for overlays
+  const documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+  
+  // Trigger dialog open
+  const openButton = await loader.getHarness(
+    MatButtonHarness.with({ text: 'Open Dialog' })
+  );
+  await openButton.click();
+  
+  // Get dialog harness
+  const dialog = await documentRootLoader.getHarness(MatDialogHarness);
+  
+  expect(await dialog.getTitleText()).toBe('Confirm Action');
+  expect(await dialog.getContentText()).toContain('Are you sure');
+  
+  // Close dialog
+  await dialog.close();
+  
+  // Verify dialog is closed
+  const dialogs = await documentRootLoader.getAllHarnesses(MatDialogHarness);
+  expect(dialogs.length).toBe(0);
+});
+
+it('should pass data to dialog', async () => {
+  component.openDialog({ message: 'Test Message' });
+  fixture.detectChanges();
+  
+  const documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+  const dialog = await documentRootLoader.getHarness(MatDialogHarness);
+  
+  expect(await dialog.getContentText()).toContain('Test Message');
+});
+```
+
+### Testing Tables
+
+```ts
+import { MatTableHarness } from '@angular/material/table/testing';
+
+it('should display table data', async () => {
+  const table = await loader.getHarness(MatTableHarness);
+  
+  const rows = await table.getRows();
+  expect(rows.length).toBe(3);
+  
+  const firstRowCells = await rows[0].getCells();
+  const firstRowText = await parallel(() => 
+    firstRowCells.map(cell => cell.getText())
+  );
+  
+  expect(firstRowText).toEqual(['John', 'Doe', '30']);
+});
+
+it('should sort table', async () => {
+  const table = await loader.getHarness(MatTableHarness);
+  const headers = await table.getHeaderRows();
+  const nameHeader = await headers[0].getCells({ columnName: 'name' });
+  
+  await nameHeader[0].click(); // Sort ascending
+  
+  let rows = await table.getRows();
+  let firstCell = await rows[0].getCells();
+  expect(await firstCell[0].getText()).toBe('Alice');
+  
+  await nameHeader[0].click(); // Sort descending
+  
+  rows = await table.getRows();
+  firstCell = await rows[0].getCells();
+  expect(await firstCell[0].getText()).toBe('Zoe');
+});
+```
+
+## Best Practices
+
+<Steps>
+  <Step title="Use harnesses for Material components">
+    Always prefer component harnesses over direct DOM queries:
+
+    ```ts
+    // ❌ Bad - brittle, depends on internals
+    const button = fixture.nativeElement.querySelector('.mat-mdc-button');
+    button.click();
+
+    // ✅ Good - robust, maintainable
+    const button = await loader.getHarness(MatButtonHarness);
+    await button.click();
+    ```
+  </Step>
+
+  <Step title="Filter semantically">
+    Use meaningful properties to identify components:
+
+    ```ts
+    // ❌ Bad - implementation detail
+    MatButtonHarness.with({ selector: '.submit-btn' })
+
+    // ✅ Good - semantic meaning
+    MatButtonHarness.with({ text: 'Submit' })
+    MatInputHarness.with({ placeholder: 'Enter email' })
+    ```
+  </Step>
+
+  <Step title="Test user behavior">
+    Focus on what users do, not implementation:
+
+    ```ts
+    // ❌ Bad - testing implementation
+    it('should set isOpen to true', () => {
+      component.isOpen = true;
+      expect(component.isOpen).toBe(true);
+    });
+
+    // ✅ Good - testing behavior
+    it('should show menu when button clicked', async () => {
+      const menu = await loader.getHarness(MatMenuHarness);
+      await menu.open();
+      expect(await menu.isOpen()).toBe(true);
+    });
+    ```
+  </Step>
+
+  <Step title="Use async/await consistently">
+    All harness operations are async:
+
+    ```ts
+    // ❌ Bad - missing await
+    const button = loader.getHarness(MatButtonHarness);
+    button.click();
+
+    // ✅ Good - proper async handling
+    const button = await loader.getHarness(MatButtonHarness);
+    await button.click();
+    ```
+  </Step>
+
+  <Step title="Scope harness loaders">
+    Use child loaders for specificity:
+
+    ```ts
+    // Get loader for specific section
+    const headerLoader = await loader.getChildLoader('header');
+    const headerButton = await headerLoader.getHarness(MatButtonHarness);
+    
+    const footerLoader = await loader.getChildLoader('footer');
+    const footerButton = await footerLoader.getHarness(MatButtonHarness);
+    ```
+  </Step>
+</Steps>
+
+## Testing Accessibility
+
+<Warning>
+  Always test that your Material components are accessible!
+</Warning>
+
+```ts
+it('should have proper ARIA attributes', async () => {
+  const button = await loader.getHarness(MatButtonHarness);
+  const host = await button.host();
+  
+  expect(await host.getAttribute('aria-label')).toBe('Submit form');
+  expect(await host.getAttribute('role')).toBe('button');
+});
+
+it('should manage focus properly', async () => {
+  const input = await loader.getHarness(MatInputHarness);
+  
+  await input.focus();
+  expect(await input.isFocused()).toBe(true);
+  
+  await input.blur();
+  expect(await input.isFocused()).toBe(false);
+});
+
+it('should announce changes to screen readers', async () => {
+  const snackBar = await documentRootLoader.getHarness(MatSnackBarHarness);
+  
+  expect(await snackBar.getRole()).toBe('alert');
+  expect(await snackBar.getMessage()).toBe('Changes saved');
+});
+```
+
+## Performance Testing
+
+```ts
+it('should render large list efficiently', async () => {
+  const startTime = performance.now();
+  
+  component.items = Array.from({ length: 1000 }, (_, i) => ({
+    id: i,
+    name: `Item ${i}`
+  }));
+  
+  fixture.detectChanges();
+  await fixture.whenStable();
+  
+  const endTime = performance.now();
+  const renderTime = endTime - startTime;
+  
+  expect(renderTime).toBeLessThan(1000); // Should render in <1s
+});
+```
+
+## Common Pitfalls
+
+<AccordionGroup>
+  <Accordion title="Forgetting to await harness operations">
+    ```ts
+    // ❌ This will fail!
+    const button = loader.getHarness(MatButtonHarness);
+    button.click(); // Error: button is a Promise!
+
+    // ✅ Correct
+    const button = await loader.getHarness(MatButtonHarness);
+    await button.click();
+    ```
+  </Accordion>
+
+  <Accordion title="Using wrong loader for overlays">
+    ```ts
+    // ❌ Wrong - overlays are attached to document body
+    const dialog = await loader.getHarness(MatDialogHarness);
+
+    // ✅ Correct - use document root loader
+    const documentRootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+    const dialog = await documentRootLoader.getHarness(MatDialogHarness);
+    ```
+  </Accordion>
+
+  <Accordion title="Not waiting for animations">
+    ```ts
+    // ❌ May fail if animations aren't complete
+    await dialog.close();
+    expect(component.dialogClosed).toBe(true);
+
+    // ✅ Harnesses wait for animations automatically
+    await dialog.close();
+    // Dialog close animation completes before promise resolves
+    expect(component.dialogClosed).toBe(true);
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Testing Checklist
+
+<Check>Use component harnesses for all Material components</Check>
+<Check>Test user interactions, not implementation details</Check>
+<Check>Verify accessibility attributes and behavior</Check>
+<Check>Test form validation and error states</Check>
+<Check>Test responsive behavior at different viewports</Check>
+<Check>Test keyboard navigation and shortcuts</Check>
+<Check>Test loading and error states</Check>
+<Check>Use semantic filters (text, labels) over CSS selectors</Check>
+<Check>Handle asynchronous operations with async/await</Check>
+<Check>Test both happy path and edge cases</Check>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Component Harnesses" icon="flask" href="/guides/component-harnesses">
+    Complete guide to using harnesses
+  </Card>
+  <Card title="Angular Testing" icon="angular" href="https://angular.io/guide/testing">
+    Official Angular testing guide
+  </Card>
+  <Card title="CDK Testing" icon="shield" href="https://material.angular.dev/cdk/test-harnesses/overview">
+    CDK test harnesses documentation
+  </Card>
+  <Card title="Accessibility Testing" icon="universal-access" href="https://www.w3.org/WAI/test-evaluate/">
+    Web accessibility testing resources
+  </Card>
+</CardGroup>

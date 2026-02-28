@@ -1,0 +1,213 @@
+---
+title: Observers
+description: Observe DOM changes and mutations
+---
+
+The `@angular/cdk/observers` package provides utilities for observing DOM changes, including content changes and element mutations.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {ObserversModule} from '@angular/cdk/observers';
+```
+
+## ContentObserver
+
+Observes text content changes within an element.
+
+### Using the Service
+
+```typescript
+import {Component, ElementRef, inject, OnDestroy, ViewChild} from '@angular/core';
+import {ContentObserver} from '@angular/cdk/observers';
+import {Subscription} from 'rxjs';
+
+@Component({
+  selector: 'app-content-watcher',
+  template: `
+    <div #content>{{ dynamicContent }}</div>
+    <p>Content changed {{ changeCount }} times</p>
+  `,
+})
+export class ContentWatcher implements OnDestroy {
+  @ViewChild('content') content: ElementRef;
+  private contentObserver = inject(ContentObserver);
+  private subscription: Subscription;
+  changeCount = 0;
+  dynamicContent = 'Initial content';
+
+  ngAfterViewInit() {
+    this.subscription = this.contentObserver
+      .observe(this.content)
+      .subscribe(() => {
+        this.changeCount++;
+        console.log('Content changed!');
+      });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+}
+```
+
+### Using the Directive
+
+```html
+<div (cdkObserveContent)="onContentChange()">
+  Content to observe
+</div>
+```
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-directive-example',
+  template: `
+    <div 
+      (cdkObserveContent)="onContentChange($event)"
+      [cdkObserveContentDisabled]="!observing">
+      {{ message }}
+    </div>
+    <button (click)="message = 'Updated!''">Update</button>
+    <button (click)="observing = !observing">Toggle Observing</button>
+  `,
+})
+export class DirectiveExample {
+  message = 'Watch me';
+  observing = true;
+
+  onContentChange(event: MutationRecord[]) {
+    console.log('Content changed:', event);
+  }
+}
+```
+
+## MutationObserverFactory
+
+Creates `MutationObserver` instances with proper cleanup.
+
+```typescript
+import {Component, ElementRef, inject, OnDestroy, ViewChild} from '@angular/core';
+import {MutationObserverFactory} from '@angular/cdk/observers';
+
+@Component({
+  selector: 'app-mutation-example',
+  template: `<div #observed>Observed element</div>`,
+})
+export class MutationExample implements OnDestroy {
+  @ViewChild('observed') element: ElementRef;
+  private mutationObserverFactory = inject(MutationObserverFactory);
+  private observer: MutationObserver;
+
+  ngAfterViewInit() {
+    this.observer = this.mutationObserverFactory.create(mutations => {
+      console.log('Mutations:', mutations);
+    });
+
+    this.observer.observe(this.element.nativeElement, {
+      childList: true,
+      attributes: true,
+      characterData: true,
+      subtree: true,
+    });
+  }
+
+  ngOnDestroy() {
+    this.observer?.disconnect();
+  }
+}
+```
+
+## API Reference
+
+### ContentObserver
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `observe(element)` | `Observable<MutationRecord[]>` | Observe content changes |
+
+### cdkObserveContent Directive
+
+**Selector**: `[cdkObserveContent]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkObserveContentDisabled` | `boolean` | Disable observation |
+| `debounce` | `number` | Debounce time in ms |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cdkObserveContent` | `MutationRecord[]` | Emits on content change |
+
+## Use Cases
+
+### Auto-resize Textareas
+
+```typescript
+import {Component, ElementRef, ViewChild} from '@angular/core';
+import {ContentObserver} from '@angular/cdk/observers';
+
+@Component({
+  selector: 'app-auto-resize',
+  template: `
+    <textarea 
+      #textarea
+      (cdkObserveContent)="resize()"
+      [(ngModel)]="text"></textarea>
+  `,
+})
+export class AutoResize {
+  @ViewChild('textarea') textarea: ElementRef;
+  text = '';
+
+  resize() {
+    const element = this.textarea.nativeElement;
+    element.style.height = 'auto';
+    element.style.height = element.scrollHeight + 'px';
+  }
+}
+```
+
+### Dynamic Tooltip Positioning
+
+```typescript
+import {Component, ElementRef, ViewChild} from '@angular/core';
+
+@Component({
+  selector: 'app-smart-tooltip',
+  template: `
+    <div #content (cdkObserveContent)="updateTooltip()">
+      {{ content }}
+    </div>
+    <div class="tooltip" [style.top.px]="tooltipTop">
+      Tooltip
+    </div>
+  `,
+})
+export class SmartTooltip {
+  @ViewChild('content') content: ElementRef;
+  tooltipTop = 0;
+
+  updateTooltip() {
+    const rect = this.content.nativeElement.getBoundingClientRect();
+    this.tooltipTop = rect.bottom + 8;
+  }
+}
+```
+
+## Best Practices
+
+1. **Unsubscribe on destroy** - Prevent memory leaks
+2. **Use debounce** - Avoid excessive updates
+3. **Observe specific changes** - Configure MutationObserver options
+4. **Consider performance** - Observation has overhead
+
+## See Also
+
+- [MutationObserver API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)

@@ -1,0 +1,546 @@
+---
+title: Accessibility
+description: Learn about accessibility features in Angular Material and best practices for building inclusive applications
+icon: universal-access
+---
+
+## Overview
+
+Accessibility is a core principle of Angular Material. All components are designed to work with assistive technologies and follow WAI-ARIA best practices to ensure your applications are usable by everyone.
+
+<Info>
+  Angular Material components are tested with screen readers and keyboard navigation to ensure they provide an accessible experience out of the box.
+</Info>
+
+## Browser and Screen Reader Support
+
+Angular Material supports the most recent two versions of all major browsers:
+
+<CardGroup cols={2}>
+  <Card title="Desktop Browsers" icon="desktop">
+    - Chrome
+    - Firefox
+    - Safari
+    - Edge
+  </Card>
+  
+  <Card title="Mobile Browsers" icon="mobile">
+    - Chrome on Android
+    - Safari on iOS
+  </Card>
+</CardGroup>
+
+### Screen Reader Support
+
+Angular Material aims for great user experience with the following screen readers:
+
+<Tabs>
+  <Tab title="Windows">
+    **NVDA and JAWS** with Firefox or Chrome
+    
+    - Use NVDA (free) or JAWS for testing
+    - Test with both Firefox and Chrome
+    - Verify keyboard navigation works correctly
+    - Check that ARIA labels are announced properly
+  </Tab>
+  
+  <Tab title="macOS">
+    **VoiceOver** with Safari or Chrome
+    
+    - Enable VoiceOver: Cmd + F5
+    - Test with Safari (primary) and Chrome
+    - Verify rotor navigation works
+    - Check form field announcements
+  </Tab>
+  
+  <Tab title="iOS">
+    **VoiceOver** with Safari
+    
+    - Enable in Settings > Accessibility > VoiceOver
+    - Test touch gestures with VoiceOver
+    - Verify swipe navigation
+    - Check custom controls are accessible
+  </Tab>
+  
+  <Tab title="Android">
+    **Android Accessibility Suite** (TalkBack) with Chrome
+    
+    - Enable in Settings > Accessibility > TalkBack
+    - Test with Chrome browser
+    - Verify swipe navigation
+    - Check focus indicators are visible
+  </Tab>
+  
+  <Tab title="Chrome OS">
+    **ChromeVox** with Chrome
+    
+    - Enable ChromeVox extension
+    - Test keyboard shortcuts
+    - Verify announcements are clear
+    - Check navigation landmarks
+  </Tab>
+</Tabs>
+
+## Accessibility Features
+
+### Keyboard Navigation
+
+All Angular Material components support full keyboard navigation:
+
+<AccordionGroup>
+  <Accordion title="Tab Navigation" icon="keyboard">
+    - **Tab**: Move focus forward
+    - **Shift + Tab**: Move focus backward
+    - Components maintain proper tab order
+    - Focus indicators are clearly visible
+  </Accordion>
+  
+  <Accordion title="Arrow Key Navigation" icon="arrows">
+    Many components support arrow keys:
+    
+    - **Menus**: Up/Down arrows to navigate items
+    - **Tabs**: Left/Right arrows to switch tabs
+    - **Lists**: Up/Down arrows to navigate options
+    - **Date Pickers**: Arrow keys to navigate calendar
+  </Accordion>
+  
+  <Accordion title="Action Keys" icon="hand-pointer">
+    - **Enter**: Activate buttons and links
+    - **Space**: Toggle checkboxes and select options
+    - **Escape**: Close dialogs and overlays
+    - **Home/End**: Navigate to first/last items
+  </Accordion>
+</AccordionGroup>
+
+### ARIA Support
+
+Angular Material components implement appropriate ARIA attributes:
+
+<Tabs>
+  <Tab title="Labels">
+    Components provide accessible labels:
+    
+    ```html
+    <!-- Automatic labeling -->
+    <mat-checkbox>Accept terms</mat-checkbox>
+    
+    <!-- Manual aria-label -->
+    <button mat-icon-button aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+    
+    <!-- aria-labelledby -->
+    <div id="dialog-title">Confirm Action</div>
+    <div role="dialog" aria-labelledby="dialog-title">
+      <!-- content -->
+    </div>
+    ```
+  </Tab>
+  
+  <Tab title="States">
+    Components communicate state to assistive technology:
+    
+    ```html
+    <!-- Checked state -->
+    <mat-checkbox [checked]="true" aria-checked="true">
+      Selected option
+    </mat-checkbox>
+    
+    <!-- Disabled state -->
+    <button mat-button [disabled]="true" aria-disabled="true">
+      Disabled button
+    </button>
+    
+    <!-- Expanded state -->
+    <mat-expansion-panel [expanded]="true" aria-expanded="true">
+      Panel content
+    </mat-expansion-panel>
+    ```
+  </Tab>
+  
+  <Tab title="Roles">
+    Components use semantic HTML and ARIA roles:
+    
+    ```html
+    <!-- Button role -->
+    <button mat-button role="button">Click me</button>
+    
+    <!-- Menu role -->
+    <mat-menu role="menu">
+      <button mat-menu-item role="menuitem">Option 1</button>
+    </mat-menu>
+    
+    <!-- Dialog role -->
+    <mat-dialog-container role="dialog" aria-modal="true">
+      <!-- content -->
+    </mat-dialog-container>
+    ```
+  </Tab>
+  
+  <Tab title="Live Regions">
+    Use live regions for dynamic updates:
+    
+    ```typescript
+    import { LiveAnnouncer } from '@angular/cdk/a11y';
+    
+    constructor(private liveAnnouncer: LiveAnnouncer) {}
+    
+    saveData() {
+      // Save data...
+      this.liveAnnouncer.announce('Data saved successfully');
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Focus Management
+
+The CDK provides powerful focus management tools:
+
+<Steps>
+  <Step title="Focus Trap">
+    Trap focus within dialogs and overlays:
+    
+    ```html
+    <div cdkTrapFocus>
+      <!-- Focus cannot leave this region with Tab key -->
+      <button>First</button>
+      <button>Second</button>
+      <button>Third</button>
+    </div>
+    ```
+  </Step>
+  
+  <Step title="Focus Monitor">
+    Track how elements receive focus:
+    
+    ```typescript
+    import { FocusMonitor } from '@angular/cdk/a11y';
+    
+    constructor(private focusMonitor: FocusMonitor, private el: ElementRef) {}
+    
+    ngOnInit() {
+      this.focusMonitor.monitor(this.el.nativeElement).subscribe(origin => {
+        console.log('Focused via:', origin); // 'mouse', 'keyboard', 'touch', 'program'
+      });
+    }
+    ```
+  </Step>
+  
+  <Step title="Initial Focus">
+    Set initial focus in regions:
+    
+    ```html
+    <div cdkTrapFocus>
+      <input cdkFocusInitial placeholder="This receives focus first">
+      <button>Submit</button>
+    </div>
+    ```
+  </Step>
+</Steps>
+
+### High Contrast Mode
+
+Angular Material supports high contrast modes used by users with low vision:
+
+```scss
+@use '@angular/cdk';
+
+.my-button {
+  @include cdk.high-contrast {
+    outline: solid 1px; // Adds border in high contrast mode
+  }
+}
+
+.my-card {
+  @include cdk.high-contrast($target: active) {
+    border: 2px solid;
+  }
+}
+```
+
+## Strong Focus Indicators
+
+Enable enhanced focus indicators to meet accessibility requirements like [WCAG 2.4.7](https://www.w3.org/WAI/WCAG21/Understanding/focus-visible.html):
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+  
+  // Enable strong focus indicators
+  @include mat.strong-focus-indicators();
+}
+```
+
+### Customize Focus Indicators
+
+```scss
+@include mat.strong-focus-indicators((
+  border-color: red,
+  border-style: dotted,
+  border-width: 4px,
+  border-radius: 2px,
+));
+```
+
+## Accessibility Best Practices
+
+<AccordionGroup>
+  <Accordion title="Always Provide Labels" icon="tag">
+    Every interactive element needs an accessible label:
+    
+    ```html
+    <!-- Good: Has visible label -->
+    <mat-checkbox>Accept terms and conditions</mat-checkbox>
+    
+    <!-- Good: Has aria-label -->
+    <button mat-icon-button aria-label="Delete item">
+      <mat-icon>delete</mat-icon>
+    </button>
+    
+    <!-- Bad: No label -->
+    <button mat-icon-button>
+      <mat-icon>delete</mat-icon>
+    </button>
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Semantic HTML" icon="code">
+    Use the correct HTML element for the job:
+    
+    ```html
+    <!-- Good: Button for actions -->
+    <button mat-button (click)="save()">Save</button>
+    
+    <!-- Good: Link for navigation -->
+    <a mat-button routerLink="/home">Home</a>
+    
+    <!-- Bad: Div as button -->
+    <div (click)="save()">Save</div>
+    ```
+  </Accordion>
+  
+  <Accordion title="Maintain Heading Hierarchy" icon="heading">
+    Use headings in order (h1, h2, h3...):
+    
+    ```html
+    <!-- Good -->
+    <h1>Page Title</h1>
+    <h2>Section Title</h2>
+    <h3>Subsection</h3>
+    
+    <!-- Bad: Skipping levels -->
+    <h1>Page Title</h1>
+    <h4>Section Title</h4>
+    ```
+  </Accordion>
+  
+  <Accordion title="Provide Form Validation Feedback" icon="triangle-exclamation">
+    Make errors accessible to screen readers:
+    
+    ```html
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input matInput [formControl]="email">
+      <mat-error *ngIf="email.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="email.hasError('email')">
+        Please enter a valid email
+      </mat-error>
+    </mat-form-field>
+    ```
+  </Accordion>
+  
+  <Accordion title="Ensure Sufficient Color Contrast" icon="adjust">
+    Text should have sufficient contrast ratio:
+    
+    - **Normal text**: At least 4.5:1
+    - **Large text** (18pt+): At least 3:1
+    - **UI components**: At least 3:1
+    
+    Use Material Design colors which are designed for sufficient contrast.
+  </Accordion>
+  
+  <Accordion title="Support Keyboard-Only Users" icon="keyboard">
+    Test your application using only the keyboard:
+    
+    - All interactive elements are reachable
+    - Focus indicators are clearly visible
+    - Logical tab order is maintained
+    - No keyboard traps exist
+  </Accordion>
+  
+  <Accordion title="Avoid ALL CAPS in Content" icon="font">
+    Screen readers may read capitalized text character-by-character:
+    
+    ```html
+    <!-- Bad -->
+    <button>CLICK HERE</button>
+    
+    <!-- Good -->
+    <button>Click here</button>
+    
+    <!-- Good: CSS transformation if needed -->
+    <button style="text-transform: uppercase">Click here</button>
+    ```
+  </Accordion>
+  
+  <Accordion title="Provide Alternative Text" icon="image">
+    Images and icons need alternatives:
+    
+    ```html
+    <!-- Decorative icon (hidden from screen readers) -->
+    <mat-icon aria-hidden="true">star</mat-icon>
+    
+    <!-- Meaningful icon (needs label) -->
+    <button mat-icon-button aria-label="Add to favorites">
+      <mat-icon>favorite</mat-icon>
+    </button>
+    
+    <!-- Image with alt text -->
+    <img src="profile.jpg" alt="User profile picture">
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Testing Accessibility
+
+<Steps>
+  <Step title="Keyboard Testing">
+    Test your application using only the keyboard:
+    
+    - Can you reach all interactive elements?
+    - Is the focus indicator always visible?
+    - Is the tab order logical?
+    - Can you activate all buttons and links?
+  </Step>
+  
+  <Step title="Screen Reader Testing">
+    Test with a screen reader:
+    
+    - Are all elements properly announced?
+    - Do form fields have clear labels?
+    - Are error messages read aloud?
+    - Can you navigate by headings and landmarks?
+  </Step>
+  
+  <Step title="Automated Testing">
+    Use automated testing tools:
+    
+    ```bash
+    # Install axe-core for testing
+    npm install --save-dev axe-core
+    ```
+    
+    ```typescript
+    import { runA11yChecks } from '@angular/cdk/testing';
+    
+    it('should pass accessibility checks', async () => {
+      await runA11yChecks(fixture);
+    });
+    ```
+  </Step>
+  
+  <Step title="Color Contrast Testing">
+    Use browser DevTools or tools like:
+    
+    - Chrome DevTools Lighthouse
+    - axe DevTools browser extension
+    - WebAIM Color Contrast Checker
+  </Step>
+</Steps>
+
+## CDK Accessibility Tools
+
+The CDK provides utilities for building accessible custom components:
+
+<CardGroup cols={2}>
+  <Card title="Live Announcer" icon="volume-high">
+    Announce messages to screen readers:
+    
+    ```typescript
+    import { LiveAnnouncer } from '@angular/cdk/a11y';
+    
+    constructor(private announcer: LiveAnnouncer) {}
+    
+    announce() {
+      this.announcer.announce('Message sent');
+    }
+    ```
+  </Card>
+  
+  <Card title="Focus Trap" icon="lock">
+    Trap focus within a region:
+    
+    ```html
+    <div cdkTrapFocus>
+      <!-- Focus stays here -->
+    </div>
+    ```
+  </Card>
+  
+  <Card title="Focus Monitor" icon="eye">
+    Monitor focus origin:
+    
+    ```typescript
+    this.focusMonitor.monitor(element)
+      .subscribe(origin => {
+        console.log('Focus via:', origin);
+      });
+    ```
+  </Card>
+  
+  <Card title="List Key Manager" icon="list">
+    Manage keyboard navigation in lists:
+    
+    ```typescript
+    import { FocusKeyManager } from '@angular/cdk/a11y';
+    
+    this.keyManager = new FocusKeyManager(this.items)
+      .withWrap();
+    ```
+  </Card>
+</CardGroup>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="WCAG Guidelines" icon="book" href="https://www.w3.org/WAI/WCAG21/quickref/">
+    Web Content Accessibility Guidelines
+  </Card>
+  
+  <Card title="WAI-ARIA Practices" icon="universal-access" href="https://www.w3.org/WAI/ARIA/apg/">
+    ARIA Authoring Practices Guide
+  </Card>
+  
+  <Card title="MDN Accessibility" icon="graduation-cap" href="https://developer.mozilla.org/en-US/docs/Web/Accessibility">
+    Learn about web accessibility
+  </Card>
+  
+  <Card title="axe DevTools" icon="wrench" href="https://www.deque.com/axe/devtools/">
+    Browser extension for accessibility testing
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="CDK a11y Module" icon="toolbox" href="/cdk">
+    Explore CDK accessibility utilities
+  </Card>
+  
+  <Card title="Theming" icon="palette" href="/essentials/theming">
+    Learn about color contrast in themes
+  </Card>
+  
+  <Card title="Components" icon="grid" href="/api-reference/material">
+    Explore accessible Material components
+  </Card>
+</CardGroup>

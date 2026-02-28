@@ -1,0 +1,237 @@
+---
+title: Slide Toggle
+description: MatSlideToggle is an on/off control that can be toggled via clicking.
+---
+
+## Overview
+
+`<mat-slide-toggle>` is an on/off control that can be toggled via clicking. The slide toggle behaves similarly to a checkbox, but doesn't support an indeterminate state like `<mat-checkbox>`.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Template">
+    ```html
+    <mat-slide-toggle>Slide me!</mat-slide-toggle>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-slide-toggle-example',
+      template: `
+        <mat-slide-toggle [formControl]="toggleControl">
+          Enable notifications
+        </mat-slide-toggle>
+      `
+    })
+    export class SlideToggleExample {
+      toggleControl = new FormControl(false);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatSlideToggle
+
+Selector: `mat-slide-toggle`
+
+Exported as: `matSlideToggle`
+
+#### Inputs
+
+<ParamField path="checked" type="boolean" default="false">
+  Whether the slide toggle is checked.
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the slide toggle is disabled.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether the slide toggle has a ripple.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette" default="'accent'">
+  Theme color of the slide toggle. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="labelPosition" type="'before' | 'after'" default="'after'">
+  Whether the label should appear after or before the slide toggle. Defaults to 'after'.
+</ParamField>
+
+<ParamField path="required" type="boolean" default="false">
+  Whether the slide toggle is required.
+</ParamField>
+
+<ParamField path="name" type="string | null" default="null">
+  Name value will be applied to the input element if present.
+</ParamField>
+
+<ParamField path="id" type="string">
+  A unique id for the slide toggle input. If none is supplied, it will be auto-generated.
+</ParamField>
+
+<ParamField path="tabIndex" type="number" default="0">
+  Tabindex of slide toggle.
+</ParamField>
+
+<ParamField path="hideIcon" type="boolean" default="false">
+  Whether to hide the icon inside of the slide toggle.
+</ParamField>
+
+<ParamField path="disabledInteractive" type="boolean" default="false">
+  Whether the slide toggle should remain interactive when it is disabled.
+</ParamField>
+
+<ParamField path="aria-label" type="string | null" default="null">
+  Used to set the aria-label attribute on the underlying input element.
+</ParamField>
+
+<ParamField path="aria-labelledby" type="string | null" default="null">
+  Used to set the aria-labelledby attribute on the underlying input element.
+</ParamField>
+
+<ParamField path="aria-describedby" type="string">
+  Used to set the aria-describedby attribute on the underlying input element.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="change" type="EventEmitter<MatSlideToggleChange>">
+  An event is dispatched each time the slide toggle changes its value.
+</ParamField>
+
+<ParamField path="toggleChange" type="EventEmitter<void>">
+  An event is dispatched each time the slide toggle input is toggled. This event is always emitted when the user toggles the slide toggle, but does not mean the slide toggle's value has changed.
+</ParamField>
+
+#### Methods
+
+<ParamField path="focus()" type="void">
+  Focuses the slide toggle.
+</ParamField>
+
+<ParamField path="toggle()" type="void">
+  Toggles the checked state of the slide toggle.
+</ParamField>
+
+### MatSlideToggleChange
+
+<ParamField path="source" type="MatSlideToggle">
+  The source slide toggle of the event.
+</ParamField>
+
+<ParamField path="checked" type="boolean">
+  The new `checked` value of the slide toggle.
+</ParamField>
+
+## Accessibility
+
+- The slide toggle uses a native checkbox input under the hood
+- The component supports keyboard interaction (Space to toggle)
+- Use `aria-label` or `aria-labelledby` when the slide toggle doesn't have a visible label
+- Disabled slide toggles are not focusable and are announced as disabled to screen readers
+- The checked state is announced to screen readers
+
+## Advanced Usage
+
+### Label Position
+
+```html
+<mat-slide-toggle labelPosition="before">
+  Label before toggle
+</mat-slide-toggle>
+```
+
+### Forms Integration
+
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+
+@Component({
+  selector: 'app-slide-toggle-form',
+  template: `
+    <form [formGroup]="settingsForm">
+      <mat-slide-toggle formControlName="notifications">
+        Enable notifications
+      </mat-slide-toggle>
+      <mat-slide-toggle formControlName="darkMode">
+        Dark mode
+      </mat-slide-toggle>
+      <mat-slide-toggle formControlName="autoSave">
+        Auto-save
+      </mat-slide-toggle>
+    </form>
+  `
+})
+export class SlideToggleFormExample {
+  settingsForm: FormGroup;
+  
+  constructor(private fb: FormBuilder) {
+    this.settingsForm = this.fb.group({
+      notifications: [true],
+      darkMode: [false],
+      autoSave: [true]
+    });
+  }
+}
+```
+
+### Handling Events
+
+```typescript
+export class SlideToggleEventsExample {
+  isChecked = false;
+  
+  onToggleChange(event: MatSlideToggleChange) {
+    console.log('Slide toggle changed:', event.checked);
+    this.isChecked = event.checked;
+  }
+}
+```
+
+```html
+<mat-slide-toggle (change)="onToggleChange($event)">
+  Toggle me
+</mat-slide-toggle>
+```
+
+### Color Variants
+
+```html
+<mat-slide-toggle color="primary">Primary</mat-slide-toggle>
+<mat-slide-toggle color="accent">Accent</mat-slide-toggle>
+<mat-slide-toggle color="warn">Warn</mat-slide-toggle>
+```
+
+### Hide Icon
+
+```html
+<mat-slide-toggle [hideIcon]="true">
+  Toggle without icon
+</mat-slide-toggle>
+```
+
+### Disabled Interactive
+
+```html
+<mat-slide-toggle [disabled]="true" [disabledInteractive]="true">
+  Disabled but interactive
+</mat-slide-toggle>
+```
+
+### Required Toggle
+
+```html
+<mat-slide-toggle [required]="true">
+  Required toggle
+</mat-slide-toggle>
+```

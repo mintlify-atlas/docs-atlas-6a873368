@@ -1,0 +1,394 @@
+---
+title: Collections
+description: Data structures and utilities for managing collections
+---
+
+The `@angular/cdk/collections` package provides data structures and utilities for working with collections, including `DataSource` for tables and lists.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {DataSource} from '@angular/cdk/collections';
+```
+
+## DataSource
+
+Abstract class for providing data to CDK components like tables and trees.
+
+### Basic DataSource
+
+```typescript
+import {DataSource, CollectionViewer} from '@angular/cdk/collections';
+import {Observable, BehaviorSubject} from 'rxjs';
+
+export interface User {
+  id: number;
+  name: string;
+}
+
+export class UserDataSource extends DataSource<User> {
+  private data = new BehaviorSubject<User[]>([]);
+
+  constructor(initialData: User[]) {
+    super();
+    this.data.next(initialData);
+  }
+
+  connect(collectionViewer: CollectionViewer): Observable<User[]> {
+    return this.data.asObservable();
+  }
+
+  disconnect(collectionViewer: CollectionViewer): void {
+    this.data.complete();
+  }
+
+  updateData(users: User[]) {
+    this.data.next(users);
+  }
+}
+```
+
+**Usage**:
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-user-table',
+  template: `
+    <table cdk-table [dataSource]="dataSource">
+      <!-- Column definitions -->
+    </table>
+  `,
+})
+export class UserTableComponent {
+  dataSource = new UserDataSource([
+    {id: 1, name: 'Alice'},
+    {id: 2, name: 'Bob'},
+  ]);
+}
+```
+
+### Async DataSource
+
+```typescript
+import {DataSource} from '@angular/cdk/collections';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+
+export class AsyncUserDataSource extends DataSource<User> {
+  constructor(private http: HttpClient) {
+    super();
+  }
+
+  connect(): Observable<User[]> {
+    return this.http.get<User[]>('/api/users');
+  }
+
+  disconnect(): void {}
+}
+```
+
+### Paginated DataSource
+
+```typescript
+import {DataSource} from '@angular/cdk/collections';
+import {BehaviorSubject, Observable, combineLatest} from 'rxjs';
+import {map} from 'rxjs/operators';
+
+export class PaginatedDataSource extends DataSource<User> {
+  private data = new BehaviorSubject<User[]>([]);
+  private pageSize = new BehaviorSubject<number>(10);
+  private pageIndex = new BehaviorSubject<number>(0);
+
+  constructor(allUsers: User[]) {
+    super();
+    this.data.next(allUsers);
+  }
+
+  connect(): Observable<User[]> {
+    return combineLatest([
+      this.data,
+      this.pageSize,
+      this.pageIndex
+    ]).pipe(
+      map(([data, pageSize, pageIndex]) => {
+        const start = pageIndex * pageSize;
+        return data.slice(start, start + pageSize);
+      })
+    );
+  }
+
+  disconnect(): void {
+    this.data.complete();
+    this.pageSize.complete();
+    this.pageIndex.complete();
+  }
+
+  setPage(index: number, size: number) {
+    this.pageIndex.next(index);
+    this.pageSize.next(size);
+  }
+}
+```
+
+## ArrayDataSource
+
+Convenience `DataSource` implementation for arrays:
+
+```typescript
+import {ArrayDataSource} from '@angular/cdk/collections';
+
+const users = [
+  {id: 1, name: 'Alice'},
+  {id: 2, name: 'Bob'},
+];
+
+const dataSource = new ArrayDataSource(users);
+```
+
+## SelectionModel
+
+Manage item selection state:
+
+```typescript
+import {SelectionModel} from '@angular/cdk/collections';
+
+export interface Item {
+  id: number;
+  name: string;
+}
+
+@Component({
+  selector: 'app-selectable-list',
+  template: `
+    <div>
+      <button (click)="selectAll()">Select All</button>
+      <button (click)="clearSelection()">Clear</button>
+      <p>Selected: {{ selection.selected.length }}</p>
+    </div>
+    
+    <ul>
+      <li *ngFor="let item of items"
+          [class.selected]="selection.isSelected(item)"
+          (click)="selection.toggle(item)">
+        {{ item.name }}
+      </li>
+    </ul>
+  `,
+})
+export class SelectableListComponent {
+  items: Item[] = [
+    {id: 1, name: 'Item 1'},
+    {id: 2, name: 'Item 2'},
+    {id: 3, name: 'Item 3'},
+  ];
+
+  // Multi-selection model
+  selection = new SelectionModel<Item>(true, []);
+
+  selectAll() {
+    this.selection.select(...this.items);
+  }
+
+  clearSelection() {
+    this.selection.clear();
+  }
+}
+```
+
+### Single Selection
+
+```typescript
+// Single selection mode (first parameter is false)
+const singleSelection = new SelectionModel<Item>(false, []);
+
+singleSelection.select(item1);  // Selects item1
+singleSelection.select(item2);  // Deselects item1, selects item2
+```
+
+### Selection Events
+
+```typescript
+import {SelectionModel} from '@angular/cdk/collections';
+
+const selection = new SelectionModel<Item>(true, []);
+
+selection.changed.subscribe(change => {
+  console.log('Added:', change.added);
+  console.log('Removed:', change.removed);
+  console.log('Selected:', selection.selected);
+});
+```
+
+## UniqueSelectionDispatcher
+
+Coordinate selection across multiple selection models:
+
+```typescript
+import {UniqueSelectionDispatcher} from '@angular/cdk/collections';
+
+@Component({
+  selector: 'app-radio-group',
+  template: `
+    <div *ngFor="let option of options">
+      <input 
+        type="radio" 
+        [name]="name"
+        [value]="option.value"
+        (change)="onSelect(option.value)">
+      {{ option.label }}
+    </div>
+  `,
+})
+export class RadioGroupComponent {
+  @Input() name: string;
+  options = [
+    {value: '1', label: 'Option 1'},
+    {value: '2', label: 'Option 2'},
+  ];
+
+  private dispatcher = inject(UniqueSelectionDispatcher);
+  private removeListener: () => void;
+
+  ngOnInit() {
+    this.removeListener = this.dispatcher.listen((id, name) => {
+      if (name === this.name) {
+        // Another radio in this group was selected
+        console.log('Selection changed to:', id);
+      }
+    });
+  }
+
+  onSelect(value: string) {
+    this.dispatcher.notify(value, this.name);
+  }
+
+  ngOnDestroy() {
+    this.removeListener();
+  }
+}
+```
+
+## API Reference
+
+### DataSource
+
+```typescript
+abstract class DataSource<T> {
+  abstract connect(collectionViewer: CollectionViewer): Observable<readonly T[]>;
+  abstract disconnect(collectionViewer: CollectionViewer): void;
+}
+```
+
+### SelectionModel
+
+```typescript
+class SelectionModel<T> {
+  constructor(
+    private _multiple: boolean = false,
+    initiallySelectedValues?: T[],
+    private _emitChanges: boolean = true,
+    compareWith?: (o1: T, o2: T) => boolean
+  )
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `selected` | `T[]` | Currently selected values |
+| `changed` | `Observable` | Selection change events |
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `select(...values)` | `void` | Select values |
+| `deselect(...values)` | `void` | Deselect values |
+| `toggle(value)` | `void` | Toggle selection |
+| `clear()` | `void` | Clear all selections |
+| `isSelected(value)` | `boolean` | Check if selected |
+| `isEmpty()` | `boolean` | Check if empty |
+| `hasValue()` | `boolean` | Check if has value |
+| `sort(predicate?)` | `void` | Sort selected values |
+
+## Practical Examples
+
+### Filterable DataSource
+
+```typescript
+import {DataSource} from '@angular/cdk/collections';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+
+export class FilterableDataSource extends DataSource<User> {
+  private data = new BehaviorSubject<User[]>([]);
+  private filter = new BehaviorSubject<string>('');
+
+  constructor(users: User[]) {
+    super();
+    this.data.next(users);
+  }
+
+  connect(): Observable<User[]> {
+    return combineLatest([this.data, this.filter]).pipe(
+      map(([data, filter]) => {
+        if (!filter) return data;
+        return data.filter(user => 
+          user.name.toLowerCase().includes(filter.toLowerCase())
+        );
+      })
+    );
+  }
+
+  disconnect(): void {
+    this.data.complete();
+    this.filter.complete();
+  }
+
+  setFilter(filterText: string) {
+    this.filter.next(filterText);
+  }
+}
+```
+
+### Master-Detail Selection
+
+```typescript
+@Component({
+  template: `
+    <div class="master">
+      <div *ngFor="let item of items"
+           [class.selected]="selection.isSelected(item)"
+           (click)="selection.select(item)">
+        {{ item.name }}
+      </div>
+    </div>
+    
+    <div class="detail" *ngIf="selection.hasValue()">
+      <h3>{{ selection.selected[0].name }}</h3>
+      <p>{{ selection.selected[0].description }}</p>
+    </div>
+  `,
+})
+export class MasterDetailComponent {
+  items = [...];
+  selection = new SelectionModel<Item>(false);  // Single selection
+}
+```
+
+## Best Practices
+
+1. **Clean up** - Always implement `disconnect()` to complete observables
+2. **Efficient updates** - Use `BehaviorSubject` for data updates
+3. **Type safety** - Use generics with `DataSource<T>`
+4. **Selection comparison** - Provide `compareWith` for object comparison
+5. **Memory leaks** - Unsubscribe from `changed` events
+
+## See Also
+
+- [CdkTable](/cdk/table)
+- [CdkTree](/cdk/tree)
+- [RxJS Documentation](https://rxjs.dev/)

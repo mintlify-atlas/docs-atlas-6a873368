@@ -1,0 +1,398 @@
+---
+title: Clipboard
+description: Copy text to the system clipboard
+---
+
+The `@angular/cdk/clipboard` package provides utilities for copying text to the user's clipboard.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {ClipboardModule} from '@angular/cdk/clipboard';
+```
+
+## Basic Usage
+
+### Clipboard Service
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Clipboard} from '@angular/cdk/clipboard';
+
+@Component({
+  selector: 'app-copy-example',
+  template: `
+    <button (click)="copyText()">Copy to Clipboard</button>
+    <p *ngIf="copied">Copied!</p>
+  `,
+})
+export class CopyExample {
+  private clipboard = inject(Clipboard);
+  copied = false;
+
+  copyText() {
+    const text = 'Hello, this is copied text!';
+    const success = this.clipboard.copy(text);
+    
+    if (success) {
+      this.copied = true;
+      setTimeout(() => this.copied = false, 2000);
+    }
+  }
+}
+```
+
+### CdkCopyToClipboard Directive
+
+The simplest way to copy text is using the directive:
+
+```html
+<button 
+  [cdkCopyToClipboard]="textToCopy"
+  (cdkCopyToClipboardCopied)="onCopied($event)">
+  Copy
+</button>
+```
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-directive-example',
+  template: `
+    <input #input value="Text to copy" />
+    
+    <button 
+      [cdkCopyToClipboard]="input.value"
+      (cdkCopyToClipboardCopied)="showCopiedMessage($event)">
+      Copy
+    </button>
+    
+    <p *ngIf="copySuccess">Successfully copied!</p>
+    <p *ngIf="copySuccess === false">Copy failed</p>
+  `,
+})
+export class DirectiveExample {
+  copySuccess: boolean | null = null;
+
+  showCopiedMessage(success: boolean) {
+    this.copySuccess = success;
+    setTimeout(() => this.copySuccess = null, 2000);
+  }
+}
+```
+
+## Advanced Usage
+
+### Copying from Input Elements
+
+```typescript
+import {Component, ViewChild, ElementRef} from '@angular/core';
+import {Clipboard} from '@angular/cdk/clipboard';
+
+@Component({
+  selector: 'app-input-copy',
+  template: `
+    <input #inputElement type="text" value="Copy this!" />
+    <button (click)="copyInputValue()">Copy Input</button>
+  `,
+})
+export class InputCopy {
+  @ViewChild('inputElement') inputElement: ElementRef<HTMLInputElement>;
+  private clipboard = inject(Clipboard);
+
+  copyInputValue() {
+    const value = this.inputElement.nativeElement.value;
+    this.clipboard.copy(value);
+  }
+}
+```
+
+### Copy with Feedback
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+
+@Component({
+  selector: 'app-accessible-copy',
+  template: `
+    <button (click)="copyWithAnnouncement()">
+      Copy Code
+    </button>
+  `,
+})
+export class AccessibleCopy {
+  private clipboard = inject(Clipboard);
+  private announcer = inject(LiveAnnouncer);
+
+  copyWithAnnouncement() {
+    const code = 'npm install @angular/cdk';
+    const success = this.clipboard.copy(code);
+    
+    if (success) {
+      this.announcer.announce('Code copied to clipboard');
+    } else {
+      this.announcer.announce('Failed to copy code', 'assertive');
+    }
+  }
+}
+```
+
+### Copy Code Blocks
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-code-snippet',
+  template: `
+    <pre><code>{{ codeSnippet }}</code></pre>
+    <button 
+      [cdkCopyToClipboard]="codeSnippet"
+      (cdkCopyToClipboardCopied)="showIcon = $event">
+      {{ showIcon ? '✓ Copied' : 'Copy' }}
+    </button>
+  `,
+  styles: [`
+    pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+    }
+  `]
+})
+export class CodeSnippet {
+  showIcon = false;
+  codeSnippet = `
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  template: '<h1>Hello World</h1>'
+})
+export class AppComponent {}
+  `;
+}
+```
+
+### Large Text / Pending Copy
+
+For large strings that may take time to process:
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Clipboard, PendingCopy} from '@angular/cdk/clipboard';
+
+@Component({
+  selector: 'app-large-copy',
+  template: `
+    <button (click)="copyLargeText()" [disabled]="copying">
+      {{ copying ? 'Copying...' : 'Copy Large Text' }}
+    </button>
+  `,
+})
+export class LargeCopy {
+  private clipboard = inject(Clipboard);
+  copying = false;
+
+  copyLargeText() {
+    this.copying = true;
+    
+    // Generate or fetch large text
+    const largeText = this.generateLargeText();
+    
+    // Create pending copy
+    const pending = this.clipboard.beginCopy(largeText);
+    
+    // Copy in next tick to avoid blocking UI
+    setTimeout(() => {
+      const success = pending.copy();
+      pending.destroy();
+      this.copying = false;
+      
+      console.log(success ? 'Copied!' : 'Failed');
+    });
+  }
+
+  private generateLargeText(): string {
+    return 'Very large text content...'.repeat(10000);
+  }
+}
+```
+
+## API Reference
+
+### Clipboard Service
+
+**Injectable**: `{providedIn: 'root'}`
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `copy(text: string)` | `boolean` | Copies text to clipboard, returns success |
+| `beginCopy(text: string)` | `PendingCopy` | Creates a pending copy for large strings |
+
+### PendingCopy
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `copy()` | `boolean` | Executes the copy operation |
+| `destroy()` | `void` | Cleans up resources |
+
+### CdkCopyToClipboard Directive
+
+**Selector**: `[cdkCopyToClipboard]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkCopyToClipboard` | `string` | Text to copy to clipboard |
+| `cdkCopyToClipboardAttempts` | `number` | Number of copy attempts (default: 1) |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cdkCopyToClipboardCopied` | `boolean` | Emits whether copy succeeded |
+
+## Browser Support
+
+The clipboard API uses the modern Clipboard API when available, falling back to `document.execCommand('copy')` for older browsers.
+
+### Permissions
+
+Some browsers require user interaction (e.g., click event) to allow clipboard access.
+
+```typescript
+// This works - triggered by user action
+@HostListener('click')
+onClick() {
+  this.clipboard.copy('text');
+}
+
+// This may fail - not triggered by user action
+ngOnInit() {
+  this.clipboard.copy('text'); // May be blocked
+}
+```
+
+## Testing
+
+```typescript
+import {TestBed} from '@angular/core/testing';
+import {Clipboard, ClipboardModule} from '@angular/cdk/clipboard';
+
+describe('ClipboardService', () => {
+  let clipboard: Clipboard;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [ClipboardModule]
+    });
+    clipboard = TestBed.inject(Clipboard);
+  });
+
+  it('should copy text to clipboard', () => {
+    const result = clipboard.copy('test text');
+    // Note: Actual clipboard may not be accessible in test environment
+    expect(result).toBeDefined();
+  });
+});
+```
+
+### Mocking in Tests
+
+```typescript
+import {Clipboard} from '@angular/cdk/clipboard';
+
+class MockClipboard {
+  copy(text: string): boolean {
+    console.log('Mock copy:', text);
+    return true;
+  }
+  
+  beginCopy(text: string) {
+    return {
+      copy: () => true,
+      destroy: () => {}
+    };
+  }
+}
+
+TestBed.configureTestingModule({
+  providers: [
+    {provide: Clipboard, useClass: MockClipboard}
+  ]
+});
+```
+
+## Accessibility
+
+Provide feedback when copying:
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+
+@Component({
+  selector: 'app-a11y-copy',
+  template: `
+    <button 
+      [cdkCopyToClipboard]="shareUrl"
+      (cdkCopyToClipboardCopied)="onCopy($event)"
+      [attr.aria-label]="ariaLabel">
+      {{ buttonText }}
+    </button>
+  `,
+})
+export class A11yCopy {
+  private announcer = inject(LiveAnnouncer);
+  
+  shareUrl = 'https://example.com/share';
+  buttonText = 'Copy Link';
+  ariaLabel = 'Copy share link to clipboard';
+
+  onCopy(success: boolean) {
+    if (success) {
+      this.buttonText = 'Copied!';
+      this.announcer.announce('Link copied to clipboard');
+      setTimeout(() => this.buttonText = 'Copy Link', 2000);
+    }
+  }
+}
+```
+
+## Best Practices
+
+1. **Provide feedback** - Always show success/failure to users
+2. **Use ARIA announcements** - Inform screen reader users
+3. **Handle errors** - Check return value and handle failures
+4. **User interaction** - Ensure copy is triggered by user action
+5. **Clear messaging** - Tell users what's being copied
+
+## Standalone Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+
+@Component({
+  selector: 'app-standalone-clipboard',
+  standalone: true,
+  imports: [ClipboardModule],
+  template: `
+    <button [cdkCopyToClipboard]="'Hello World'">
+      Copy
+    </button>
+  `,
+})
+export class StandaloneClipboard {}
+```
+
+## See Also
+
+- [Clipboard API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)
+- [LiveAnnouncer](/cdk/a11y#liveannouncer)

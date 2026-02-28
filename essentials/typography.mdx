@@ -1,0 +1,477 @@
+---
+title: Typography
+description: Configure typography settings for Angular Material components
+icon: font
+---
+
+## Overview
+
+Angular Material's typography system controls text styles across all components, including font families, font weights, font sizes, and line heights. The typography configuration is based on Material Design's type scale.
+
+## Typography Configuration
+
+Typography is configured as part of the theme using the `mat.theme` mixin.
+
+### Single Font Family
+
+The simplest approach is to specify a single font family:
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+This configuration:
+- Applies **Roboto** to all text in Material components
+- Uses font weight **700** for bold text
+- Uses font weight **500** for medium text
+- Uses font weight **400** for regular text
+
+### Advanced Typography Map
+
+For more control, provide a typography map with separate font families for plain and brand text:
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: (
+      plain-family: Roboto,
+      brand-family: 'Open Sans',
+      bold-weight: 900,
+      medium-weight: 500,
+      regular-weight: 300,
+    ),
+    density: 0,
+  ));
+}
+```
+
+**Typography Map Properties:**
+
+<ParamField path="plain-family" type="string">
+  Font family for body text, buttons, and most UI elements
+</ParamField>
+
+<ParamField path="brand-family" type="string">
+  Font family for headings, titles, and prominent text
+</ParamField>
+
+<ParamField path="bold-weight" type="number" default="700">
+  Font weight for bold text (typically 700-900)
+</ParamField>
+
+<ParamField path="medium-weight" type="number" default="500">
+  Font weight for medium emphasis text (typically 500-600)
+</ParamField>
+
+<ParamField path="regular-weight" type="number" default="400">
+  Font weight for regular text (typically 300-400)
+</ParamField>
+
+## Material Design Type Scale
+
+Angular Material implements the Material Design type scale with the following levels:
+
+<AccordionGroup>
+  <Accordion title="Display Large" icon="text-size">
+    Largest heading size, used for hero sections
+    
+    **CSS Variable:** `--mat-sys-display-large`
+    
+    **Default Size:** 57px / 64px line height
+  </Accordion>
+  
+  <Accordion title="Display Medium" icon="text-size">
+    Large heading size for section headers
+    
+    **CSS Variable:** `--mat-sys-display-medium`
+    
+    **Default Size:** 45px / 52px line height
+  </Accordion>
+  
+  <Accordion title="Display Small" icon="text-size">
+    Smaller heading for subsections
+    
+    **CSS Variable:** `--mat-sys-display-small`
+    
+    **Default Size:** 36px / 44px line height
+  </Accordion>
+  
+  <Accordion title="Headline Large" icon="heading">
+    Large headline text
+    
+    **CSS Variable:** `--mat-sys-headline-large`
+    
+    **Default Size:** 32px / 40px line height
+  </Accordion>
+  
+  <Accordion title="Headline Medium" icon="heading">
+    Medium headline text
+    
+    **CSS Variable:** `--mat-sys-headline-medium`
+    
+    **Default Size:** 28px / 36px line height
+  </Accordion>
+  
+  <Accordion title="Headline Small" icon="heading">
+    Small headline text
+    
+    **CSS Variable:** `--mat-sys-headline-small`
+    
+    **Default Size:** 24px / 32px line height
+  </Accordion>
+  
+  <Accordion title="Title Large" icon="heading">
+    Large title text, used in dialogs and cards
+    
+    **CSS Variable:** `--mat-sys-title-large`
+    
+    **Default Size:** 22px / 28px line height
+  </Accordion>
+  
+  <Accordion title="Title Medium" icon="heading">
+    Medium title text
+    
+    **CSS Variable:** `--mat-sys-title-medium`
+    
+    **Default Size:** 16px / 24px line height
+    
+    **Font Weight:** Medium
+  </Accordion>
+  
+  <Accordion title="Title Small" icon="heading">
+    Small title text
+    
+    **CSS Variable:** `--mat-sys-title-small`
+    
+    **Default Size:** 14px / 20px line height
+    
+    **Font Weight:** Medium
+  </Accordion>
+  
+  <Accordion title="Body Large" icon="align-left">
+    Large body text for prominent content
+    
+    **CSS Variable:** `--mat-sys-body-large`
+    
+    **Default Size:** 16px / 24px line height
+  </Accordion>
+  
+  <Accordion title="Body Medium" icon="align-left">
+    Default body text size
+    
+    **CSS Variable:** `--mat-sys-body-medium`
+    
+    **Default Size:** 14px / 20px line height
+  </Accordion>
+  
+  <Accordion title="Body Small" icon="align-left">
+    Small body text for secondary content
+    
+    **CSS Variable:** `--mat-sys-body-small`
+    
+    **Default Size:** 12px / 16px line height
+  </Accordion>
+  
+  <Accordion title="Label Large" icon="tag">
+    Large label text for buttons and tabs
+    
+    **CSS Variable:** `--mat-sys-label-large`
+    
+    **Default Size:** 14px / 20px line height
+    
+    **Font Weight:** Medium
+  </Accordion>
+  
+  <Accordion title="Label Medium" icon="tag">
+    Medium label text
+    
+    **CSS Variable:** `--mat-sys-label-medium`
+    
+    **Default Size:** 12px / 16px line height
+    
+    **Font Weight:** Medium
+  </Accordion>
+  
+  <Accordion title="Label Small" icon="tag">
+    Small label text for hints and captions
+    
+    **CSS Variable:** `--mat-sys-label-small`
+    
+    **Default Size:** 11px / 16px line height
+    
+    **Font Weight:** Medium
+  </Accordion>
+</AccordionGroup>
+
+## Loading Fonts
+
+### Google Fonts
+
+Load fonts from Google Fonts in your `index.html`:
+
+```html index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My App</title>
+  
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Load Roboto with weights 400, 500, and 700 -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Load Open Sans for brand text -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+```
+
+<Tip>
+  Angular CLI projects are configured by default to inline Google Fonts assets to reduce render-blocking requests and improve performance.
+</Tip>
+
+### Custom Fonts
+
+To use custom fonts, include them via `@font-face` in your global styles:
+
+```scss styles.scss
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('/assets/fonts/MyCustomFont-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('/assets/fonts/MyCustomFont-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('/assets/fonts/MyCustomFont-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
+Then use it in your theme:
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: 'MyCustomFont',
+    density: 0
+  ));
+}
+```
+
+## Using Typography Styles
+
+### In Templates with Utility Classes
+
+Enable utility classes in your theme:
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((/* ... */));
+  @include mat.system-classes();
+}
+```
+
+Then use them in templates:
+
+```html
+<h1 class="mat-font-display-lg">Welcome</h1>
+<h2 class="mat-font-headline-md">Getting Started</h2>
+<p class="mat-font-body-lg">This is large body text.</p>
+<p class="mat-font-body-md">This is regular body text.</p>
+<span class="mat-font-label-sm">Small label</span>
+```
+
+### In Component Styles with CSS Variables
+
+Use CSS variables directly:
+
+```scss my-component.scss
+.page-title {
+  font: var(--mat-sys-display-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.section-heading {
+  font: var(--mat-sys-headline-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.body-text {
+  font: var(--mat-sys-body-medium);
+  line-height: 1.5;
+}
+
+.caption {
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+```
+
+## Typography Best Practices
+
+<AccordionGroup>
+  <Accordion title="Maintain Type Hierarchy" icon="layer-group">
+    Use the type scale to create clear visual hierarchy:
+    
+    - **Display** styles for hero content
+    - **Headline** styles for page and section titles
+    - **Title** styles for card headers and dialogs
+    - **Body** styles for main content
+    - **Label** styles for buttons, tabs, and captions
+  </Accordion>
+  
+  <Accordion title="Load Only Needed Font Weights" icon="weight-scale">
+    Only load the font weights you'll actually use:
+    
+    ```html
+    <!-- Good: Only loads needed weights -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Avoid: Loading all weights -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    ```
+  </Accordion>
+  
+  <Accordion title="Use font-display: swap" icon="arrows-rotate">
+    When loading custom fonts, use `font-display: swap` to prevent invisible text during font loading:
+    
+    ```scss
+    @font-face {
+      font-family: 'MyFont';
+      src: url('/assets/fonts/MyFont.woff2') format('woff2');
+      font-display: swap; /* Shows fallback font while loading */
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Provide Font Fallbacks" icon="shield">
+    Always specify fallback fonts:
+    
+    ```scss
+    @include mat.theme((
+      typography: ('Roboto', 'Helvetica Neue', Arial, sans-serif),
+    ));
+    ```
+  </Accordion>
+  
+  <Accordion title="Avoid ALL CAPS in Content" icon="font">
+    Using ALL CAPS in content causes issues for screen readers and localization. Use CSS `text-transform` if needed:
+    
+    ```html
+    <!-- Avoid -->
+    <button>CLICK ME</button>
+    
+    <!-- Better -->
+    <button style="text-transform: uppercase">Click me</button>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Examples
+
+### Complete Typography Setup
+
+<CodeGroup>
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: (
+      plain-family: ('Roboto', 'Helvetica Neue', sans-serif),
+      brand-family: ('Montserrat', 'Open Sans', sans-serif),
+      bold-weight: 700,
+      medium-weight: 500,
+      regular-weight: 400,
+    ),
+    density: 0,
+  ));
+  @include mat.system-classes();
+}
+
+body {
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+```
+
+```html index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="mat-bg-surface mat-text-on-surface">
+  <app-root></app-root>
+</body>
+</html>
+```
+
+```html component.html
+<h1 class="mat-font-display-lg">Welcome to My App</h1>
+<h2 class="mat-font-headline-md">Getting Started</h2>
+<p class="mat-font-body-md">
+  Angular Material provides a comprehensive typography system based on Material Design.
+</p>
+<button mat-raised-button color="primary">Get Started</button>
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="palette" href="/essentials/theming">
+    Learn about the complete theming system
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access" href="/essentials/accessibility">
+    Ensure your typography is accessible
+  </Card>
+  
+  <Card title="Material Design Type Scale" icon="ruler" href="https://m3.material.io/styles/typography/type-scale-tokens">
+    Material Design typography specification
+  </Card>
+  
+  <Card title="Google Fonts" icon="google" href="https://fonts.google.com">
+    Browse and select fonts
+  </Card>
+</CardGroup>

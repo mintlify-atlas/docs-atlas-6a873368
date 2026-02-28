@@ -1,0 +1,413 @@
+---
+title: 'Map Overlays'
+description: 'Add shapes and overlays to Google Maps'
+---
+
+# Map Overlays
+
+Google Maps supports various overlays including shapes, layers, and custom overlays.
+
+## Shapes
+
+### MapPolyline
+
+Draw lines on the map.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapPolyline} from '@angular/google-maps';
+
+@Component({
+  selector: 'polyline-example',
+  imports: [GoogleMap, MapPolyline],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-polyline [options]="polylineOptions" />
+    </google-map>
+  `
+})
+export class PolylineExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 12;
+  
+  polylineOptions: google.maps.PolylineOptions = {
+    path: [
+      {lat: 40.7128, lng: -74.0060},
+      {lat: 40.7580, lng: -73.9855},
+      {lat: 40.7489, lng: -73.9680}
+    ],
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  };
+}
+```
+
+### MapPolygon
+
+Draw filled polygon shapes.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapPolygon} from '@angular/google-maps';
+
+@Component({
+  selector: 'polygon-example',
+  imports: [GoogleMap, MapPolygon],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-polygon [options]="polygonOptions" />
+    </google-map>
+  `
+})
+export class PolygonExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 13;
+  
+  polygonOptions: google.maps.PolygonOptions = {
+    paths: [
+      {lat: 40.7128, lng: -74.0060},
+      {lat: 40.7228, lng: -74.0060},
+      {lat: 40.7228, lng: -73.9960},
+      {lat: 40.7128, lng: -73.9960}
+    ],
+    strokeColor: '#FF0000',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#FF0000',
+    fillOpacity: 0.35
+  };
+}
+```
+
+### MapRectangle
+
+Draw rectangles on the map.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapRectangle} from '@angular/google-maps';
+
+@Component({
+  selector: 'rectangle-example',
+  imports: [GoogleMap, MapRectangle],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-rectangle [options]="rectangleOptions" />
+    </google-map>
+  `
+})
+export class RectangleExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 12;
+  
+  rectangleOptions: google.maps.RectangleOptions = {
+    bounds: {
+      north: 40.7228,
+      south: 40.7028,
+      east: -73.9960,
+      west: -74.0160
+    },
+    strokeColor: '#0000FF',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#0000FF',
+    fillOpacity: 0.35
+  };
+}
+```
+
+### MapCircle
+
+Draw circles on the map.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapCircle} from '@angular/google-maps';
+
+@Component({
+  selector: 'circle-example',
+  imports: [GoogleMap, MapCircle],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-circle [center]="circleCenter" [radius]="radius" [options]="circleOptions" />
+    </google-map>
+  `
+})
+export class CircleExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 12;
+  circleCenter = {lat: 40.7128, lng: -74.0060};
+  radius = 1000; // meters
+  
+  circleOptions: google.maps.CircleOptions = {
+    strokeColor: '#00FF00',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#00FF00',
+    fillOpacity: 0.35
+  };
+}
+```
+
+## Image Overlays
+
+### MapGroundOverlay
+
+Overlay images on the map.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapGroundOverlay} from '@angular/google-maps';
+
+@Component({
+  selector: 'ground-overlay-example',
+  imports: [GoogleMap, MapGroundOverlay],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-ground-overlay 
+        [url]="imageUrl"
+        [bounds]="imageBounds" />
+    </google-map>
+  `
+})
+export class GroundOverlayExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 14;
+  imageUrl = 'https://example.com/overlay-image.png';
+  
+  imageBounds: google.maps.LatLngBoundsLiteral = {
+    north: 40.7228,
+    south: 40.7028,
+    east: -73.9960,
+    west: -74.0160
+  };
+}
+```
+
+## Data Layers
+
+### MapKmlLayer
+
+Display KML/KMZ files on the map.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapKmlLayer} from '@angular/google-maps';
+
+@Component({
+  selector: 'kml-layer-example',
+  imports: [GoogleMap, MapKmlLayer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-kml-layer [url]="kmlUrl" />
+    </google-map>
+  `
+})
+export class KmlLayerExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 12;
+  kmlUrl = 'https://example.com/data.kml';
+}
+```
+
+### MapHeatmapLayer
+
+Visualize data density with a heatmap.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapHeatmapLayer} from '@angular/google-maps';
+
+@Component({
+  selector: 'heatmap-example',
+  imports: [GoogleMap, MapHeatmapLayer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom" [options]="mapOptions">
+      <map-heatmap-layer [data]="heatmapData" [options]="heatmapOptions" />
+    </google-map>
+  `
+})
+export class HeatmapExample {
+  center = {lat: 37.7749, lng: -122.4194};
+  zoom = 13;
+  
+  mapOptions: google.maps.MapOptions = {
+    mapId: 'YOUR_MAP_ID'
+  };
+  
+  heatmapData: google.maps.LatLngLiteral[] = [
+    {lat: 37.7749, lng: -122.4194},
+    {lat: 37.7849, lng: -122.4294},
+    {lat: 37.7649, lng: -122.4094},
+    // ... more points
+  ];
+  
+  heatmapOptions = {
+    radius: 20,
+    opacity: 0.6
+  };
+}
+```
+
+## Traffic & Transit Layers
+
+### MapTrafficLayer
+
+Display real-time traffic information.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapTrafficLayer} from '@angular/google-maps';
+
+@Component({
+  selector: 'traffic-layer-example',
+  imports: [GoogleMap, MapTrafficLayer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-traffic-layer />
+    </google-map>
+  `
+})
+export class TrafficLayerExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 14;
+}
+```
+
+### MapTransitLayer
+
+Display public transit lines.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapTransitLayer} from '@angular/google-maps';
+
+@Component({
+  selector: 'transit-layer-example',
+  imports: [GoogleMap, MapTransitLayer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-transit-layer />
+    </google-map>
+  `
+})
+export class TransitLayerExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 14;
+}
+```
+
+### MapBicyclingLayer
+
+Display bicycling routes.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapBicyclingLayer} from '@angular/google-maps';
+
+@Component({
+  selector: 'bicycling-layer-example',
+  imports: [GoogleMap, MapBicyclingLayer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-bicycling-layer />
+    </google-map>
+  `
+})
+export class BicyclingLayerExample {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 14;
+}
+```
+
+## Directions
+
+### MapDirectionsRenderer
+
+Display route directions on the map.
+
+```typescript
+import {Component, OnInit} from '@angular/core';
+import {GoogleMap, MapDirectionsRenderer} from '@angular/google-maps';
+
+@Component({
+  selector: 'directions-example',
+  imports: [GoogleMap, MapDirectionsRenderer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      @if (directionsResult) {
+        <map-directions-renderer [directions]="directionsResult" />
+      }
+    </google-map>
+  `
+})
+export class DirectionsExample implements OnInit {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 12;
+  directionsResult?: google.maps.DirectionsResult;
+  
+  ngOnInit() {
+    const directionsService = new google.maps.DirectionsService();
+    
+    directionsService.route(
+      {
+        origin: {lat: 40.7128, lng: -74.0060},
+        destination: {lat: 40.7580, lng: -73.9855},
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (result, status) => {
+        if (status === 'OK' && result) {
+          this.directionsResult = result;
+        }
+      }
+    );
+  }
+}
+```
+
+## Interactive Shapes
+
+All shape overlays support click and drag events:
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapPolygon} from '@angular/google-maps';
+
+@Component({
+  selector: 'interactive-polygon',
+  imports: [GoogleMap, MapPolygon],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-polygon 
+        [options]="polygonOptions"
+        (polygonClick)="onPolygonClick($event)"
+        (polygonDrag)="onPolygonDrag($event)" />
+    </google-map>
+  `
+})
+export class InteractivePolygon {
+  center = {lat: 40.7128, lng: -74.0060};
+  zoom = 13;
+  
+  polygonOptions: google.maps.PolygonOptions = {
+    paths: [/* ... */],
+    editable: true,
+    draggable: true
+  };
+  
+  onPolygonClick(event: google.maps.PolyMouseEvent) {
+    console.log('Polygon clicked at', event.latLng?.toJSON());
+  }
+  
+  onPolygonDrag(event: any) {
+    console.log('Polygon dragged');
+  }
+}
+```
+
+## Source Code
+
+View the source code:
+- [Shapes](https://github.com/angular/components/tree/main/src/google-maps)
+- [Layers](https://github.com/angular/components/tree/main/src/google-maps)

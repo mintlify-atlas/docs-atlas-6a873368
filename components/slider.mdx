@@ -1,0 +1,229 @@
+---
+title: Slider
+description: MatSlider allows users to select from a range of values by moving the slider thumb.
+---
+
+## Overview
+
+`<mat-slider>` allows users to select from a range of values by moving the slider thumb. It is similar in behavior to the native `<input type="range">` element.
+
+## Basic Usage
+
+```html
+<mat-slider>
+  <input matSliderThumb>
+</mat-slider>
+```
+
+## API Reference
+
+### MatSlider
+
+Selector: `mat-slider`
+
+Exported as: `matSlider`
+
+#### Inputs
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the slider is disabled.
+</ParamField>
+
+<ParamField path="discrete" type="boolean" default="false">
+  Whether the slider displays a numeric value label upon pressing the thumb.
+</ParamField>
+
+<ParamField path="showTickMarks" type="boolean" default="false">
+  Whether the slider displays tick marks along the slider track.
+</ParamField>
+
+<ParamField path="min" type="number" default="0">
+  The minimum value that the slider can have.
+</ParamField>
+
+<ParamField path="max" type="number" default="100">
+  The maximum value that the slider can have.
+</ParamField>
+
+<ParamField path="step" type="number" default="1">
+  The values at which the thumb will snap.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette">
+  Theme color of the slider. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether ripples are disabled in the slider.
+</ParamField>
+
+### MatSliderThumb
+
+Directive for the slider thumb (required).
+
+Selector: `input[matSliderThumb]`
+
+#### Inputs
+
+<ParamField path="value" type="number" default="0">
+  The current value of the slider thumb.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="valueChange" type="EventEmitter<number>">
+  Event emitted when the slider thumb value changes.
+</ParamField>
+
+<ParamField path="dragStart" type="EventEmitter<MatSliderDragEvent>">
+  Event emitted when the user starts dragging the slider thumb.
+</ParamField>
+
+<ParamField path="dragEnd" type="EventEmitter<MatSliderDragEvent>">
+  Event emitted when the user stops dragging the slider thumb.
+</ParamField>
+
+## Usage Examples
+
+### Basic Slider
+
+<Tabs>
+  <Tab title="Template">
+    ```html
+    <mat-slider min="0" max="100">
+      <input matSliderThumb [(ngModel)]="value">
+    </mat-slider>
+    <p>Value: {{ value }}</p>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-slider-example',
+      template: `
+        <mat-slider min="0" max="100">
+          <input matSliderThumb [formControl]="sliderControl">
+        </mat-slider>
+        <p>Value: {{ sliderControl.value }}</p>
+      `
+    })
+    export class SliderExample {
+      sliderControl = new FormControl(50);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Discrete Slider with Tick Marks
+
+```html
+<mat-slider min="0" max="100" step="10" discrete showTickMarks>
+  <input matSliderThumb [(ngModel)]="value">
+</mat-slider>
+```
+
+### Range Slider
+
+```html
+<mat-slider min="0" max="100">
+  <input matSliderStartThumb [(ngModel)]="startValue">
+  <input matSliderEndThumb [(ngModel)]="endValue">
+</mat-slider>
+```
+
+### Disabled Slider
+
+```html
+<mat-slider [disabled]="true">
+  <input matSliderThumb value="50">
+</mat-slider>
+```
+
+## Accessibility
+
+- The slider thumb uses a native `<input type="range">` element
+- ARIA attributes are automatically managed
+- Keyboard navigation is fully supported:
+  - `ARROW_RIGHT/UP`: Increase value
+  - `ARROW_LEFT/DOWN`: Decrease value
+  - `PAGE_UP`: Increase by large step
+  - `PAGE_DOWN`: Decrease by large step
+  - `HOME`: Set to minimum value
+  - `END`: Set to maximum value
+- Screen readers announce the current value and range
+- Use `aria-label` or `aria-labelledby` to provide accessible labels
+
+## Advanced Usage
+
+### Custom Step Size
+
+```html
+<mat-slider min="0" max="1" step="0.1">
+  <input matSliderThumb [(ngModel)]="decimalValue">
+</mat-slider>
+```
+
+### Value Formatting
+
+```typescript
+export class SliderFormattingExample {
+  formatLabel(value: number): string {
+    if (value >= 1000) {
+      return Math.round(value / 1000) + 'k';
+    }
+    return `${value}`;
+  }
+}
+```
+
+```html
+<mat-slider min="0" max="100000" step="1000" discrete>
+  <input matSliderThumb [(ngModel)]="value" [displayWith]="formatLabel">
+</mat-slider>
+```
+
+### Listening to Drag Events
+
+```typescript
+export class SliderDragExample {
+  isDragging = false;
+  
+  onDragStart(event: MatSliderDragEvent) {
+    this.isDragging = true;
+    console.log('Drag started:', event);
+  }
+  
+  onDragEnd(event: MatSliderDragEvent) {
+    this.isDragging = false;
+    console.log('Drag ended:', event);
+  }
+}
+```
+
+```html
+<mat-slider>
+  <input matSliderThumb 
+    (dragStart)="onDragStart($event)"
+    (dragEnd)="onDragEnd($event)">
+</mat-slider>
+```
+
+### Color Variants
+
+```html
+<mat-slider color="primary">
+  <input matSliderThumb>
+</mat-slider>
+
+<mat-slider color="accent">
+  <input matSliderThumb>
+</mat-slider>
+
+<mat-slider color="warn">
+  <input matSliderThumb>
+</mat-slider>
+```

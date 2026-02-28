@@ -1,0 +1,231 @@
+---
+title: "Creating a Custom Form Field Control"
+description: "Learn how to create custom form field controls that work with mat-form-field"
+---
+
+It is possible to create custom form field controls that can be used inside `<mat-form-field>`. This can be useful if you need to create a component that shares a lot of common behavior with a form field, but adds some additional logic.
+
+## Building a Custom Phone Input
+
+In this guide we'll learn how to create a custom input for inputting US telephone numbers and hook it up to work with `<mat-form-field>`.
+
+### Starting Component
+
+Let's start with a simple input component that segments the parts of the number into their own inputs:
+
+```ts
+class MyTel {
+  constructor(public area: string, public exchange: string, public subscriber: string) {}
+}
+
+@Component({
+  selector: 'example-tel-input',
+  template: `
+    <div role="group" [formGroup]="parts">
+      <input class="area" formControlName="area" maxlength="3">
+      <span>&ndash;</span>
+      <input class="exchange" formControlName="exchange" maxlength="3">
+      <span>&ndash;</span>
+      <input class="subscriber" formControlName="subscriber" maxlength="4">
+    </div>
+  `,
+  styles: [`
+    div {
+      display: flex;
+    }
+    input {
+      border: none;
+      background: none;
+      padding: 0;
+      outline: none;
+      font: inherit;
+      text-align: center;
+      color: currentColor;
+    }
+  `],
+})
+export class MyTelInput {
+  parts: FormGroup;
+
+  @Input()
+  get value(): MyTel | null {
+    let n = this.parts.value;
+    if (n.area.length == 3 && n.exchange.length == 3 && n.subscriber.length == 4) {
+      return new MyTel(n.area, n.exchange, n.subscriber);
+    }
+    return null;
+  }
+  set value(tel: MyTel | null) {
+    tel = tel || new MyTel('', '', '');
+    this.parts.setValue({area: tel.area, exchange: tel.exchange, subscriber: tel.subscriber});
+  }
+
+  constructor(fb: FormBuilder) {
+    this.parts =  fb.group({
+      'area': '',
+      'exchange': '',
+      'subscriber': '',
+    });
+  }
+}
+```
+
+## Implementing MatFormFieldControl
+
+<Steps>
+  <Step title="Provide the component">
+    The first step is to provide our component as an implementation of the `MatFormFieldControl` interface:
+
+    ```ts
+    @Component({
+      ...
+      providers: [{provide: MatFormFieldControl, useExisting: MyTelInput}],
+    })
+    export class MyTelInput implements MatFormFieldControl<MyTel> {
+      ...
+    }
+    ```
+  </Step>
+
+  <Step title="Implement required properties">
+    Now we need to implement the various methods and properties declared by the interface.
+
+    ### value
+    This property allows setting or getting the value of the control. Since our component already has a value property, no changes are needed.
+
+    ### stateChanges
+    The `<mat-form-field>` uses OnPush change detection, so we need to notify it when things change:
+
+    ```ts
+    stateChanges = new Subject<void>();
+
+    set value(tel: MyTel | null) {
+      ...
+      this.stateChanges.next();
+    }
+
+    ngOnDestroy() {
+      this.stateChanges.complete();
+    }
+    ```
+
+    ### id
+    Return a unique ID for the component:
+
+    ```ts
+    static nextId = 0;
+    @HostBinding() id = `example-tel-input-${MyTelInput.nextId++}`;
+    ```
+
+    ### placeholder
+    Allow users to specify a placeholder:
+
+    ```ts
+    @Input()
+    get placeholder() {
+      return this._placeholder;
+    }
+    set placeholder(plh) {
+      this._placeholder = plh;
+      this.stateChanges.next();
+    }
+    private _placeholder: string;
+    ```
+  </Step>
+
+  <Step title="Handle focus state">
+    Track whether the control is focused:
+
+    ```ts
+    focused = false;
+
+    onFocusIn(event: FocusEvent) {
+      if (!this.focused) {
+        this.focused = true;
+        this.stateChanges.next();
+      }
+    }
+
+    onFocusOut(event: FocusEvent) {
+      if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
+        this.touched = true;
+        this.focused = false;
+        this.onTouched();
+        this.stateChanges.next();
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Implement empty and disabled states">
+    ```ts
+    get empty() {
+      let n = this.parts.value;
+      return !n.area && !n.exchange && !n.subscriber;
+    }
+
+    @Input()
+    get disabled(): boolean { return this._disabled; }
+    set disabled(value: BooleanInput) {
+      this._disabled = coerceBooleanProperty(value);
+      this._disabled ? this.parts.disable() : this.parts.enable();
+      this.stateChanges.next();
+    }
+    private _disabled = false;
+    ```
+  </Step>
+</Steps>
+
+## Accessibility
+
+Our custom form field control consists of multiple inputs that describe segments of a phone number. For accessibility purposes, we put those inputs inside a `div` with `role="group"`.
+
+To improve screen reader support, we should link the group to the label:
+
+```typescript
+export class MyTelInput implements MatFormFieldControl<MyTel> {
+  constructor(...
+              @Optional() public parentFormField: MatFormField) {
+}
+```
+
+```html
+<div role="group" [formGroup]="parts"
+     [attr.aria-describedby]="describedBy"
+     [attr.aria-labelledby]="parentFormField?.getLabelId()">
+```
+
+## Using the Custom Control
+
+<Note>
+  Now that we've fully implemented the interface, we can use our component inside `<mat-form-field>`!
+</Note>
+
+```html
+<mat-form-field>
+  <example-tel-input></example-tel-input>
+</mat-form-field>
+```
+
+We also get all the features that come with `<mat-form-field>` such as floating placeholder, prefix, suffix, hints, and errors:
+
+```html
+<mat-form-field>
+  <example-tel-input placeholder="Phone number" required></example-tel-input>
+  <mat-icon matPrefix>phone</mat-icon>
+  <mat-hint>Include area code</mat-hint>
+</mat-form-field>
+```
+
+## API Reference
+
+For more information about the `MatFormFieldControl` interface, see the [form field API documentation](https://material.angular.dev/components/form-field/api).
+
+<CardGroup cols={2}>
+  <Card title="Component Harnesses" icon="flask" href="/guides/component-harnesses">
+    Learn how to test your custom form field
+  </Card>
+  <Card title="Theming Components" icon="palette" href="/guides/theming-components">
+    Style your custom form field
+  </Card>
+</CardGroup>

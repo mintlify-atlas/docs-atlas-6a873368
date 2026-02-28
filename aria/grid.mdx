@@ -1,0 +1,138 @@
+---
+title: 'ARIA Grid'
+description: 'Accessible data grid component with keyboard navigation'
+---
+
+# ARIA Grid
+
+The ARIA Grid provides an accessible, interactive data grid with full keyboard navigation following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Grid
+
+The main grid container.
+
+**Selector**: `[ngGrid]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/grid/grid.ts`
+
+### GridRow
+
+A row within the grid.
+
+**Selector**: `[ngGridRow]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/grid/grid-row.ts`
+
+### GridCell
+
+A cell within a grid row.
+
+**Selector**: `[ngGridCell]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/grid/grid-cell.ts`
+
+### GridCellWidget
+
+An interactive widget within a grid cell.
+
+**Selector**: `[ngGridCellWidget]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/grid/grid-cell-widget.ts`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {Grid, GridRow, GridCell} from '@angular/aria';
+
+@Component({
+  selector: 'app-grid-example',
+  imports: [Grid, GridRow, GridCell],
+  template: `
+    <div ngGrid>
+      <div ngGridRow>
+        <div ngGridCell>Name</div>
+        <div ngGridCell>Email</div>
+        <div ngGridCell>Role</div>
+      </div>
+      
+      @for (user of users; track user.id) {
+        <div ngGridRow>
+          <div ngGridCell>{{user.name}}</div>
+          <div ngGridCell>{{user.email}}</div>
+          <div ngGridCell>{{user.role}}</div>
+        </div>
+      }
+    </div>
+  `
+})
+export class GridExample {
+  users = [
+    {id: 1, name: 'Alice', email: 'alice@example.com', role: 'Admin'},
+    {id: 2, name: 'Bob', email: 'bob@example.com', role: 'User'},
+    {id: 3, name: 'Charlie', email: 'charlie@example.com', role: 'Editor'}
+  ];
+}
+```
+
+## Interactive Grid with Widgets
+
+```html
+<div ngGrid>
+  <div ngGridRow>
+    <div ngGridCell>Task</div>
+    <div ngGridCell>Actions</div>
+  </div>
+  
+  @for (task of tasks; track task.id) {
+    <div ngGridRow>
+      <div ngGridCell>{{task.name}}</div>
+      <div ngGridCell>
+        <button ngGridCellWidget (click)="edit(task)">Edit</button>
+        <button ngGridCellWidget (click)="delete(task)">Delete</button>
+      </div>
+    </div>
+  }
+</div>
+```
+
+## Keyboard Navigation
+
+- **Arrow Keys** - Navigate between cells
+- **Home** - Move to first cell in row
+- **End** - Move to last cell in row
+- **Ctrl+Home** - Move to first cell in grid
+- **Ctrl+End** - Move to last cell in grid
+- **Page Up/Down** - Scroll through rows
+- **Enter** - Activate focused cell or widget
+- **F2** - Enter edit mode (if supported)
+
+## Accessibility Features
+
+- Implements ARIA grid pattern
+- Proper roles: `grid`, `row`, `gridcell`
+- `aria-rowindex` and `aria-colindex` for position
+- `aria-selected` for selected cells
+- `aria-readonly` for non-editable cells
+- Full keyboard navigation
+- Screen reader support
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [grid.ts](https://github.com/angular/components/tree/main/src/aria/grid/grid.ts)
+- [grid-row.ts](https://github.com/angular/components/tree/main/src/aria/grid/grid-row.ts)
+- [grid-cell.ts](https://github.com/angular/components/tree/main/src/aria/grid/grid-cell.ts)
+- [grid-cell-widget.ts](https://github.com/angular/components/tree/main/src/aria/grid/grid-cell-widget.ts)

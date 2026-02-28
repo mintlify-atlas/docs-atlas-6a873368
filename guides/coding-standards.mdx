@@ -1,0 +1,640 @@
+---
+title: "Coding Standards"
+description: "Coding standards and best practices for Angular Material development"
+---
+
+These coding standards ensure consistency throughout the Angular Material codebase and help maintain high code quality.
+
+<Info>
+  The [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html) is the basis for our coding style.
+</Info>
+
+## General Principles
+
+<CardGroup cols={2}>
+  <Card title="Write Useful Comments" icon="comment">
+    Explain **why**, not just **what**
+  </Card>
+  <Card title="Prefer Focused Components" icon="cubes">
+    Small, granular components over complex, configurable ones
+  </Card>
+  <Card title="Small Modules" icon="puzzle-piece">
+    Keep files under 400 lines when possible
+  </Card>
+  <Card title="Less is More" icon="minimize">
+    Avoid adding features that don't offer high value
+  </Card>
+</CardGroup>
+
+## Comments
+
+### Write Useful Comments
+
+<Tabs>
+  <Tab title="Bad Comment">
+    Comments that just describe what code does:
+
+    ```ts
+    // Set default tabindex.
+    if (!$attrs['tabindex']) {
+      $element.attr('tabindex', '-1');
+    }
+    ```
+
+    <Warning>
+      This comment doesn't add value - it just repeats what the code does.
+    </Warning>
+  </Tab>
+
+  <Tab title="Good Comment">
+    Comments that explain why code exists:
+
+    ```ts
+    // Unless the user specifies so, the calendar should not be a tab stop.
+    // This is necessary because ngAria might add a tabindex to anything with an ng-model
+    // (based on whether or not the user has turned that particular feature on/off).
+    if (!$attrs['tabindex']) {
+      $element.attr('tabindex', '-1');
+    }
+    ```
+
+    <Check>
+      This explains the reasoning and context - invaluable for future developers.
+    </Check>
+  </Tab>
+</Tabs>
+
+### Comment Styles
+
+<CodeGroup>
+```ts TypeScript
+/**
+ * JsDoc-style comments for descriptions
+ * Used on classes, methods, properties
+ */
+class MyComponent {
+  /** The current theme color. */
+  color: string;
+
+  // Regular comments for explanations
+  // Use for background info and context
+}
+```
+
+```scss SCSS
+// Always use // style comments in SCSS
+.mat-button {
+  // Never use /* */ style comments
+  padding: 8px;
+}
+```
+
+```html HTML
+<!-- Use HTML comments -->
+<!-- These are stripped when building -->
+<button>Click me</button>
+```
+</CodeGroup>
+
+## Component Design
+
+### Prefer Focused Components
+
+<Tabs>
+  <Tab title="Avoid">
+    ```html
+    <mat-button>Basic button</mat-button>
+    <mat-button class="mat-fab">FAB</mat-button>
+    <mat-button class="mat-icon-button">icon</mat-button>
+    ```
+
+    ❌ Using classes to drastically change behavior
+  </Tab>
+
+  <Tab title="Prefer">
+    ```html
+    <mat-button>Basic button</mat-button>
+    <mat-fab>FAB</mat-fab>
+    <mat-icon-button>icon</mat-icon-button>
+    ```
+
+    ✅ Separate components for distinct behaviors
+  </Tab>
+</Tabs>
+
+### Module Organization
+
+<Steps>
+  <Step title="Keep modules focused">
+    Single responsibility principle - one module, one purpose
+  </Step>
+
+  <Step title="Ideal file size">
+    Target **200-300 lines** per file
+  </Step>
+
+  <Step title="Refactor threshold">
+    Start refactoring around **400 lines** (excluding long constants/comments)
+  </Step>
+</Steps>
+
+## Code Style
+
+### Column Limit
+
+<Warning>
+  All code and docs must be **100 columns or fewer**.
+</Warning>
+
+This applies to:
+- TypeScript
+- SCSS
+- HTML
+- Bash scripts
+- Markdown files
+
+### API Design
+
+#### Avoid Boolean Arguments
+
+<Tabs>
+  <Tab title="Avoid">
+    ```ts
+    function getTargetElement(createIfNotFound = false) {
+      // "Do something extra" parameter
+    }
+    ```
+
+    ❌ Boolean arguments that mean "do something extra" are unclear.
+  </Tab>
+
+  <Tab title="Prefer">
+    ```ts
+    function getExistingTargetElement() {
+      // ...
+    }
+
+    function createTargetElement() {
+      // ...
+    }
+    ```
+
+    ✅ Separate functions with clear intent.
+  </Tab>
+</Tabs>
+
+## TypeScript
+
+### Typing
+
+<AccordionGroup>
+  <Accordion title="Avoid any">
+    ```ts
+    // ❌ Bad
+    function process(data: any) {
+      // ...
+    }
+
+    // ✅ Good
+    function process<T>(data: T) {
+      // ...
+    }
+
+    // ✅ Also good
+    function process(data: unknown) {
+      if (typeof data === 'string') {
+        // Type narrowing
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Explicit types for public API">
+    ```ts
+    export class MyComponent {
+      // ✅ Explicit return type
+      getValue(): string {
+        return this._value;
+      }
+
+      // ✅ Explicit parameter types
+      setValue(value: string): void {
+        this._value = value;
+      }
+
+      private _value: string = '';
+    }
+    ```
+
+    <Info>
+      Documentation tooling requires explicit types for public APIs.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+### Fluent APIs
+
+```ts
+class ConfigBuilder {
+  // Use 'this' return type for chaining
+  withName(name: string): this {
+    this.config.name = name;
+    return this;
+  }
+
+  withColor(color: string): this {
+    this.config.color = color;
+    return this;
+  }
+}
+
+// Usage:
+const config = new ConfigBuilder()
+  .withName('my-component')
+  .withColor('primary');
+```
+
+### Access Modifiers
+
+<ParamField path="public" type="default">
+  Omit the `public` keyword - it's the default
+</ParamField>
+
+<ParamField path="private" type="_prefixed">
+  Use `private` with underscore prefix for truly private members
+</ParamField>
+
+<ParamField path="protected" type="no prefix">
+  Use `protected` when appropriate, no prefix
+</ParamField>
+
+<ParamField path="_internal" type="underscore only">
+  Prefix library-internal properties with underscore without `private` keyword
+</ParamField>
+
+```ts
+export class MyComponent {
+  // ✅ Public - no keyword
+  value: string;
+
+  // ✅ Private - keyword + prefix
+  private _state: State;
+
+  // ✅ Protected - keyword only
+  protected config: Config;
+
+  // ✅ Internal - prefix only (used in templates)
+  _elementRef: ElementRef;
+}
+```
+
+<Note>
+  Use `@docs-private` JSDoc annotation to hide symbols from public API docs.
+</Note>
+
+### Getters and Setters
+
+<Steps>
+  <Step title="Use for @Input properties">
+    ```ts
+    @Input()
+    get disabled(): boolean {
+      return this._disabled;
+    }
+    set disabled(value: BooleanInput) {
+      this._disabled = coerceBooleanProperty(value);
+    }
+    private _disabled = false;
+    ```
+  </Step>
+
+  <Step title="Keep them simple">
+    If logic takes more than 3 lines, extract to a method.
+  </Step>
+
+  <Step title="Getter before setter">
+    Always place getter immediately before its setter.
+  </Step>
+
+  <Step title="Decorate getters only">
+    ```ts
+    @Input()  // ✅ On getter
+    get value(): string {
+      return this._value;
+    }
+    set value(v: string) {  // No decorator
+      this._value = v;
+    }
+    ```
+  </Step>
+
+  <Step title="Prefer readonly properties">
+    ```ts
+    // ✅ Prefer this
+    readonly active: boolean;
+
+    // ❌ Over this
+    get active(): boolean {
+      return this._active;
+    }
+    ```
+  </Step>
+</Steps>
+
+### JsDoc Comments
+
+<Tabs>
+  <Tab title="Properties">
+    ```ts
+    /** The label position relative to the checkbox. Defaults to 'after'. */
+    @Input() labelPosition: 'before' | 'after' = 'after';
+    ```
+  </Tab>
+
+  <Tab title="Methods">
+    ```ts
+    /**
+     * Opens a modal dialog containing the given component.
+     * @param component Type of the component to load into the dialog.
+     * @param config Dialog configuration options.
+     * @returns Reference to the newly-opened dialog.
+     */
+    open<T>(component: ComponentType<T>, config?: MatDialogConfig): MatDialogRef<T> {
+      // ...
+    }
+    ```
+  </Tab>
+
+  <Tab title="Boolean Properties">
+    ```ts
+    /** Whether the button is disabled. */
+    disabled: boolean = false;
+    ```
+
+    <Check>
+      Use "Whether..." not "True if..."
+    </Check>
+  </Tab>
+</Tabs>
+
+### Naming
+
+<AccordionGroup>
+  <Accordion title="General Rules">
+    - Write out words instead of abbreviations
+    - Prefer exact names: `labelPosition` over `align`
+    - Use `is` and `has` prefixes for booleans (except `@Input` properties)
+    - Don't suffix observables with `$`
+  </Accordion>
+
+  <Accordion title="Classes">
+    ```ts
+    // ❌ Bad - describes usage
+    class RadioService { }
+
+    // ✅ Good - describes purpose
+    class UniqueSelectionDispatcher { }
+    ```
+
+    - Name based on responsibility
+    - Avoid "Service" suffix
+    - Think of it as a job title
+    - Prefix directives: `Mat` for Material, `Cdk` for CDK
+  </Accordion>
+
+  <Accordion title="Methods">
+    ```ts
+    // ❌ Bad - describes when it's called
+    handleClick() {
+      // ...
+    }
+
+    // ✅ Good - describes what it does
+    activateRipple() {
+      // ...
+    }
+    ```
+
+    Capture the action performed, not when it's called.
+  </Accordion>
+
+  <Accordion title="Selectors">
+    **Components:**
+    - Lowercase with hyphens: `mat-button`
+    - Use element selectors (exceptions for native elements)
+
+    **Directives:**
+    - camelCase: `matTooltip`
+    - Exceptions for components with empty templates
+  </Accordion>
+</AccordionGroup>
+
+### Patterns to Avoid
+
+#### Don't Use Inheritance for Behavior
+
+<Tabs>
+  <Tab title="Avoid">
+    ```ts
+    // ❌ Limits composition
+    class MyButton extends BaseButton {
+      // Can only inherit from one class
+    }
+    ```
+  </Tab>
+
+  <Tab title="Prefer">
+    ```ts
+    // ✅ Allows multiple behaviors
+    class MyButton extends mixinDisabled(mixinColor(BaseClass)) {
+      // Can mix in multiple behaviors
+    }
+    ```
+
+    Use [TypeScript mixins](https://www.typescriptlang.org/docs/handbook/mixins.html) instead.
+  </Tab>
+</Tabs>
+
+#### Use Input Transforms
+
+```ts
+import { Input, booleanAttribute, numberAttribute } from '@angular/core';
+
+@Input({ transform: booleanAttribute }) disabled: boolean = false;
+@Input({ transform: numberAttribute }) tabIndex: number = 0;
+```
+
+This allows:
+```html
+<component disabled></component>
+<component tabIndex="5"></component>
+```
+
+## CSS / SCSS
+
+### Be Cautious with Flexbox
+
+<Warning>
+  - Flex baseline calculation differs from other display values
+  - Difficult to align flex elements with standard elements
+  - Never use flex on elements with projected content
+  - Component outermost elements should be block or inline-block
+</Warning>
+
+### Specificity
+
+<Tabs>
+  <Tab title="Avoid">
+    ```scss
+    .mat-calendar {
+      display: block;
+
+      .mat-month {
+        display: inline-block;
+
+        .mat-date.mat-selected {
+          font-weight: bold;
+        }
+      }
+    }
+    ```
+
+    ❌ Nested selectors increase specificity
+  </Tab>
+
+  <Tab title="Prefer">
+    ```scss
+    .mat-calendar {
+      display: block;
+    }
+
+    .mat-calendar-month {
+      display: inline-block;
+    }
+
+    .mat-calendar-date.mat-selected {
+      font-weight: bold;
+    }
+    ```
+
+    ✅ Flat selectors, easy to override
+  </Tab>
+</Tabs>
+
+### Best Practices
+
+<Steps>
+  <Step title="Never set margin on host">
+    Let users control component spacing.
+  </Step>
+
+  <Step title="Style host when possible">
+    ```scss
+    // ✅ Prefer
+    the-host-element {
+      color: red;
+    }
+
+    // ❌ Over
+    the-host-element {
+      .some-child-element {
+        color: red;
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Support high-contrast mode">
+    ```scss
+    @include cdk-high-contrast(active, off) {
+      .mat-button {
+        border: 1px solid #fff !important;
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Document CSS classes">
+    ```scss
+    // The calendar icon button used to open the calendar pane.
+    .mat-datepicker-button { ... }
+
+    // Floating pane that contains the calendar.
+    .mat-datepicker-calendar-pane { ... }
+    ```
+  </Step>
+
+  <Step title="Use classes over tag names">
+    ```scss
+    // ✅ Do
+    .mat-mdc-slider { ... }
+
+    // ❌ Don't
+    mdc-slider { ... }
+    ```
+  </Step>
+</Steps>
+
+## Angular Specific
+
+### Host Bindings
+
+<Tabs>
+  <Tab title="Prefer">
+    ```ts
+    @Component({
+      host: {
+        '(click)': 'onClick($event)',
+        '[class.active]': 'isActive',
+      }
+    })
+    ```
+
+    ✅ Prevents type preservation issues
+  </Tab>
+
+  <Tab title="Avoid">
+    ```ts
+    @HostListener('click', ['$event'])
+    onClick(event: Event) { }
+
+    @HostBinding('class.active')
+    isActive: boolean;
+    ```
+
+    ❌ Can cause issues in non-browser environments
+  </Tab>
+</Tabs>
+
+### Expose Native Inputs
+
+```html
+<!-- ✅ Do -->
+<your-component>
+  <input>
+</your-component>
+
+<!-- ❌ Don't -->
+<your-component></your-component>
+```
+
+<Check>
+  Let users interact directly with native inputs via `ng-content`.
+</Check>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="TypeScript Style Guide" icon="typescript" href="https://google.github.io/styleguide/tsguide.html">
+    Google's official TypeScript guide
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/guides/contributing">
+    How to contribute to Angular Material
+  </Card>
+  <Card title="Dev Environment" icon="terminal" href="/guides/dev-environment">
+    Set up your development environment
+  </Card>
+  <Card title="Component Harnesses" icon="flask" href="/guides/component-harnesses">
+    Testing guidelines
+  </Card>
+</CardGroup>

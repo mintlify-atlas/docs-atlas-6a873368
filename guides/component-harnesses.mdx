@@ -1,0 +1,348 @@
+---
+title: "Using Component Harnesses"
+description: "Test Angular Material components with component harnesses for robust, maintainable tests"
+---
+
+The Angular CDK provides code for creating component test harnesses. A component harness is a class that lets a test interact with a component via a supported API. Each harness's API interacts with a component the same way a user would.
+
+<Info>
+  Component harnesses are based on the [PageObject](https://martinfowler.com/bliki/PageObject.html) pattern commonly used for integration testing.
+</Info>
+
+## Benefits of Component Harnesses
+
+<CardGroup cols={2}>
+  <Card title="Easier to Read" icon="book-open">
+    Harnesses make tests easier to understand with straightforward APIs
+  </Card>
+  <Card title="More Robust" icon="shield">
+    Tests are less likely to break when updating Angular Material
+  </Card>
+</CardGroup>
+
+### Why Use Harnesses?
+
+1. **Abstraction** - Tests don't depend on component internals like DOM structure
+2. **Asynchronicity** - Harnesses normalize async behavior automatically
+3. **Maintainability** - Angular team updates harnesses, not your tests
+4. **Readability** - Clear, self-documenting test code
+
+## Supported Test Environments
+
+<Tabs>
+  <Tab title="Karma (Unit Tests)">
+    Uses `TestbedHarnessEnvironment` for component testing with Angular TestBed
+  </Tab>
+  <Tab title="Selenium WebDriver (E2E)">
+    Uses `SeleniumWebDriverHarnessEnvironment` for end-to-end tests
+  </Tab>
+  <Tab title="Custom">
+    Extend `HarnessEnvironment` and `TestElement` for other environments
+  </Tab>
+</Tabs>
+
+## Getting Started
+
+<Steps>
+  <Step title="Import the harness environment">
+    ```ts
+    import {HarnessLoader} from '@angular/cdk/testing';
+    import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+
+    let loader: HarnessLoader;
+
+    describe('my-component', () => {
+      beforeEach(async () => {
+        TestBed.configureTestingModule({
+          imports: [MyModule], 
+          declarations: [UserProfile]
+        });
+        fixture = TestBed.createComponent(UserProfile);
+        loader = TestbedHarnessEnvironment.loader(fixture);
+      });
+    });
+    ```
+
+    <Note>
+      - `@angular/cdk/testing` - Shared symbols for all environments
+      - `@angular/cdk/testing/testbed` - Karma-specific symbols
+      - `@angular/cdk/testing/selenium-webdriver` - Selenium-specific symbols
+    </Note>
+  </Step>
+
+  <Step title="Load a harness">
+    ```ts
+    import {MatButtonHarness} from '@angular/material/button/testing';
+
+    it('should work', async () => {
+      const buttons = await loader.getAllHarnesses(MatButtonHarness); 
+      const firstButton = await loader.getHarness(MatButtonHarness);
+    });
+    ```
+
+    <Warning>
+      All harness APIs are asynchronous and return `Promise` objects. Use `async`/`await` syntax.
+    </Warning>
+  </Step>
+
+  <Step title="Filter harnesses">
+    Use `with()` to filter harnesses by specific criteria:
+
+    ```ts
+    it('should work', async () => {
+      // By id
+      const info = await loader.getHarness(
+        MatButtonHarness.with({selector: '#more-info'})
+      );
+      
+      // By text
+      const cancel = await loader.getHarness(
+        MatButtonHarness.with({text: 'Cancel'})
+      );
+      
+      // By multiple criteria
+      const okButton = await loader.getHarness(
+        MatButtonHarness.with({
+          selector: '.confirm', 
+          text: /^(Ok|Okay)$/
+        })
+      );
+    });
+    ```
+  </Step>
+
+  <Step title="Interact with components">
+    ```ts
+    it('should mark confirmed when ok button clicked', async () => {
+      const okButton = await loader.getHarness(
+        MatButtonHarness.with({selector: '.confirm'})
+      );
+      
+      expect(fixture.componentInstance.confirmed).toBe(false);
+      expect(await okButton.isDisabled()).toBe(false);
+      
+      await okButton.click();
+      
+      expect(fixture.componentInstance.confirmed).toBe(true);
+    });
+    ```
+
+    <Info>
+      Harnesses automatically call change detection and wait for stability. No need for `detectChanges()` or `whenStable()`!
+    </Info>
+  </Step>
+</Steps>
+
+## Loading Harnesses from Specific Sections
+
+You can load harnesses for a sub-section of the DOM:
+
+```ts
+it('should work', async () => {
+  const footerLoader = await loader.getChildLoader('.footer');
+  const footerButton = await footerLoader.getHarness(MatButtonHarness);
+});
+```
+
+## Filter Options
+
+All harnesses support these standard options:
+
+<ParamField path="selector" type="string">
+  CSS selector that the component must match
+</ParamField>
+
+<ParamField path="ancestor" type="string">
+  CSS selector for an ancestor element
+</ParamField>
+
+Additional options vary by component. For example, `MatButtonHarness` also supports:
+
+<ParamField path="text" type="string | RegExp">
+  Text content or regex pattern to match
+</ParamField>
+
+## Comparison: With vs Without Harnesses
+
+<Tabs>
+  <Tab title="Without Harnesses">
+    ```ts
+    it('should switch to bug report template', async () => {
+      expect(fixture.debugElement.query('bug-report-form')).toBeNull();
+      
+      const selectTrigger = fixture.debugElement.query(
+        By.css('.mat-select-trigger')
+      );
+      selectTrigger.triggerEventHandler('click', {});
+      fixture.detectChanges();
+      await fixture.whenStable();
+      
+      const options = document.querySelectorAll('.mat-select-panel mat-option');
+      options[1].click(); // Click the second option, "Bug"
+      fixture.detectChanges();
+      await fixture.whenStable();
+      
+      expect(fixture.debugElement.query('bug-report-form')).not.toBeNull();
+    });
+    ```
+
+    <Warning>
+      This test depends on internal DOM structure and requires manual change detection.
+    </Warning>
+  </Tab>
+
+  <Tab title="With Harnesses">
+    ```ts
+    it('should switch to bug report template', async () => {
+      expect(fixture.debugElement.query('bug-report-form')).toBeNull();
+      
+      const select = await loader.getHarness(MatSelectHarness);
+      await select.open();
+      
+      const bugOption = await select.getOption({text: 'Bug'});
+      await bugOption.click();
+      
+      expect(fixture.debugElement.query('bug-report-form')).not.toBeNull();
+    });
+    ```
+
+    <Check>
+      Clear, self-documenting code that doesn't depend on component internals.
+    </Check>
+  </Tab>
+</Tabs>
+
+## Key Advantages
+
+<AccordionGroup>
+  <Accordion title="Better Readability">
+    - `await select.open()` is self-explanatory
+    - Filter API makes code self-documenting
+    - No comments needed to explain intent
+    - Eliminates repetitive `detectChanges()` and `whenStable()` calls
+  </Accordion>
+
+  <Accordion title="More Robust">
+    - No dependency on internal CSS selectors
+    - Protected from DOM restructuring
+    - Normalized asynchronous behavior
+    - Angular team maintains harness compatibility
+  </Accordion>
+
+  <Accordion title="Future-Proof">
+    - Survives component refactoring
+    - Works across async/sync changes
+    - One update point for breaking changes
+    - Reduces maintenance burden
+  </Accordion>
+</AccordionGroup>
+
+## Common Patterns
+
+### Testing Forms
+
+```ts
+it('should validate form', async () => {
+  const input = await loader.getHarness(
+    MatInputHarness.with({selector: '[name="email"]'})
+  );
+  
+  await input.setValue('invalid-email');
+  expect(await input.hasError('email')).toBe(true);
+  
+  await input.setValue('valid@email.com');
+  expect(await input.hasError()).toBe(false);
+});
+```
+
+### Testing Dialogs
+
+```ts
+it('should open dialog', async () => {
+  const button = await loader.getHarness(
+    MatButtonHarness.with({text: 'Open Dialog'})
+  );
+  await button.click();
+  
+  const dialog = await documentRootLoader.getHarness(MatDialogHarness);
+  expect(await dialog.getTitleText()).toBe('Confirmation');
+  
+  await dialog.close();
+});
+```
+
+### Testing Menus
+
+```ts
+it('should select menu item', async () => {
+  const menuTrigger = await loader.getHarness(MatMenuHarness);
+  await menuTrigger.open();
+  
+  const items = await menuTrigger.getItems();
+  await items[0].click();
+  
+  expect(component.selectedAction).toBe('action-1');
+});
+```
+
+## Available Harnesses
+
+Angular Material provides harnesses for most components:
+
+<CardGroup cols={3}>
+  <Card title="Form Controls" icon="input-text">
+    Input, Select, Checkbox, Radio, Slider, Datepicker
+  </Card>
+  <Card title="Buttons & Indicators" icon="hand-pointer">
+    Button, Icon Button, FAB, Chips, Badge
+  </Card>
+  <Card title="Navigation" icon="compass">
+    Menu, Tabs, Stepper, Tree
+  </Card>
+  <Card title="Layout" icon="table-cells">
+    Card, List, Grid List, Divider
+  </Card>
+  <Card title="Popups" icon="window">
+    Dialog, Bottom Sheet, Snackbar, Tooltip
+  </Card>
+  <Card title="Data" icon="table">
+    Table, Sort, Paginator, Tree
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Always use harnesses when available">
+    If a harness exists for a component, use it instead of querying DOM directly.
+  </Step>
+
+  <Step title="Filter by semantic properties">
+    Use text content, labels, or roles rather than CSS classes or ids when possible.
+  </Step>
+
+  <Step title="Use child loaders for specificity">
+    When multiple instances exist, use `getChildLoader()` to scope searches.
+  </Step>
+
+  <Step title="Leverage TypeScript">
+    Harnesses are fully typed - let your IDE help you discover available methods.
+  </Step>
+</Steps>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="CDK Testing" icon="flask" href="https://material.angular.dev/cdk/test-harnesses/overview">
+    Official CDK testing documentation
+  </Card>
+  <Card title="API Reference" icon="book" href="https://material.angular.dev/cdk/test-harnesses/api">
+    Complete harness API reference
+  </Card>
+  <Card title="Testing Guide" icon="check" href="/guides/testing-strategies">
+    Testing strategies and best practices
+  </Card>
+  <Card title="Custom Harnesses" icon="wrench" href="https://material.angular.dev/cdk/test-harnesses/overview#creating-a-harness">
+    Create your own component harnesses
+  </Card>
+</CardGroup>

@@ -1,0 +1,222 @@
+---
+title: Radio Button
+description: Radio buttons allow users to select one option from a set.
+---
+
+## Overview
+
+`<mat-radio-button>` provides the same functionality as a native `<input type="radio">` enhanced with Material Design styling and animations. Radio buttons are typically used within a `<mat-radio-group>` to create a set of mutually exclusive options.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Template">
+    ```html
+    <mat-radio-group>
+      <mat-radio-button value="1">Option 1</mat-radio-button>
+      <mat-radio-button value="2">Option 2</mat-radio-button>
+      <mat-radio-button value="3">Option 3</mat-radio-button>
+    </mat-radio-group>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-radio-example',
+      template: `
+        <mat-radio-group [formControl]="radioControl">
+          <mat-radio-button value="option1">Option 1</mat-radio-button>
+          <mat-radio-button value="option2">Option 2</mat-radio-button>
+          <mat-radio-button value="option3">Option 3</mat-radio-button>
+        </mat-radio-group>
+      `
+    })
+    export class RadioExample {
+      radioControl = new FormControl('option1');
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatRadioGroup
+
+Selector: `mat-radio-group`
+
+Exported as: `matRadioGroup`
+
+#### Inputs
+
+<ParamField path="name" type="string">
+  Name of the radio button group. All radio buttons inside this group will use this name.
+</ParamField>
+
+<ParamField path="value" type="any">
+  Value for the radio-group. Should equal the value of the selected radio button if there is a corresponding radio button with a matching value.
+</ParamField>
+
+<ParamField path="selected" type="MatRadioButton | null" default="null">
+  The currently selected radio button. If set to a new radio button, the radio group value will be updated to match the new selected button.
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the radio group is disabled.
+</ParamField>
+
+<ParamField path="required" type="boolean" default="false">
+  Whether the radio group is required.
+</ParamField>
+
+<ParamField path="labelPosition" type="'before' | 'after'" default="'after'">
+  Whether the labels should appear after or before the radio buttons. Defaults to 'after'.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette">
+  Theme color of the radio buttons in the group. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="disabledInteractive" type="boolean" default="false">
+  Whether buttons in the group should be interactive while they're disabled.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="change" type="EventEmitter<MatRadioChange>">
+  Event emitted when the group value changes. Change events are only emitted when the value changes due to user interaction.
+</ParamField>
+
+### MatRadioButton
+
+Selector: `mat-radio-button`
+
+Exported as: `matRadioButton`
+
+#### Inputs
+
+<ParamField path="id" type="string">
+  A unique id for the radio button. Auto-generated if not provided.
+</ParamField>
+
+<ParamField path="name" type="string | null" default="null">
+  Analog to HTML 'name' attribute used to group radios for unique selection.
+</ParamField>
+
+<ParamField path="value" type="any">
+  The value of this radio button.
+</ParamField>
+
+<ParamField path="checked" type="boolean" default="false">
+  Whether the radio button is checked.
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the radio button is disabled.
+</ParamField>
+
+<ParamField path="labelPosition" type="'before' | 'after'" default="'after'">
+  Whether the label should appear after or before the radio button. Defaults to 'after'.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette">
+  Theme color of the radio button. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether ripples are disabled on the radio button.
+</ParamField>
+
+<ParamField path="disabledInteractive" type="boolean" default="false">
+  Whether the radio button should remain interactive when it is disabled.
+</ParamField>
+
+<ParamField path="tabIndex" type="number" default="0">
+  Tabindex of the radio button.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="change" type="EventEmitter<MatRadioChange>">
+  Event emitted when the checked state of this radio button changes.
+</ParamField>
+
+### MatRadioChange
+
+<ParamField path="source" type="MatRadioButton">
+  The radio button that emits the change event.
+</ParamField>
+
+<ParamField path="value" type="any">
+  The value of the radio button.
+</ParamField>
+
+## Accessibility
+
+- The radio group uses `role="radiogroup"`
+- Each radio button uses a native `<input type="radio">` element
+- Labels are properly associated with radio buttons
+- Use the `name` attribute to group related radio buttons
+- Keyboard navigation is fully supported (Arrow keys to navigate, Space to select)
+- Screen readers announce the current selection and group information
+- Disabled radio buttons are not focusable and are announced as disabled
+
+## Advanced Usage
+
+### Label Position
+
+```html
+<mat-radio-group labelPosition="before">
+  <mat-radio-button value="1">Before label</mat-radio-button>
+  <mat-radio-button value="2">Before label</mat-radio-button>
+</mat-radio-group>
+```
+
+### Dynamic Options
+
+```typescript
+export class RadioDynamicExample {
+  options = [
+    { label: 'Option 1', value: '1' },
+    { label: 'Option 2', value: '2' },
+    { label: 'Option 3', value: '3' }
+  ];
+  selectedValue: string;
+}
+```
+
+```html
+<mat-radio-group [(ngModel)]="selectedValue">
+  <mat-radio-button *ngFor="let option of options" [value]="option.value">
+    {{ option.label }}
+  </mat-radio-button>
+</mat-radio-group>
+```
+
+### Disabled State
+
+```html
+<!-- Disable entire group -->
+<mat-radio-group [disabled]="true">
+  <mat-radio-button value="1">Option 1</mat-radio-button>
+  <mat-radio-button value="2">Option 2</mat-radio-button>
+</mat-radio-group>
+
+<!-- Disable individual button -->
+<mat-radio-group>
+  <mat-radio-button value="1">Option 1</mat-radio-button>
+  <mat-radio-button value="2" [disabled]="true">Option 2 (disabled)</mat-radio-button>
+</mat-radio-group>
+```
+
+### Disabled Interactive
+
+```html
+<mat-radio-group [disabled]="true" [disabledInteractive]="true">
+  <mat-radio-button value="1">Interactive when disabled</mat-radio-button>
+  <mat-radio-button value="2">Interactive when disabled</mat-radio-button>
+</mat-radio-group>
+```

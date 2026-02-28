@@ -1,0 +1,434 @@
+---
+title: MatCard
+description: Card component for Angular Material - provides a content container with Material Design styling.
+---
+
+# MatCard
+
+The `mat-card` is a content container component that provides Material Design styling and layout for cards. Cards contain content and actions about a single subject.
+
+## Basic Usage
+
+```typescript
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'card-example',
+  imports: [MatCardModule, MatButtonModule],
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Card Title</mat-card-title>
+        <mat-card-subtitle>Card Subtitle</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p>Card content goes here.</p>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-button>ACTION 1</button>
+        <button mat-button>ACTION 2</button>
+      </mat-card-actions>
+    </mat-card>
+  `
+})
+export class CardExample {}
+```
+
+## API Reference
+
+### MatCard
+
+Selector: `mat-card`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `appearance` | `MatCardAppearance` | `'raised'` | Card appearance style |
+
+### MatCardHeader
+
+Selector: `mat-card-header`
+
+Container for card header content including title, subtitle, and avatar.
+
+### MatCardTitle
+
+Selector: `mat-card-title`, `[mat-card-title]`, `[matCardTitle]`
+
+Title element for a card.
+
+### MatCardSubtitle
+
+Selector: `mat-card-subtitle`, `[mat-card-subtitle]`, `[matCardSubtitle]`
+
+Subtitle element for a card.
+
+### MatCardContent
+
+Selector: `mat-card-content`
+
+Container for main card content.
+
+### MatCardActions
+
+Selector: `mat-card-actions`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `align` | `'start' \| 'end'` | `'start'` | Position of the actions inside the card |
+
+### MatCardFooter
+
+Selector: `mat-card-footer`
+
+Container for card footer content.
+
+### MatCardTitleGroup
+
+Selector: `mat-card-title-group`
+
+Container for title, subtitle, and content image.
+
+### MatCardImage
+
+Selector: `[mat-card-image]`, `[matCardImage]`
+
+Primary image content for a card.
+
+### MatCardSmImage
+
+Selector: `[mat-card-sm-image]`, `[matCardImageSmall]`
+
+Small image for a card.
+
+### MatCardMdImage
+
+Selector: `[mat-card-md-image]`, `[matCardImageMedium]`
+
+Medium image for a card.
+
+### MatCardLgImage
+
+Selector: `[mat-card-lg-image]`, `[matCardImageLarge]`
+
+Large image for a card.
+
+### MatCardXlImage
+
+Selector: `[mat-card-xl-image]`, `[matCardImageXLarge]`
+
+Extra-large image for a card.
+
+### MatCardAvatar
+
+Selector: `[mat-card-avatar]`, `[matCardAvatar]`
+
+Avatar image for a card header.
+
+## Examples
+
+### Card with Image
+
+```typescript
+@Component({
+  template: `
+    <mat-card>
+      <img mat-card-image src="path/to/image.jpg" alt="Photo">
+      <mat-card-content>
+        <p>Card content with image</p>
+      </mat-card-content>
+    </mat-card>
+  `
+})
+export class CardImageExample {}
+```
+
+### Card with Avatar
+
+```typescript
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  imports: [MatCardModule, MatIconModule],
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <div mat-card-avatar>
+          <mat-icon>person</mat-icon>
+        </div>
+        <mat-card-title>John Doe</mat-card-title>
+        <mat-card-subtitle>Software Engineer</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p>This is a card with an avatar in the header.</p>
+      </mat-card-content>
+    </mat-card>
+  `
+})
+export class CardAvatarExample {}
+```
+
+### Card with Actions Aligned End
+
+```typescript
+@Component({
+  template: `
+    <mat-card>
+      <mat-card-content>
+        <p>Card with actions aligned to the end</p>
+      </mat-card-content>
+      
+      <mat-card-actions align="end">
+        <button mat-button>LIKE</button>
+        <button mat-button>SHARE</button>
+      </mat-card-actions>
+    </mat-card>
+  `
+})
+export class CardActionsAlignExample {}
+```
+
+### Card Appearances
+
+```typescript
+@Component({
+  template: `
+    <mat-card appearance="outlined">
+      <mat-card-content>Outlined card</mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="raised">
+      <mat-card-content>Raised card (default)</mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="filled">
+      <mat-card-content>Filled card</mat-card-content>
+    </mat-card>
+  `
+})
+export class CardAppearancesExample {}
+```
+
+### Card Title Group
+
+```typescript
+@Component({
+  template: `
+    <mat-card>
+      <mat-card-title-group>
+        <mat-card-title>Title</mat-card-title>
+        <mat-card-subtitle>Subtitle</mat-card-subtitle>
+        <img mat-card-sm-image src="path/to/image.jpg" alt="Small image">
+      </mat-card-title-group>
+      
+      <mat-card-content>
+        <p>Content goes here</p>
+      </mat-card-content>
+    </mat-card>
+  `
+})
+export class CardTitleGroupExample {}
+```
+
+### Card Grid Layout
+
+```typescript
+@Component({
+  template: `
+    <div class="card-grid">
+      <mat-card *ngFor="let card of cards">
+        <mat-card-header>
+          <mat-card-title>{{ card.title }}</mat-card-title>
+          <mat-card-subtitle>{{ card.subtitle }}</mat-card-subtitle>
+        </mat-card-header>
+        
+        <img mat-card-image [src]="card.image" [alt]="card.title">
+        
+        <mat-card-content>
+          <p>{{ card.content }}</p>
+        </mat-card-content>
+        
+        <mat-card-actions>
+          <button mat-button>LIKE</button>
+          <button mat-button>SHARE</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  `,
+  styles: [`
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+  `]
+})
+export class CardGridExample {
+  cards = [
+    {
+      title: 'Card 1',
+      subtitle: 'Subtitle 1',
+      image: 'path/to/image1.jpg',
+      content: 'Content for card 1'
+    },
+    // ... more cards
+  ];
+}
+```
+
+### Card with Footer
+
+```typescript
+@Component({
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Article Title</mat-card-title>
+        <mat-card-subtitle>By Author Name</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p>Article content goes here...</p>
+      </mat-card-content>
+      
+      <mat-card-footer>
+        <small>Published on January 1, 2024</small>
+      </mat-card-footer>
+    </mat-card>
+  `
+})
+export class CardFooterExample {}
+```
+
+## Accessibility
+
+Cards are primarily visual containers and do not have specific ARIA roles by default. Add appropriate roles and labels based on your use case:
+
+```html
+<mat-card role="article" aria-label="Blog post">
+  <mat-card-header>
+    <mat-card-title>Accessible Card</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Content here</p>
+  </mat-card-content>
+</mat-card>
+```
+
+For interactive cards:
+
+```html
+<mat-card tabindex="0" role="button" (click)="handleClick()" (keydown.enter)="handleClick()">
+  <mat-card-content>
+    Interactive card content
+  </mat-card-content>
+</mat-card>
+```
+
+## Styling
+
+### Custom Card Styles
+
+```scss
+mat-card {
+  max-width: 400px;
+  margin: 16px;
+}
+
+mat-card-header {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
+
+mat-card-content {
+  padding: 16px;
+}
+
+mat-card-actions {
+  padding: 8px;
+}
+```
+
+### Card Spacing
+
+```scss
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+mat-card {
+  flex: 1 1 300px;
+  max-width: 400px;
+}
+```
+
+## Types
+
+### MatCardAppearance
+
+```typescript
+type MatCardAppearance = 'outlined' | 'raised' | 'filled';
+```
+
+### MatCardConfig
+
+```typescript
+interface MatCardConfig {
+  appearance?: MatCardAppearance;
+}
+```
+
+## Injection Tokens
+
+### MAT_CARD_CONFIG
+
+```typescript
+const MAT_CARD_CONFIG: InjectionToken<MatCardConfig>;
+```
+
+Configure default card appearance:
+
+```typescript
+providers: [
+  {
+    provide: MAT_CARD_CONFIG,
+    useValue: {
+      appearance: 'outlined'
+    }
+  }
+]
+```
+
+## Best Practices
+
+1. **Keep content focused**: Cards should represent a single topic or subject
+2. **Use consistent layouts**: Maintain consistent card structure across your app
+3. **Limit actions**: Include 1-2 primary actions per card
+4. **Responsive sizing**: Ensure cards work well on different screen sizes
+5. **Appropriate images**: Use proper image sizes and aspect ratios
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.card-theme($theme);
+}
+```

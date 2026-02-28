@@ -1,0 +1,548 @@
+---
+title: Theming
+description: Customize the appearance of Angular Material components using the theming system
+icon: palette
+---
+
+## Overview
+
+Angular Material's theming system lets you customize the appearance of your components by defining color palettes, typography, and density. The theming system is based on Google's [Material Design](https://m3.material.io/styles) specification and uses Material Design tokens.
+
+<Info>
+  This guide describes the theming system introduced in Angular Material v19. If you're using an earlier version, refer to [v18.material.angular.dev/guides](https://v18.material.angular.dev/guides).
+</Info>
+
+## Getting Started
+
+Your application needs a **theme file** that includes Angular Material's `mat.theme` mixin. This mixin generates CSS variables based on your color, typography, and density settings.
+
+### Basic Theme
+
+Create a theme file (e.g., `theme.scss`) that applies a color palette, typography, and density:
+
+```scss theme.scss
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+This theme:
+- Uses the violet color palette
+- Applies Roboto font family
+- Uses standard density (0)
+- Supports both light and dark modes via `color-scheme: light dark`
+
+### Applying Background Colors
+
+To apply the theme's surface colors to your application:
+
+```scss styles.scss
+body {
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+```
+
+Or use utility classes:
+
+```scss theme.scss
+html {
+  @include mat.theme((/* ... */));
+  @include mat.system-classes();
+}
+```
+
+```html
+<body class="mat-bg-surface mat-text-on-surface">
+```
+
+## Color Palettes
+
+The theme's color determines component styles like button fills, checkbox colors, and ripple effects.
+
+### Single Color Palette
+
+Provide a single palette to use for primary, secondary, and tertiary colors:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+### Prebuilt Color Palettes
+
+Angular Material provides twelve prebuilt palettes:
+
+<CardGroup cols={3}>
+  <Card title="Red" icon="circle" iconType="solid" color="#f44336">
+    `mat.$red-palette`
+  </Card>
+  <Card title="Green" icon="circle" iconType="solid" color="#4caf50">
+    `mat.$green-palette`
+  </Card>
+  <Card title="Blue" icon="circle" iconType="solid" color="#2196f3">
+    `mat.$blue-palette`
+  </Card>
+  <Card title="Yellow" icon="circle" iconType="solid" color="#ffeb3b">
+    `mat.$yellow-palette`
+  </Card>
+  <Card title="Cyan" icon="circle" iconType="solid" color="#00bcd4">
+    `mat.$cyan-palette`
+  </Card>
+  <Card title="Magenta" icon="circle" iconType="solid" color="#e91e63">
+    `mat.$magenta-palette`
+  </Card>
+  <Card title="Orange" icon="circle" iconType="solid" color="#ff9800">
+    `mat.$orange-palette`
+  </Card>
+  <Card title="Chartreuse" icon="circle" iconType="solid" color="#cddc39">
+    `mat.$chartreuse-palette`
+  </Card>
+  <Card title="Spring Green" icon="circle" iconType="solid" color="#8bc34a">
+    `mat.$spring-green-palette`
+  </Card>
+  <Card title="Azure" icon="circle" iconType="solid" color="#03a9f4">
+    `mat.$azure-palette`
+  </Card>
+  <Card title="Violet" icon="circle" iconType="solid" color="#9c27b0">
+    `mat.$violet-palette`
+  </Card>
+  <Card title="Rose" icon="circle" iconType="solid" color="#e91e63">
+    `mat.$rose-palette`
+  </Card>
+</CardGroup>
+
+### Color Map with Multiple Palettes
+
+Customize primary, secondary, and tertiary colors separately:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$violet-palette,
+      tertiary: mat.$orange-palette,
+      theme-type: light,
+    ),
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+### Theme Type Options
+
+The `theme-type` determines how colors are defined:
+
+<Tabs>
+  <Tab title="color-scheme (Default)">
+    Includes both light and dark colors using the CSS `light-dark()` function:
+    
+    ```scss
+    html {
+      color-scheme: light dark;
+      @include mat.theme((
+        color: mat.$violet-palette,
+        typography: Roboto,
+        density: 0
+      ));
+    }
+    ```
+    
+    The application follows user's system preferences.
+  </Tab>
+  
+  <Tab title="light">
+    Only defines light color values:
+    
+    ```scss
+    html {
+      @include mat.theme((
+        color: (
+          primary: mat.$violet-palette,
+          theme-type: light,
+        ),
+        typography: Roboto,
+        density: 0
+      ));
+    }
+    ```
+  </Tab>
+  
+  <Tab title="dark">
+    Only defines dark color values:
+    
+    ```scss
+    html {
+      @include mat.theme((
+        color: (
+          primary: mat.$violet-palette,
+          theme-type: dark,
+        ),
+        typography: Roboto,
+        density: 0
+      ));
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Custom Color Palettes
+
+Generate custom palettes using the Angular CLI schematic:
+
+```bash
+ng generate @angular/material:theme-color
+```
+
+This schematic creates a custom palette file based on your color inputs for primary, secondary, tertiary, and neutral colors.
+
+## Typography
+
+The typography configuration controls text styles across all components.
+
+### Single Font Family
+
+Apply one font family to all text:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+This uses:
+- **700** for bold text
+- **500** for medium text
+- **400** for regular text
+
+### Typography Map
+
+Customize font families and weights:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: (
+      plain-family: Roboto,
+      brand-family: 'Open Sans',
+      bold-weight: 900,
+      medium-weight: 500,
+      regular-weight: 300,
+    ),
+    density: 0,
+  ));
+}
+```
+
+- **plain-family**: Used for body text
+- **brand-family**: Used for headings and titles
+- **bold-weight**, **medium-weight**, **regular-weight**: Font weight values
+
+### Loading Fonts
+
+Load fonts from Google Fonts in your `index.html`:
+
+```html index.html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+```
+
+<Tip>
+  Angular CLI projects automatically inline Google Fonts to reduce render-blocking requests.
+</Tip>
+
+## Density
+
+Density controls component spacing and size. Values range from **0** (default) to **-5** (most dense).
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: -2,
+  ));
+}
+```
+
+Each step down reduces sizes by 4px:
+
+<Steps>
+  <Step title="Density 0">
+    Default spacing - most comfortable for general use
+  </Step>
+  <Step title="Density -1">
+    Slightly more compact - 4px smaller
+  </Step>
+  <Step title="Density -2">
+    Compact - 8px smaller
+  </Step>
+  <Step title="Density -3">
+    Very compact - 12px smaller
+  </Step>
+  <Step title="Density -4">
+    Extremely compact - 16px smaller
+  </Step>
+  <Step title="Density -5">
+    Maximum density - 20px smaller
+  </Step>
+</Steps>
+
+<Warning>
+  Setting density below 0 can reduce accessibility. High density may make navigation harder for users of assistive technology.
+</Warning>
+
+## Light and Dark Mode
+
+By default, `mat.theme` uses the CSS `light-dark()` function to support both light and dark modes.
+
+### Automatic Mode Switching
+
+Follow user's system preferences:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+```
+
+### Explicit Light or Dark
+
+Force a specific mode:
+
+<CodeGroup>
+```scss Light Mode
+html {
+  color-scheme: light;
+  @include mat.theme((/* ... */));
+}
+```
+
+```scss Dark Mode
+html {
+  color-scheme: dark;
+  @include mat.theme((/* ... */));
+}
+```
+</CodeGroup>
+
+### Class-Based Mode Toggle
+
+Toggle mode with a CSS class:
+
+```scss
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+body.dark-mode {
+  color-scheme: dark;
+}
+```
+
+```typescript
+toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+}
+```
+
+## Multiple Themes
+
+Apply different themes in different contexts:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+.warning-section {
+  @include mat.theme((
+    color: mat.$orange-palette,
+  ));
+}
+```
+
+## Using Theme Styles
+
+Access theme CSS variables in your custom components:
+
+```scss my-component.scss
+.my-banner {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  border: 1px solid var(--mat-sys-outline-variant);
+  font: var(--mat-sys-body-large);
+}
+```
+
+Or use utility classes:
+
+```html
+<div class="mat-bg-primary-container mat-text-on-primary-container mat-border-variant mat-font-body-lg">
+  Important message
+</div>
+```
+
+## Customizing Tokens
+
+### System Tokens
+
+Override system-level tokens:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ));
+  
+  .custom-primary {
+    @include mat.theme-overrides((
+      primary-container: #84ffff
+    ));
+  }
+}
+```
+
+Or pass overrides directly:
+
+```scss
+html {
+  @include mat.theme((
+    color: mat.$violet-palette,
+    typography: Roboto,
+    density: 0
+  ), $overrides: (
+    primary-container: orange,
+  ));
+}
+```
+
+### Component Tokens
+
+Customize individual components:
+
+```scss
+html {
+  @include mat.card-overrides((
+    elevated-container-color: red,
+    elevated-container-shape: 32px,
+    title-text-size: 2rem,
+  ));
+}
+```
+
+See each component's documentation for available tokens.
+
+## Strong Focus Indicators
+
+Enable highly visible focus outlines for better accessibility:
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((/* ... */));
+  @include mat.strong-focus-indicators();
+}
+```
+
+### Customize Focus Indicators
+
+```scss
+@include mat.strong-focus-indicators((
+  border-color: red,
+  border-style: dotted,
+  border-width: 4px,
+  border-radius: 2px,
+));
+```
+
+## Shadow DOM
+
+If using Shadow DOM, load theme styles within each shadow root:
+
+```typescript
+@Component({
+  selector: 'app-shadow',
+  template: '<button mat-raised-button>Click me</button>',
+  styles: [`
+    @import '@angular/material/prebuilt-themes/azure-blue.css';
+  `],
+  encapsulation: ViewEncapsulation.ShadowDom
+})
+export class ShadowComponent {}
+```
+
+Or use [Constructable Stylesheets](https://web.dev/articles/constructable-stylesheets).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Typography" icon="font" href="/essentials/typography">
+    Learn more about typography configuration
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access" href="/essentials/accessibility">
+    Accessibility features and best practices
+  </Card>
+  
+  <Card title="Component Theming" icon="paintbrush" href="https://material.angular.dev/guide/theming-your-components">
+    Theme your custom components
+  </Card>
+  
+  <Card title="Material Design" icon="palette" href="https://m3.material.io/">
+    Material Design specification
+  </Card>
+</CardGroup>

@@ -1,0 +1,257 @@
+---
+title: Tooltip
+description: Directive to display informative tooltips on hover or focus
+---
+
+Directive that attaches a Material Design tooltip to elements. Shows on hover, focus, or long-press.
+
+## Import
+
+```typescript
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
+```
+
+## Basic Usage
+
+```html
+<button matTooltip="This is a tooltip">Hover me</button>
+```
+
+## API Reference
+
+### MatTooltip
+
+Selector: `[matTooltip]`
+
+Exported as: `matTooltip`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() matTooltip` | `string` | Message to display in tooltip |
+| `@Input() matTooltipPosition` | `TooltipPosition` | Position relative to element. Default: 'below' |
+| `@Input() matTooltipPositionAtOrigin` | `boolean` | Position at click/touch origin |
+| `@Input() matTooltipDisabled` | `boolean` | Disables the tooltip |
+| `@Input() matTooltipShowDelay` | `number` | Delay before showing (ms). Default: 0 |
+| `@Input() matTooltipHideDelay` | `number` | Delay before hiding (ms). Default: 0 |
+| `@Input() matTooltipClass` | `string \| string[]` | CSS classes for tooltip |
+| `@Input() matTooltipTouchGestures` | `TooltipTouchGestures` | Touch gesture handling. Options: 'auto', 'on', 'off'. Default: 'auto' |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `show(delay?: number): void` | Shows the tooltip |
+| `hide(delay?: number): void` | Hides the tooltip |
+| `toggle(): void` | Toggles tooltip visibility |
+
+## Position Options
+
+Tooltip can be positioned in 6 locations:
+
+```html
+<button matTooltip="Above" matTooltipPosition="above">Above</button>
+<button matTooltip="Below" matTooltipPosition="below">Below</button>
+<button matTooltip="Left" matTooltipPosition="left">Left</button>
+<button matTooltip="Right" matTooltipPosition="right">Right</button>
+<button matTooltip="Before" matTooltipPosition="before">Before</button>
+<button matTooltip="After" matTooltipPosition="after">After</button>
+```
+
+## Examples
+
+### With Delay
+
+```html
+<button matTooltip="Appears after 1 second"
+        matTooltipShowDelay="1000">
+  Hover me
+</button>
+```
+
+### Disabled Tooltip
+
+```html
+<button matTooltip="You won't see this"
+        [matTooltipDisabled]="true">
+  No tooltip
+</button>
+```
+
+### Manual Control
+
+```typescript
+export class TooltipComponent {
+  @ViewChild(MatTooltip) tooltip!: MatTooltip;
+
+  showTooltip() {
+    this.tooltip.show();
+  }
+
+  hideTooltip() {
+    this.tooltip.hide();
+  }
+}
+```
+
+```html
+<button #tooltip="matTooltip"
+        matTooltip="Controlled tooltip">
+  Button
+</button>
+<button (click)="showTooltip()">Show</button>
+<button (click)="hideTooltip()">Hide</button>
+```
+
+### Custom Styling
+
+```html
+<button matTooltip="Custom styled"
+        matTooltipClass="custom-tooltip">
+  Styled tooltip
+</button>
+```
+
+```css
+.custom-tooltip {
+  font-size: 16px;
+  background-color: #1976d2;
+  max-width: 300px;
+}
+```
+
+### Multi-line Tooltip
+
+```html
+<button [matTooltip]="longMessage">
+  Long tooltip
+</button>
+```
+
+```typescript
+export class Component {
+  longMessage = `
+    This is a longer tooltip message
+    that spans multiple lines.
+    It will wrap automatically.
+  `;
+}
+```
+
+### With Icons
+
+```html
+<mat-icon matTooltip="Settings">settings</mat-icon>
+```
+
+### Disabled Interactive Elements
+
+```html
+<!-- Wrap disabled elements for tooltips to work -->
+<div matTooltip="This button is disabled">
+  <button mat-raised-button [disabled]="true">
+    Disabled
+  </button>
+</div>
+```
+
+### Dynamic Tooltip
+
+```typescript
+export class Component {
+  getMessage(): string {
+    return `Current time: ${new Date().toLocaleTimeString()}`;
+  }
+}
+```
+
+```html
+<button [matTooltip]="getMessage()">
+  Dynamic
+</button>
+```
+
+### Touch Gestures
+
+```html
+<!-- Disable on touch devices -->
+<button matTooltip="Desktop only"
+        matTooltipTouchGestures="off">
+  Desktop tooltip
+</button>
+
+<!-- Always enable -->
+<button matTooltip="All devices"
+        matTooltipTouchGestures="on">
+  Universal tooltip
+</button>
+```
+
+### Position at Origin
+
+```html
+<button matTooltip="Appears at click point"
+        [matTooltipPositionAtOrigin]="true">
+  Click me
+</button>
+```
+
+## Accessibility
+
+- Tooltip content added via `aria-describedby`
+- Shows on keyboard focus (not just hover)
+- Dismisses on ESC key
+- Keep tooltip messages concise
+- Don't put essential information only in tooltips
+
+```html
+<!-- Good: Icon button with tooltip -->
+<button mat-icon-button 
+        aria-label="Delete item"
+        matTooltip="Delete">
+  <mat-icon>delete</mat-icon>
+</button>
+```
+
+## Configuration
+
+```typescript
+import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
+
+const customTooltipDefaults: MatTooltipDefaultOptions = {
+  showDelay: 500,
+  hideDelay: 0,
+  touchendHideDelay: 1500,
+  position: 'above',
+  touchGestures: 'auto'
+};
+
+@NgModule({
+  providers: [
+    { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: customTooltipDefaults }
+  ]
+})
+export class AppModule {}
+```
+
+## Types
+
+```typescript
+type TooltipPosition = 'left' | 'right' | 'above' | 'below' | 'before' | 'after';
+type TooltipTouchGestures = 'auto' | 'on' | 'off';
+```
+
+## Best Practices
+
+- Use tooltips for supplementary information, not critical content
+- Keep messages brief (1-2 lines)
+- Don't use tooltips on mobile-only interfaces
+- Provide adequate show delay to avoid accidental triggers
+- Use consistent positioning throughout your app
+
+## Related Components
+
+- [Snack Bar](/components/snack-bar) - For actionable notifications
+- [Dialog](/components/dialog) - For more complex information

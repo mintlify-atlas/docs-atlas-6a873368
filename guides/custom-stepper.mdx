@@ -1,0 +1,193 @@
+---
+title: "Creating a Custom Stepper"
+description: "Build a custom stepper component using the CDK stepper"
+---
+
+The [CDK stepper](https://material.angular.dev/cdk/stepper/overview) allows you to build a custom stepper which you can completely style yourself without any specific Material Design styling.
+
+## Overview
+
+In this guide, we'll learn how to build our own custom stepper using the CDK stepper. This approach gives you complete control over the appearance and behavior of your stepper.
+
+## Create the Custom Stepper Component
+
+<Steps>
+  <Step title="Extend CdkStepper">
+    Create a new Angular component that extends `CdkStepper`:
+
+    ```ts
+    @Component({
+      selector: 'app-custom-stepper',
+      templateUrl: './custom-stepper.component.html',
+      styleUrl: './custom-stepper.component.css',
+      // This custom stepper provides itself as CdkStepper so that it can be recognized
+      // by other components.
+      providers: [{ provide: CdkStepper, useExisting: CustomStepperComponent }]
+    })
+    export class CustomStepperComponent extends CdkStepper {
+      onClick(index: number): void {
+        this.selectedIndex = index;
+      }
+    }
+    ```
+
+    <Info>
+      After extending `CdkStepper`, you can access properties like `linear`, `selectedIndex`, and `steps` from the base class.
+    </Info>
+  </Step>
+
+  <Step title="Create the template">
+    Design the HTML template for your custom stepper:
+
+    ```html
+    <section class="container">
+      <header><h2>Step {{selectedIndex + 1}}/{{steps.length}}</h2></header>
+
+      <div [style.display]="selected ? 'block' : 'none'">
+        <!-- Content from the CdkStep is projected here -->
+        <ng-container [ngTemplateOutlet]="selected.content"></ng-container>
+      </div>
+
+      <footer class="step-navigation-bar">
+        <button class="nav-button" cdkStepperPrevious>&larr;</button>
+        @for (step of steps; track step; let i = $index) {
+          <button class="step" [class.active]="selectedIndex === i" (click)="onClick(i)">
+            Step {{i + 1}}
+          </button>
+        }
+        <button class="nav-button" cdkStepperNext>&rarr;</button>
+      </footer>
+    </section>
+    ```
+  </Step>
+
+  <Step title="Add custom styles">
+    Style the stepper however you want:
+
+    ```css
+    .example-container {
+      border: 1px solid black;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .example-step-navigation-bar {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 10px;
+    }
+
+    .example-step {
+      background: transparent;
+      border: 0;
+      margin: 0 10px;
+      padding: 10px;
+      color: black;
+    }
+
+    .example-step.example-active {
+      color: blue;
+      border-bottom: 1px solid blue;
+    }
+
+    .example-nav-button {
+      background: transparent;
+      border: 0;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Using the Custom Stepper
+
+Now you can use your custom stepper component and fill it with steps:
+
+<CodeGroup>
+```html Basic Usage
+<app-custom-stepper>
+  <cdk-step><p>This is any content of "Step 1"</p></cdk-step>
+  <cdk-step><p>This is any content of "Step 2"</p></cdk-step>
+</app-custom-stepper>
+```
+
+```html Dynamic Steps
+<app-custom-stepper>
+  @for (step of mySteps; track step) {
+    <cdk-step>
+      <my-step-component [step]="$index"></my-step-component>
+    </cdk-step>
+  }
+</app-custom-stepper>
+```
+</CodeGroup>
+
+<Note>
+  Each step needs to be wrapped inside a `<cdk-step>` tag.
+</Note>
+
+## Linear Mode
+
+The `CdkStepper` provides linear mode which requires the user to complete previous steps before proceeding.
+
+### Example Without Forms
+
+```html
+<app-custom-stepper linear>
+  <cdk-step editable="false" [completed]="completed">
+    <input type="text" name="a" value="Cannot proceed to next step" />
+    <button (click)="completeStep()">Complete step</button>
+  </cdk-step>
+  <cdk-step editable="false">
+    <input type="text" name="b" value="b" />
+  </cdk-step>
+</app-custom-stepper>
+```
+
+```ts
+export class AppComponent {
+  completed = false;
+
+  completeStep(): void {
+    this.completed = true;
+  }
+}
+```
+
+<Warning>
+  In linear mode, users cannot navigate to subsequent steps until the current step is marked as completed.
+</Warning>
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="Step Navigation">
+    The CDK stepper provides built-in directives for navigation:
+    - `cdkStepperPrevious` - Navigate to the previous step
+    - `cdkStepperNext` - Navigate to the next step
+  </Accordion>
+
+  <Accordion title="Step Control">
+    Control step behavior using:
+    - `selectedIndex` - Get or set the current step
+    - `linear` - Enable sequential step validation
+    - `completed` - Mark a step as completed
+    - `editable` - Allow returning to completed steps
+  </Accordion>
+
+  <Accordion title="Custom Content">
+    Use `ng-content` or `ngTemplateOutlet` to project custom content into each step.
+  </Accordion>
+</AccordionGroup>
+
+## API Documentation
+
+For detailed information about available properties and methods, see the [CDK Stepper API documentation](https://material.angular.dev/cdk/stepper/api#CdkStepper).
+
+<CardGroup cols={2}>
+  <Card title="Custom Form Field" icon="input-text" href="/guides/custom-form-field">
+    Create custom form controls
+  </Card>
+  <Card title="Theming" icon="palette" href="/guides/theming-components">
+    Style your components
+  </Card>
+</CardGroup>

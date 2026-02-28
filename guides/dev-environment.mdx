@@ -1,0 +1,487 @@
+---
+title: "Developer Environment Setup"
+description: "Get your development environment ready for contributing to Angular Material"
+---
+
+This guide will help you set up your development environment to contribute to Angular Material and CDK.
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Node.js" icon="node">
+    Install Node.js (LTS version recommended)
+  </Card>
+  <Card title="pnpm" icon="package">
+    Package manager used by the project
+  </Card>
+  <Card title="Git" icon="git">
+    Version control system
+  </Card>
+  <Card title="Code Editor" icon="code">
+    VS Code or your preferred editor
+  </Card>
+</CardGroup>
+
+## Initial Setup
+
+<Steps>
+  <Step title="Install Node.js">
+    We recommend using [nvm](https://github.com/nvm-sh/nvm) to manage Node versions:
+
+    ```bash
+    # Install nvm
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+    # Install and use LTS Node
+    nvm install --lts
+    nvm use --lts
+    ```
+  </Step>
+
+  <Step title="Install pnpm">
+    ```bash
+    npm install -g pnpm
+    ```
+
+    <Info>
+      The project uses pnpm instead of npm for better performance and disk space efficiency.
+    </Info>
+  </Step>
+
+  <Step title="Fork the repository">
+    1. Go to [angular/components](https://github.com/angular/components)
+    2. Click the "Fork" button
+    3. Clone your fork:
+
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/components.git
+    cd components
+    ```
+  </Step>
+
+  <Step title="Set up remotes">
+    ```bash
+    # Add upstream remote
+    git remote add upstream https://github.com/angular/components.git
+
+    # Verify remotes
+    git remote -v
+    ```
+
+    <Note>
+      Use `upstream` for angular/components and `origin` for your fork.
+    </Note>
+  </Step>
+
+  <Step title="Install dependencies">
+    ```bash
+    pnpm install
+    ```
+
+    This may take a few minutes on first run.
+  </Step>
+</Steps>
+
+## Windows Setup
+
+<Warning>
+  Windows users should use Windows Subsystem for Linux (WSL).
+</Warning>
+
+<Steps>
+  <Step title="Install WSL">
+    Run as Administrator in PowerShell:
+
+    ```powershell
+    wsl --install
+    ```
+  </Step>
+
+  <Step title="Restart your machine">
+    After installation, restart Windows.
+  </Step>
+
+  <Step title="Enter WSL">
+    ```bash
+    wsl
+    ```
+
+    You're now in a Linux environment!
+  </Step>
+
+  <Step title="Continue with standard setup">
+    Follow the installation steps above from within WSL.
+  </Step>
+</Steps>
+
+<Info>
+  For more details, see [Microsoft's WSL documentation](https://learn.microsoft.com/en-us/windows/wsl/install).
+</Info>
+
+## Building the Project
+
+### Development Build
+
+```bash
+# Build all packages
+pnpm build
+
+# Output is in dist/releases/
+ls dist/releases/
+```
+
+### Development Server
+
+Start the dev app with live reload:
+
+```bash
+pnpm dev-app
+```
+
+The dev app will open at `http://localhost:4200` and automatically reload on changes.
+
+<Tabs>
+  <Tab title="Material Dev App">
+    Browse Material components:
+    - Navigate to `http://localhost:4200`
+    - Select component from menu
+    - Test different configurations
+  </Tab>
+
+  <Tab title="CDK Dev App">
+    Browse CDK components:
+    - Navigate to `http://localhost:4200/cdk`
+    - Test CDK primitives
+  </Tab>
+</Tabs>
+
+## Running Tests
+
+### Unit Tests
+
+<CodeGroup>
+```bash Specific Component
+# Test a single component
+pnpm test button
+pnpm test src/material/button
+```
+
+```bash All Tests
+# Run all unit tests (takes a while!)
+pnpm test
+```
+
+```bash Debug Mode
+# Debug tests in browser
+pnpm test button --debug
+```
+</CodeGroup>
+
+<Info>
+  Use `--debug` to manually connect a browser to Karma for debugging.
+</Info>
+
+### E2E Tests
+
+```bash
+pnpm e2e
+```
+
+### Linting
+
+```bash
+pnpm lint
+```
+
+## Working with Public API
+
+When making changes to public APIs:
+
+### Review API Changes
+
+```bash
+# After making changes
+pnpm test:api
+```
+
+This compares your changes against golden files.
+
+### Approve API Changes
+
+```bash
+# Approve changes for a specific target
+pnpm approve-api button
+
+# Review the diff
+cat goldens/material/button.api.md
+```
+
+<Warning>
+  Only approve intentional public API changes. These changes may be breaking!
+</Warning>
+
+## Getting Build Artifacts
+
+CI stores build artifacts for each PR:
+
+<Steps>
+  <Step title="Find the CI run">
+    Go to the PR and click "Checks"
+  </Step>
+
+  <Step title="Navigate to artifacts">
+    1. Click on `upload_release_packages` job
+    2. Switch to "Artifacts" tab
+  </Step>
+
+  <Step title="Download packages">
+    Archives are named: `<package>-pr<number>-<sha>.tgz`
+
+    Example:
+    ```json
+    {
+      "dependencies": {
+        "@angular/material": "https://circle-artifacts.com/.../material-pr12345-abc.tgz"
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Environment Variables
+
+Optional environment variables for the dev app:
+
+### Google Maps API Key
+
+```bash
+# In .bashrc or .zshrc
+export GOOGLE_MAPS_KEY=<your-api-key>
+```
+
+This enables Google Maps examples in the dev app.
+
+## Disabling Git Hooks
+
+If you don't want automatic commit validation:
+
+```bash
+# In .bashrc or .zshrc
+export HUSKY=0
+```
+
+This disables:
+- Commit message validation
+- Pre-commit formatting
+
+<Note>
+  Git hooks help maintain code quality but can be disabled for certain workflows.
+</Note>
+
+## Development Workflow
+
+### Typical Workflow
+
+<Steps>
+  <Step title="Create a branch">
+    ```bash
+    git checkout -b fix/button-ripple main
+    ```
+  </Step>
+
+  <Step title="Start dev server">
+    ```bash
+    pnpm dev-app
+    ```
+  </Step>
+
+  <Step title="Make changes">
+    Edit source files - the dev app will auto-reload
+  </Step>
+
+  <Step title="Run tests">
+    ```bash
+    pnpm test button
+    ```
+  </Step>
+
+  <Step title="Lint your code">
+    ```bash
+    pnpm lint
+    ```
+  </Step>
+
+  <Step title="Build the project">
+    ```bash
+    pnpm build
+    ```
+  </Step>
+
+  <Step title="Commit changes">
+    ```bash
+    git add .
+    git commit -m "fix(button): resolve ripple positioning issue"
+    ```
+  </Step>
+</Steps>
+
+## Common Commands
+
+<CodeGroup>
+```bash Build
+# Full build
+pnpm build
+
+# Build specific package
+pnpm build button
+```
+
+```bash Test
+# Run unit tests
+pnpm test button
+
+# Run with debug
+pnpm test button --debug
+
+# Run e2e tests
+pnpm e2e
+```
+
+```bash Dev Server
+# Start dev app
+pnpm dev-app
+
+# Start on different port
+pnpm dev-app -- --port 4201
+```
+
+```bash Code Quality
+# Lint
+pnpm lint
+
+# Format
+pnpm format
+
+# API checks
+pnpm test:api
+pnpm approve-api <target>
+```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Build fails with memory error">
+    Increase Node memory:
+
+    ```bash
+    export NODE_OPTIONS="--max-old-space-size=8192"
+    pnpm build
+    ```
+  </Accordion>
+
+  <Accordion title="Tests fail randomly">
+    Clear caches:
+
+    ```bash
+    # Clear node_modules
+    rm -rf node_modules
+    pnpm install
+
+    # Clear Angular cache
+    pnpm ng cache clean
+    ```
+  </Accordion>
+
+  <Accordion title="Dev app won't start">
+    Check port availability:
+
+    ```bash
+    # Kill process on port 4200
+    lsof -ti:4200 | xargs kill -9
+
+    # Or use different port
+    pnpm dev-app -- --port 4201
+    ```
+  </Accordion>
+
+  <Accordion title="Git hooks not running">
+    Reinstall hooks:
+
+    ```bash
+    pnpm husky install
+    ```
+  </Accordion>
+
+  <Accordion title="WSL performance issues">
+    Clone repo inside WSL filesystem (not /mnt/c):
+
+    ```bash
+    # Good
+    cd ~
+    git clone ...
+
+    # Bad (slow)
+    cd /mnt/c/Users/...
+    git clone ...
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## IDE Setup
+
+### VS Code
+
+Recommended extensions:
+
+```json
+{
+  "recommendations": [
+    "angular.ng-template",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "stylelint.vscode-stylelint"
+  ]
+}
+```
+
+### IntelliJ / WebStorm
+
+1. Enable TypeScript support
+2. Enable Angular support
+3. Configure Prettier as formatter
+4. Enable ESLint
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Contributing Guide" icon="code-pull-request" href="/guides/contributing">
+    How to contribute code
+  </Card>
+  <Card title="Coding Standards" icon="book" href="/guides/coding-standards">
+    Code style guidelines
+  </Card>
+  <Card title="GitHub Repo" icon="github" href="https://github.com/angular/components">
+    Angular Components repository
+  </Card>
+  <Card title="Team Wiki" icon="book-open" href="https://github.com/angular/components/wiki">
+    Internal team documentation
+  </Card>
+</CardGroup>
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="GitHub Discussions" icon="messages" href="https://github.com/angular/components/discussions">
+    Ask development questions
+  </Card>
+  <Card title="Gitter Chat" icon="comment" href="https://gitter.im/angular/material2">
+    Real-time chat with team
+  </Card>
+  <Card title="Stack Overflow" icon="stack-overflow" href="https://stackoverflow.com/questions/tagged/angular-material2">
+    Community Q&A
+  </Card>
+  <Card title="Discord" icon="discord" href="https://discord.gg/angular">
+    Angular community Discord
+  </Card>
+</CardGroup>

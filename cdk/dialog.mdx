@@ -1,0 +1,125 @@
+---
+title: CdkDialog
+description: Unstyled modal dialog component
+---
+
+The `CdkDialog` provides behavior for modal dialogs without visual styling.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {DialogModule} from '@angular/cdk/dialog';
+```
+
+## Basic Usage
+
+### Opening a Dialog
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Dialog} from '@angular/cdk/dialog';
+
+@Component({
+  selector: 'app-simple-dialog',
+  template: '<p>This is a dialog!</p><button (click)="close()">Close</button>',
+})
+export class SimpleDialogComponent {
+  dialogRef = inject(DialogRef);
+
+  close() {
+    this.dialogRef.close('result');
+  }
+}
+
+@Component({
+  selector: 'app-main',
+  template: '<button (click)="openDialog()">Open Dialog</button>',
+})
+export class MainComponent {
+  private dialog = inject(Dialog);
+
+  openDialog() {
+    const dialogRef = this.dialog.open(SimpleDialogComponent);
+    
+    dialogRef.closed.subscribe(result => {
+      console.log('Dialog closed with:', result);
+    });
+  }
+}
+```
+
+### Passing Data
+
+```typescript
+import {Component, inject, Inject} from '@angular/core';
+import {DIALOG_DATA, DialogRef} from '@angular/cdk/dialog';
+
+@Component({
+  template: `
+    <h2>{{ data.title }}</h2>
+    <p>{{ data.message }}</p>
+    <button (click)="close()">OK</button>
+  `,
+})
+export class DataDialogComponent {
+  dialogRef = inject(DialogRef);
+  data = inject(DIALOG_DATA);
+}
+
+// Open with data
+this.dialog.open(DataDialogComponent, {
+  data: {
+    title: 'Confirmation',
+    message: 'Are you sure?'
+  }
+});
+```
+
+### Configuration
+
+```typescript
+this.dialog.open(MyDialogComponent, {
+  width: '400px',
+  height: '300px',
+  hasBackdrop: true,
+  backdropClass: 'custom-backdrop',
+  panelClass: 'custom-panel',
+  disableClose: true,  // Prevent closing on backdrop click
+  closeOnNavigation: true,
+  data: {/* ... */}
+});
+```
+
+## API Reference
+
+### Dialog Service
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `open(component, config?)` | `DialogRef` | Open a dialog |
+
+### DialogRef
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique dialog ID |
+| `closed` | `Observable` | Emits when dialog closes |
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `close(result?)` | `void` | Close the dialog |
+| `backdropClick()` | `Observable` | Backdrop click events |
+| `keydownEvents()` | `Observable` | Keyboard events |
+
+### DIALOG_DATA
+
+Injection token for dialog data.
+
+## See Also
+
+- [Overlay](/cdk/overlay)
+- [Portal](/cdk/portal)

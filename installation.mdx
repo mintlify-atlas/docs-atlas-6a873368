@@ -1,0 +1,293 @@
+---
+title: Installation
+description: Learn how to install Angular Material and set up your Angular project
+icon: download
+---
+
+## Prerequisites
+
+Before installing Angular Material, make sure you have:
+
+<Steps>
+  <Step title="Node.js and npm">
+    Install [Node.js](https://nodejs.org/) (which includes npm). Angular requires a current, active LTS, or maintenance LTS version of Node.js.
+  </Step>
+  
+  <Step title="Angular CLI">
+    Install the Angular CLI globally:
+    
+    ```bash
+    npm install -g @angular/cli
+    ```
+  </Step>
+  
+  <Step title="Angular Project">
+    Create a new Angular project or use an existing one:
+    
+    ```bash
+    ng new my-app
+    cd my-app
+    ```
+  </Step>
+</Steps>
+
+## Automatic Installation (Recommended)
+
+The easiest way to install Angular Material is using the Angular CLI's `ng add` command:
+
+```bash
+g add @angular/material
+```
+
+### What `ng add` Does
+
+The `ng add` command will:
+
+<AccordionGroup>
+  <Accordion title="Install Dependencies" icon="box">
+    - Adds `@angular/material` to `package.json`
+    - Adds `@angular/cdk` (Component Dev Kit) to `package.json`
+    - Adds `@angular/animations` to `package.json`
+  </Accordion>
+  
+  <Accordion title="Configure Theme" icon="palette">
+    You'll be prompted to choose a prebuilt theme or set up a custom theme:
+    
+    - **Azure Blue** - Indigo & Pink
+    - **Rose Red** - Pink & Indigo
+    - **Magenta Violet** - Purple & Green
+    - **Cyan Orange** - Deep Orange & Amber
+    - **Custom** - Set up an extensible custom theme
+    
+    The selected theme will be added to your `angular.json` or a custom theme file will be created.
+  </Accordion>
+  
+  <Accordion title="Set Up Typography" icon="text">
+    You'll be asked whether to apply global Angular Material typography styles:
+    
+    - **Yes** - Applies Material Design typography across your entire application
+    - **No** - You can manually configure typography later
+  </Accordion>
+  
+  <Accordion title="Add Fonts and Icons" icon="font">
+    - Adds Roboto font to your `index.html`
+    - Adds Material Design icon font to your `index.html`
+  </Accordion>
+  
+  <Accordion title="Configure Global Styles" icon="file-code">
+    Adds global CSS to `styles.css` or `styles.scss`:
+    
+    - Removes margins from `body`
+    - Sets `height: 100%` on `html` and `body`
+    - Sets Roboto as the default application font
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  The `ng add` command is the recommended way to install Angular Material as it handles all the configuration automatically.
+</Tip>
+
+## Manual Installation
+
+If you prefer to install and configure Angular Material manually, follow these steps:
+
+<Steps>
+  <Step title="Install npm Packages">
+    Install the required packages using npm:
+    
+    ```bash
+    npm install @angular/material @angular/cdk @angular/animations
+    ```
+  </Step>
+  
+  <Step title="Configure Animations">
+    Add the `BrowserAnimationsModule` to your application. Import it in your app configuration:
+    
+    ```typescript app.config.ts
+    import { provideAnimations } from '@angular/platform-browser/animations';
+    
+    export const appConfig: ApplicationConfig = {
+      providers: [
+        provideAnimations(),
+        // other providers...
+      ]
+    };
+    ```
+    
+    Or if you're using NgModules:
+    
+    ```typescript app.module.ts
+    import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+    
+    @NgModule({
+      imports: [
+        BrowserAnimationsModule,
+        // other imports...
+      ],
+    })
+    export class AppModule { }
+    ```
+    
+    <Info>
+      If you don't want animations, you can use `NoopAnimationsModule` instead.
+    </Info>
+  </Step>
+  
+  <Step title="Include a Theme">
+    Including a theme is required to apply Material Design styles to your components.
+    
+    Add one of the prebuilt themes to your `angular.json`:
+    
+    ```json angular.json
+    "styles": [
+      "@angular/material/prebuilt-themes/azure-blue.css",
+      "src/styles.css"
+    ],
+    ```
+    
+    Available prebuilt themes:
+    - `azure-blue.css`
+    - `rose-red.css`
+    - `magenta-violet.css`
+    - `cyan-orange.css`
+    
+    Or create a custom theme file (see [Theming Guide](/essentials/theming)).
+  </Step>
+  
+  <Step title="Add Material Icons">
+    Add the Material Design icon font to your `index.html`:
+    
+    ```html index.html
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    ```
+  </Step>
+  
+  <Step title="Add Roboto Font (Optional)">
+    Add the Roboto font to your `index.html`:
+    
+    ```html index.html
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    ```
+  </Step>
+  
+  <Step title="Configure Global Styles (Optional)">
+    Add these styles to your global `styles.css` or `styles.scss`:
+    
+    ```css styles.css
+    html, body { height: 100%; }
+    body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+    ```
+  </Step>
+</Steps>
+
+## Installing Other Packages
+
+### Angular CDK Only
+
+If you only need the Component Dev Kit (CDK) without Material components:
+
+```bash
+ng add @angular/cdk
+```
+
+Or manually:
+
+```bash
+npm install @angular/cdk
+```
+
+### Google Maps Component
+
+To use the Google Maps component:
+
+```bash
+ng add @angular/google-maps
+```
+
+You'll also need to:
+1. Get a [Google Maps API key](https://developers.google.com/maps/gmp-get-started)
+2. Load the Google Maps JavaScript API in your `index.html`
+
+See the [Google Maps documentation](/google-maps/overview) for more details.
+
+### YouTube Player Component
+
+To use the YouTube Player component:
+
+```bash
+ng add @angular/youtube-player
+```
+
+The YouTube iframe API will be loaded automatically when needed.
+
+See the [YouTube Player documentation](/youtube-player/overview) for more details.
+
+## Verify Installation
+
+After installation, verify that everything is working by importing and using a component:
+
+```typescript app.component.ts
+import { Component } from '@angular/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
+@Component({
+  selector: 'app-root',
+  imports: [MatSlideToggleModule],
+  template: '<mat-slide-toggle>Toggle me!</mat-slide-toggle>',
+})
+export class AppComponent {}
+```
+
+<CodeGroup>
+```bash npm
+npm start
+```
+
+```bash ng
+ng serve
+```
+</CodeGroup>
+
+Visit [http://localhost:4200](http://localhost:4200) and you should see a Material slide toggle component.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Build your first Material application
+  </Card>
+  
+  <Card title="Theming" icon="palette" href="/essentials/theming">
+    Customize your component appearance
+  </Card>
+  
+  <Card title="Schematics" icon="terminal" href="/essentials/schematics">
+    Generate components with Angular CLI
+  </Card>
+  
+  <Card title="Components" icon="grid" href="/components/button">
+    Explore available components
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Components have no styles" icon="paint-roller">
+    Make sure you've included a theme. Check that your `angular.json` includes a prebuilt theme or that your custom theme is being loaded.
+  </Accordion>
+  
+  <Accordion title="Animations not working" icon="film">
+    Verify that `BrowserAnimationsModule` or `provideAnimations()` is included in your application configuration.
+  </Accordion>
+  
+  <Accordion title="Icons not displaying" icon="icons">
+    Check that the Material Icons font is loaded in your `index.html`. You can also use SVG icons with `MatIconModule`.
+  </Accordion>
+  
+  <Accordion title="Font not applied" icon="font">
+    Ensure the Roboto font is loaded in your `index.html` and the global styles are configured correctly.
+  </Accordion>
+</AccordionGroup>

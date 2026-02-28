@@ -1,0 +1,195 @@
+---
+title: 'ARIA Listbox'
+description: 'Accessible listbox component for selectable lists'
+---
+
+# ARIA Listbox
+
+The ARIA Listbox provides an accessible, selectable list component following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Listbox
+
+Container for displaying a list of selectable items.
+
+**Selector**: `[ngListbox]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/listbox/listbox.ts:53`
+
+#### Inputs
+
+- `value` (model) - The selected value(s). Use two-way binding with `[(value)]`
+- `multi` (boolean) - Whether multiple selection is enabled. Default: `false`
+- `orientation` ('vertical' | 'horizontal') - List orientation. Default: `'vertical'`
+- `disabled` (boolean) - Whether the listbox is disabled. Default: `false`
+- `readonly` (boolean) - Whether the listbox is read-only. Default: `false`
+- `wrap` (boolean) - Whether keyboard navigation wraps around. Default: `true`
+- `id` (string) - Unique identifier for the listbox
+
+### Option
+
+An individual selectable item within a listbox.
+
+**Selector**: `[ngOption]`
+
+#### Inputs
+
+- `value` (required) - The value associated with this option
+- `label` (string) - The text label for the option
+- `disabled` (boolean) - Whether this option is disabled
+
+## Basic Usage
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Listbox, Option} from '@angular/aria';
+
+@Component({
+  selector: 'app-listbox-example',
+  imports: [Listbox, Option],
+  template: `
+    <ul ngListbox [(value)]="selectedItem">
+      @for (item of items; track item.id) {
+        <li ngOption [value]="item.id" [label]="item.name">
+          {{item.name}}
+        </li>
+      }
+    </ul>
+    
+    <p>Selected: {{selectedItem()}}</p>
+  `
+})
+export class ListboxExample {
+  selectedItem = signal('');
+  
+  items = [
+    {id: '1', name: 'Option 1'},
+    {id: '2', name: 'Option 2'},
+    {id: '3', name: 'Option 3'}
+  ];
+}
+```
+
+## Multiple Selection
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Listbox, Option} from '@angular/aria';
+
+@Component({
+  selector: 'app-multi-select',
+  imports: [Listbox, Option],
+  template: `
+    <ul ngListbox [(value)]="selectedItems" [multi]="true">
+      @for (item of items; track item.id) {
+        <li ngOption [value]="item.id" [label]="item.name">
+          {{item.name}}
+        </li>
+      }
+    </ul>
+    
+    <p>Selected: {{selectedItems().join(', ')}}</p>
+  `
+})
+export class MultiSelectExample {
+  selectedItems = signal<string[]>([]);
+  
+  items = [
+    {id: 'apple', name: 'Apple'},
+    {id: 'banana', name: 'Banana'},
+    {id: 'cherry', name: 'Cherry'}
+  ];
+}
+```
+
+## Horizontal Orientation
+
+```html
+<ul ngListbox [(value)]="selected" orientation="horizontal">
+  <li ngOption value="small">Small</li>
+  <li ngOption value="medium">Medium</li>
+  <li ngOption value="large">Large</li>
+</ul>
+```
+
+## With Disabled Options
+
+```html
+<ul ngListbox [(value)]="selected">
+  <li ngOption value="available">Available</li>
+  <li ngOption value="sold-out" [disabled]="true">Sold Out</li>
+  <li ngOption value="in-stock">In Stock</li>
+</ul>
+```
+
+## Inside a Combobox
+
+Listbox is commonly used within a combobox for autocomplete and select patterns:
+
+```html
+<div ngCombobox>
+  <input ngComboboxInput />
+  
+  <ng-template ngComboboxPopupContainer>
+    <div ngListbox [(value)]="selectedValue">
+      @for (option of options; track option) {
+        <div ngOption [value]="option">{{option}}</div>
+      }
+    </div>
+  </ng-template>
+</div>
+```
+
+## Keyboard Navigation
+
+### Single Selection
+- **Arrow Up/Down** - Navigate between options (vertical)
+- **Arrow Left/Right** - Navigate between options (horizontal)
+- **Home** - Focus first option
+- **End** - Focus last option
+- **Space/Enter** - Select focused option
+- **Type characters** - Jump to matching option
+
+### Multiple Selection
+- **Shift+Arrow** - Extend selection range
+- **Ctrl+Arrow** - Move focus without changing selection
+- **Ctrl+Space** - Toggle selection of focused item
+- **Ctrl+A** - Select all items
+
+## Accessibility Features
+
+- Implements ARIA listbox pattern
+- `role="listbox"` on container
+- `role="option"` on items
+- `aria-selected` for selected options
+- `aria-disabled` for disabled options
+- `aria-multiselectable` for multi-select
+- `aria-activedescendant` for virtual focus
+- `aria-orientation` for layout direction
+- Full keyboard navigation
+- Screen reader announcements
+
+## Use Cases
+
+- Dropdown select menus
+- Autocomplete results
+- Multi-select lists
+- Filterable option lists
+- Command palettes
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [listbox.ts](https://github.com/angular/components/tree/main/src/aria/listbox/listbox.ts)
+- [option.ts](https://github.com/angular/components/tree/main/src/aria/listbox/option.ts)

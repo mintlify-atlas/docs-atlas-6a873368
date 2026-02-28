@@ -1,0 +1,261 @@
+---
+title: Bottom Sheet
+description: Service to trigger Material Design bottom sheets
+---
+
+Service to open Material Design bottom sheets that slide up from the bottom of the screen.
+
+## Import
+
+```typescript
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+```
+
+## Basic Usage
+
+```typescript
+import { Component } from '@angular/core';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+
+@Component({
+  selector: 'app-root',
+  template: '<button (click)="openBottomSheet()">Open</button>'
+})
+export class AppComponent {
+  constructor(private bottomSheet: MatBottomSheet) {}
+
+  openBottomSheet() {
+    this.bottomSheet.open(BottomSheetComponent);
+  }
+}
+
+@Component({
+  selector: 'app-bottom-sheet',
+  template: '<p>Bottom sheet content</p>'
+})
+export class BottomSheetComponent {}
+```
+
+## API Reference
+
+### MatBottomSheet (Service)
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `open<T>(component: ComponentType<T>, config?: MatBottomSheetConfig): MatBottomSheetRef<T>` | Opens component in bottom sheet |
+| `open<T>(template: TemplateRef<T>, config?: MatBottomSheetConfig): MatBottomSheetRef<T>` | Opens template in bottom sheet |
+| `dismiss<R>(result?: R): void` | Dismisses the currently visible bottom sheet |
+
+### MatBottomSheetRef
+
+Reference to the opened bottom sheet.
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `instance` | `T` | Component instance |
+| `containerInstance` | `MatBottomSheetContainer` | Container instance |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `dismiss(result?: R): void` | Dismisses the bottom sheet |
+| `afterDismissed(): Observable<R>` | Observable that emits when dismissed |
+| `afterOpened(): Observable<void>` | Observable that emits when opened |
+| `backdropClick(): Observable<MouseEvent>` | Observable for backdrop clicks |
+| `keydownEvents(): Observable<KeyboardEvent>` | Observable for keydown events |
+
+### MatBottomSheetConfig
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `data` | `any` | Data to pass to the bottom sheet |
+| `panelClass` | `string \| string[]` | Custom CSS classes |
+| `backdropClass` | `string` | Backdrop CSS class |
+| `disableClose` | `boolean` | Whether close on backdrop click |
+| `ariaLabel` | `string` | ARIA label |
+| `autoFocus` | `boolean \| string \| AutoFocusTarget` | Auto focus strategy |
+| `restoreFocus` | `boolean` | Restore focus on close |
+| `direction` | `Direction` | Layout direction |
+
+## Examples
+
+### With Data
+
+```typescript
+export class AppComponent {
+  constructor(private bottomSheet: MatBottomSheet) {}
+
+  openWithData() {
+    this.bottomSheet.open(BottomSheetComponent, {
+      data: { name: 'John Doe', age: 30 }
+    });
+  }
+}
+
+@Component({
+  selector: 'app-bottom-sheet',
+  template: '<p>Hello, {{data.name}}!</p>'
+})
+export class BottomSheetComponent {
+  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {}
+}
+```
+
+### Returning Data
+
+```typescript
+export class AppComponent {
+  openBottomSheet() {
+    const ref = this.bottomSheet.open(BottomSheetComponent);
+    
+    ref.afterDismissed().subscribe(result => {
+      console.log('Bottom sheet dismissed with:', result);
+    });
+  }
+}
+
+@Component({
+  selector: 'app-bottom-sheet',
+  template: `
+    <button (click)="close('confirm')">Confirm</button>
+    <button (click)="close('cancel')">Cancel</button>
+  `
+})
+export class BottomSheetComponent {
+  constructor(private ref: MatBottomSheetRef) {}
+
+  close(result: string) {
+    this.ref.dismiss(result);
+  }
+}
+```
+
+### With Template
+
+```typescript
+@Component({
+  template: `
+    <button (click)="openTemplate()">Open Template</button>
+    <ng-template #template>
+      <div class="bottom-sheet-content">
+        <h2>Template Bottom Sheet</h2>
+        <p>This is from a template!</p>
+      </div>
+    </ng-template>
+  `
+})
+export class AppComponent {
+  @ViewChild('template') template!: TemplateRef<any>;
+
+  constructor(private bottomSheet: MatBottomSheet) {}
+
+  openTemplate() {
+    this.bottomSheet.open(this.template);
+  }
+}
+```
+
+### Custom Styling
+
+```typescript
+this.bottomSheet.open(BottomSheetComponent, {
+  panelClass: 'custom-bottom-sheet',
+  backdropClass: 'custom-backdrop'
+});
+```
+
+```css
+.custom-bottom-sheet {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+```
+
+### Disable Close
+
+```typescript
+this.bottomSheet.open(BottomSheetComponent, {
+  disableClose: true // Prevents close on backdrop click or ESC
+});
+```
+
+### Share Actions
+
+```typescript
+@Component({
+  selector: 'app-share-sheet',
+  template: `
+    <mat-nav-list>
+      <a mat-list-item (click)="share('facebook')">
+        <mat-icon>facebook</mat-icon>
+        <span>Facebook</span>
+      </a>
+      <a mat-list-item (click)="share('twitter')">
+        <mat-icon>twitter</mat-icon>
+        <span>Twitter</span>
+      </a>
+      <a mat-list-item (click)="share('email')">
+        <mat-icon>email</mat-icon>
+        <span>Email</span>
+      </a>
+    </mat-nav-list>
+  `
+})
+export class ShareSheetComponent {
+  constructor(private ref: MatBottomSheetRef) {}
+
+  share(platform: string) {
+    console.log('Sharing to:', platform);
+    this.ref.dismiss(platform);
+  }
+}
+```
+
+## Accessibility
+
+- Bottom sheet has `role="dialog"`
+- Focus is trapped within the bottom sheet
+- ESC key closes the bottom sheet by default
+- Focus returns to trigger element on close
+- Use `ariaLabel` for screen readers
+
+## Configuration
+
+```typescript
+import { MAT_BOTTOM_SHEET_DEFAULT_OPTIONS } from '@angular/material/bottom-sheet';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_BOTTOM_SHEET_DEFAULT_OPTIONS,
+      useValue: {
+        hasBackdrop: true,
+        disableClose: false,
+        autoFocus: true
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Injection Tokens
+
+```typescript
+import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
+
+@Component({...})
+export class BottomSheetComponent {
+  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {}
+}
+```

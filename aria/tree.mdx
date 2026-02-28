@@ -1,0 +1,208 @@
+---
+title: 'ARIA Tree'
+description: 'Accessible tree view component for hierarchical data'
+---
+
+# ARIA Tree
+
+The ARIA Tree provides an accessible tree view component for displaying hierarchical data following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Tree
+
+The main tree container.
+
+**Selector**: `[ngTree]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/tree/tree.ts`
+
+#### Inputs
+
+- `multiselectable` (boolean) - Whether multiple tree items can be selected
+- `disabled` (boolean) - Whether the tree is disabled
+
+### TreeItem
+
+An individual node in the tree.
+
+**Selector**: `[ngTreeItem]`
+
+#### Inputs
+
+- `value` - The value associated with this tree item
+- `expanded` (boolean) - Whether this item is expanded (for parent items)
+- `disabled` (boolean) - Whether this item is disabled
+- `level` (number) - The nesting level of this item
+
+### TreeItemGroup
+
+A group of child tree items.
+
+**Selector**: `[ngTreeItemGroup]`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {Tree, TreeItem, TreeItemGroup} from '@angular/aria';
+
+@Component({
+  selector: 'app-tree-example',
+  imports: [Tree, TreeItem, TreeItemGroup],
+  template: `
+    <ul ngTree>
+      <li ngTreeItem value="documents">
+        <span>Documents</span>
+        <ul ngTreeItemGroup>
+          <li ngTreeItem value="work">Work</li>
+          <li ngTreeItem value="personal">Personal</li>
+        </ul>
+      </li>
+      
+      <li ngTreeItem value="photos">
+        <span>Photos</span>
+        <ul ngTreeItemGroup>
+          <li ngTreeItem value="2023">2023</li>
+          <li ngTreeItem value="2024">2024</li>
+        </ul>
+      </li>
+      
+      <li ngTreeItem value="downloads">Downloads</li>
+    </ul>
+  `
+})
+export class TreeExample {}
+```
+
+## Multi-Level Tree
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Tree, TreeItem, TreeItemGroup} from '@angular/aria';
+
+interface TreeNode {
+  id: string;
+  label: string;
+  children?: TreeNode[];
+}
+
+@Component({
+  selector: 'app-file-tree',
+  imports: [Tree, TreeItem, TreeItemGroup],
+  template: `
+    <ul ngTree>
+      @for (node of nodes; track node.id) {
+        <li ngTreeItem [value]="node.id">
+          <span>{{node.label}}</span>
+          @if (node.children) {
+            <ul ngTreeItemGroup>
+              <ng-container *ngTemplateOutlet="treeTemplate; context: {$implicit: node.children}" />
+            </ul>
+          }
+        </li>
+      }
+    </ul>
+    
+    <ng-template #treeTemplate let-items>
+      @for (item of items; track item.id) {
+        <li ngTreeItem [value]="item.id">
+          <span>{{item.label}}</span>
+          @if (item.children) {
+            <ul ngTreeItemGroup>
+              <ng-container *ngTemplateOutlet="treeTemplate; context: {$implicit: item.children}" />
+            </ul>
+          }
+        </li>
+      }
+    </ng-template>
+  `
+})
+export class FileTreeExample {
+  nodes: TreeNode[] = [
+    {
+      id: 'src',
+      label: 'src',
+      children: [
+        {
+          id: 'app',
+          label: 'app',
+          children: [
+            {id: 'app.component.ts', label: 'app.component.ts'},
+            {id: 'app.component.html', label: 'app.component.html'}
+          ]
+        },
+        {id: 'main.ts', label: 'main.ts'}
+      ]
+    },
+    {id: 'package.json', label: 'package.json'}
+  ];
+}
+```
+
+## Multi-Select Tree
+
+```html
+<ul ngTree [multiselectable]="true">
+  <li ngTreeItem value="item1">Item 1</li>
+  <li ngTreeItem value="item2">Item 2</li>
+  <li ngTreeItem value="item3">Item 3</li>
+</ul>
+```
+
+## Keyboard Navigation
+
+- **Arrow Up/Down** - Navigate between visible tree items
+- **Arrow Right** - Expand focused item (if collapsed) or move to first child
+- **Arrow Left** - Collapse focused item (if expanded) or move to parent
+- **Enter/Space** - Toggle selection or activate item
+- **Home** - Focus first tree item
+- **End** - Focus last visible tree item
+- **Type characters** - Jump to matching tree item
+- **\*** - Expand all siblings at the same level
+
+### Multi-Select
+- **Shift+Arrow** - Extend selection
+- **Ctrl+Arrow** - Move focus without changing selection
+- **Ctrl+Space** - Toggle selection of focused item
+
+## Accessibility Features
+
+- Implements ARIA tree pattern
+- `role="tree"` on container
+- `role="treeitem"` on items
+- `role="group"` on item groups
+- `aria-expanded` for expandable items
+- `aria-selected` for selected items
+- `aria-level` for nesting depth
+- `aria-setsize` and `aria-posinset` for position info
+- `aria-multiselectable` for multi-select trees
+- Full keyboard navigation
+- Screen reader announcements
+
+## Use Cases
+
+- File system browsers
+- Organization charts
+- Navigation menus
+- Category browsers
+- Site maps
+- Folder structures
+- Hierarchical data visualization
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [tree.ts](https://github.com/angular/components/tree/main/src/aria/tree/tree.ts)
+- [tree-item.ts](https://github.com/angular/components/tree/main/src/aria/tree/tree-item.ts)
+- [tree-item-group.ts](https://github.com/angular/components/tree/main/src/aria/tree/tree-item-group.ts)

@@ -1,0 +1,216 @@
+---
+title: 'ARIA Toolbar'
+description: 'Accessible toolbar component for grouping interactive controls'
+---
+
+# ARIA Toolbar
+
+The ARIA Toolbar provides an accessible container for grouping interactive controls following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Toolbar
+
+The main toolbar container.
+
+**Selector**: `[ngToolbar]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/toolbar/toolbar.ts`
+
+#### Inputs
+
+- `orientation` ('horizontal' | 'vertical') - Toolbar orientation
+- `disabled` (boolean) - Whether the toolbar is disabled
+
+### ToolbarWidget
+
+An interactive element within the toolbar.
+
+**Selector**: `[ngToolbarWidget]`
+
+#### Inputs
+
+- `disabled` (boolean) - Whether this widget is disabled
+
+### ToolbarWidgetGroup
+
+A group of related toolbar widgets.
+
+**Selector**: `[ngToolbarWidgetGroup]`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {Toolbar, ToolbarWidget} from '@angular/aria';
+
+@Component({
+  selector: 'app-toolbar-example',
+  imports: [Toolbar, ToolbarWidget],
+  template: `
+    <div ngToolbar>
+      <button ngToolbarWidget (click)="onNew()">New</button>
+      <button ngToolbarWidget (click)="onOpen()">Open</button>
+      <button ngToolbarWidget (click)="onSave()">Save</button>
+      <div class="separator"></div>
+      <button ngToolbarWidget (click)="onCut()">Cut</button>
+      <button ngToolbarWidget (click)="onCopy()">Copy</button>
+      <button ngToolbarWidget (click)="onPaste()">Paste</button>
+    </div>
+  `
+})
+export class ToolbarExample {
+  onNew() { console.log('New'); }
+  onOpen() { console.log('Open'); }
+  onSave() { console.log('Save'); }
+  onCut() { console.log('Cut'); }
+  onCopy() { console.log('Copy'); }
+  onPaste() { console.log('Paste'); }
+}
+```
+
+## Grouped Widgets
+
+```typescript
+import {Component} from '@angular/core';
+import {Toolbar, ToolbarWidget, ToolbarWidgetGroup} from '@angular/aria';
+
+@Component({
+  selector: 'app-toolbar-groups',
+  imports: [Toolbar, ToolbarWidget, ToolbarWidgetGroup],
+  template: `
+    <div ngToolbar>
+      <div ngToolbarWidgetGroup>
+        <button ngToolbarWidget>Bold</button>
+        <button ngToolbarWidget>Italic</button>
+        <button ngToolbarWidget>Underline</button>
+      </div>
+      
+      <div ngToolbarWidgetGroup>
+        <button ngToolbarWidget>Align Left</button>
+        <button ngToolbarWidget>Align Center</button>
+        <button ngToolbarWidget>Align Right</button>
+      </div>
+      
+      <div ngToolbarWidgetGroup>
+        <button ngToolbarWidget>Undo</button>
+        <button ngToolbarWidget>Redo</button>
+      </div>
+    </div>
+  `
+})
+export class ToolbarGroupsExample {}
+```
+
+## Vertical Toolbar
+
+```html
+<div ngToolbar orientation="vertical">
+  <button ngToolbarWidget>Button 1</button>
+  <button ngToolbarWidget>Button 2</button>
+  <button ngToolbarWidget>Button 3</button>
+</div>
+```
+
+## Text Editor Toolbar
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Toolbar, ToolbarWidget, ToolbarWidgetGroup} from '@angular/aria';
+
+@Component({
+  selector: 'app-editor-toolbar',
+  imports: [Toolbar, ToolbarWidget, ToolbarWidgetGroup],
+  template: `
+    <div ngToolbar>
+      <div ngToolbarWidgetGroup>
+        <button ngToolbarWidget 
+          [class.active]="bold()"
+          (click)="toggleBold()">
+          <strong>B</strong>
+        </button>
+        <button ngToolbarWidget 
+          [class.active]="italic()"
+          (click)="toggleItalic()">
+          <em>I</em>
+        </button>
+        <button ngToolbarWidget 
+          [class.active]="underline()"
+          (click)="toggleUnderline()">
+          <u>U</u>
+        </button>
+      </div>
+      
+      <div ngToolbarWidgetGroup>
+        <select ngToolbarWidget [(ngModel)]="fontSize">
+          <option value="12">12pt</option>
+          <option value="14">14pt</option>
+          <option value="16">16pt</option>
+          <option value="18">18pt</option>
+        </select>
+      </div>
+    </div>
+  `
+})
+export class EditorToolbarExample {
+  bold = signal(false);
+  italic = signal(false);
+  underline = signal(false);
+  fontSize = '14';
+  
+  toggleBold() { this.bold.update(v => !v); }
+  toggleItalic() { this.italic.update(v => !v); }
+  toggleUnderline() { this.underline.update(v => !v); }
+}
+```
+
+## Keyboard Navigation
+
+### Horizontal Toolbar
+- **Arrow Left/Right** - Navigate between widgets
+- **Home** - Focus first widget
+- **End** - Focus last widget
+- **Tab** - Move focus out of toolbar
+
+### Vertical Toolbar
+- **Arrow Up/Down** - Navigate between widgets
+- **Home** - Focus first widget
+- **End** - Focus last widget
+- **Tab** - Move focus out of toolbar
+
+## Accessibility Features
+
+- Implements ARIA toolbar pattern
+- `role="toolbar"` on container
+- `aria-orientation` for layout direction
+- `aria-disabled` for disabled state
+- Focus management within toolbar
+- Full keyboard navigation
+- Screen reader support
+- Proper tab order management
+
+## Use Cases
+
+- Text editor toolbars
+- Application command bars
+- Rich text formatting controls
+- Drawing tool palettes
+- Media player controls
+- Navigation toolbars
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [toolbar.ts](https://github.com/angular/components/tree/main/src/aria/toolbar/toolbar.ts)
+- [toolbar-widget.ts](https://github.com/angular/components/tree/main/src/aria/toolbar/toolbar-widget.ts)
+- [toolbar-widget-group.ts](https://github.com/angular/components/tree/main/src/aria/toolbar/toolbar-widget-group.ts)

@@ -1,0 +1,460 @@
+---
+title: MatExpansionPanel
+description: Expansion panel component for Angular Material - provides expandable content with header and body.
+---
+
+# MatExpansionPanel
+
+The `mat-expansion-panel` provides an expandable details-summary view with a header that can be clicked to show or hide content.
+
+## Basic Usage
+
+```typescript
+import { MatExpansionModule } from '@angular/material/expansion';
+
+@Component({
+  selector: 'expansion-example',
+  imports: [MatExpansionModule],
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Personal data
+          </mat-panel-title>
+          <mat-panel-description>
+            Type your name and age
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        
+        <p>Panel content goes here</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class ExpansionExample {}
+```
+
+## API Reference
+
+### MatExpansionPanel
+
+Selector: `mat-expansion-panel`
+
+Extends: `CdkAccordionItem`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `expanded` | `boolean` | `false` | Whether the expansion panel is expanded |
+| `disabled` | `boolean` | `false` | Whether the expansion panel is disabled |
+| `hideToggle` | `boolean` | `false` | Whether the toggle indicator should be hidden |
+| `togglePosition` | `'before' \| 'after'` | - | The position of the expansion indicator |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `opened` | `EventEmitter<void>` | Event emitted when the panel is opened |
+| `closed` | `EventEmitter<void>` | Event emitted when the panel is closed |
+| `expandedChange` | `EventEmitter<boolean>` | Event emitted when the expansion state changes |
+| `afterExpand` | `EventEmitter<void>` | Event emitted after the body's expansion animation happens |
+| `afterCollapse` | `EventEmitter<void>` | Event emitted after the body's collapse animation happens |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `open(): void` | Opens the expansion panel |
+| `close(): void` | Closes the expansion panel |
+| `toggle(): void` | Toggles the expansion panel |
+
+### MatAccordion
+
+Selector: `mat-accordion`
+
+Container for expansion panels that provides coordination between them.
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `multi` | `boolean` | `false` | Whether multiple panels can be open at once |
+| `displayMode` | `'default' \| 'flat'` | `'default'` | Display mode for the accordion |
+| `togglePosition` | `'before' \| 'after'` | `'after'` | The position of the expansion indicator for all panels |
+| `hideToggle` | `boolean` | `false` | Whether the toggle indicator should be hidden for all panels |
+
+### MatExpansionPanelHeader
+
+Selector: `mat-expansion-panel-header`
+
+Header element for an expansion panel.
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `expandedHeight` | `string` | - | Height of the header while the panel is expanded |
+| `collapsedHeight` | `string` | - | Height of the header while the panel is collapsed |
+
+### MatPanelTitle
+
+Selector: `mat-panel-title`
+
+Title element for an expansion panel header.
+
+### MatPanelDescription
+
+Selector: `mat-panel-description`
+
+Description element for an expansion panel header.
+
+### MatExpansionPanelContent
+
+Directive: `[matExpansionPanelContent]`
+
+Decorator for lazy-loading expansion panel content.
+
+### MatExpansionPanelActionRow
+
+Selector: `mat-action-row`
+
+Container for action buttons at the bottom of an expansion panel.
+
+## Examples
+
+### Accordion with Multiple Panels
+
+```typescript
+@Component({
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Personal data</mat-panel-title>
+          <mat-panel-description>
+            Type your name and age
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>Name: John Doe</p>
+        <p>Age: 30</p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Destination</mat-panel-title>
+          <mat-panel-description>
+            Type the country name
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>Country: United States</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class AccordionExample {}
+```
+
+### Multi-Open Accordion
+
+```typescript
+@Component({
+  template: `
+    <mat-accordion multi>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          Panel 1
+        </mat-expansion-panel-header>
+        <p>Content 1</p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          Panel 2
+        </mat-expansion-panel-header>
+        <p>Content 2</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class MultiAccordionExample {}
+```
+
+### Panel with Actions
+
+```typescript
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  imports: [MatExpansionModule, MatButtonModule],
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Trip details</mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <p>Trip information goes here</p>
+        
+        <mat-action-row>
+          <button mat-button color="warn">Cancel</button>
+          <button mat-button color="primary">Save</button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class PanelActionsExample {}
+```
+
+### Lazy Loading Content
+
+```typescript
+@Component({
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          Click to load content
+        </mat-expansion-panel-header>
+        
+        <ng-template matExpansionPanelContent>
+          <p>This content is loaded lazily when the panel is opened</p>
+          <expensive-component></expensive-component>
+        </ng-template>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class LazyPanelExample {}
+```
+
+### Toggle Position
+
+```typescript
+@Component({
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel togglePosition="before">
+        <mat-expansion-panel-header>
+          Toggle indicator before
+        </mat-expansion-panel-header>
+        <p>Content</p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel togglePosition="after">
+        <mat-expansion-panel-header>
+          Toggle indicator after (default)
+        </mat-expansion-panel-header>
+        <p>Content</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class TogglePositionExample {}
+```
+
+### Programmatic Control
+
+```typescript
+import { ViewChild } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion';
+
+@Component({
+  template: `
+    <button mat-button (click)="panel.open()">Open</button>
+    <button mat-button (click)="panel.close()">Close</button>
+    <button mat-button (click)="panel.toggle()">Toggle</button>
+
+    <mat-expansion-panel #panel>
+      <mat-expansion-panel-header>
+        Controlled Panel
+      </mat-expansion-panel-header>
+      <p>Content</p>
+    </mat-expansion-panel>
+  `
+})
+export class ControlledPanelExample {
+  @ViewChild('panel') panel!: MatExpansionPanel;
+}
+```
+
+### Nested Accordions
+
+```typescript
+@Component({
+  template: `
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Parent Panel</mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <p>Parent content</p>
+        
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Child Panel 1</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>Child content 1</p>
+          </mat-expansion-panel>
+          
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Child Panel 2</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>Child content 2</p>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-expansion-panel>
+    </mat-accordion>
+  `
+})
+export class NestedAccordionExample {}
+```
+
+## Accessibility
+
+### Keyboard Interaction
+
+- `SPACE` or `ENTER`: Toggle panel expansion
+- `TAB`: Move focus to next focusable element
+- `SHIFT + TAB`: Move focus to previous focusable element
+
+### ARIA
+
+The expansion panel header has `role="button"` and appropriate `aria-expanded`, `aria-controls`, and `aria-disabled` attributes.
+
+### Labels
+
+Provide clear, descriptive labels:
+
+```html
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>Clear descriptive title</mat-panel-title>
+    <mat-panel-description>Additional context</mat-panel-description>
+  </mat-expansion-panel-header>
+  <p>Content</p>
+</mat-expansion-panel>
+```
+
+## Display Modes
+
+### Default Mode
+
+Includes spacing between panels:
+
+```html
+<mat-accordion displayMode="default">
+```
+
+### Flat Mode
+
+Removes spacing and elevation:
+
+```html
+<mat-accordion displayMode="flat">
+```
+
+## Styling
+
+```scss
+// Custom panel spacing
+mat-expansion-panel {
+  margin: 16px 0;
+}
+
+// Custom header height
+mat-expansion-panel-header {
+  height: 64px;
+}
+
+// Custom content padding
+mat-expansion-panel .mat-expansion-panel-body {
+  padding: 24px;
+}
+
+// Hide toggle indicator
+mat-expansion-panel {
+  .mat-expansion-indicator {
+    display: none;
+  }
+}
+```
+
+## Types
+
+### MatExpansionPanelState
+
+```typescript
+type MatExpansionPanelState = 'expanded' | 'collapsed';
+```
+
+### MatAccordionTogglePosition
+
+```typescript
+type MatAccordionTogglePosition = 'before' | 'after';
+```
+
+### MatAccordionDisplayMode
+
+```typescript
+type MatAccordionDisplayMode = 'default' | 'flat';
+```
+
+## Injection Tokens
+
+### MAT_EXPANSION_PANEL_DEFAULT_OPTIONS
+
+```typescript
+const MAT_EXPANSION_PANEL_DEFAULT_OPTIONS: InjectionToken<MatExpansionPanelDefaultOptions>;
+
+interface MatExpansionPanelDefaultOptions {
+  expandedHeight: string;
+  collapsedHeight: string;
+  hideToggle: boolean;
+}
+```
+
+Configure default options:
+
+```typescript
+providers: [
+  {
+    provide: MAT_EXPANSION_PANEL_DEFAULT_OPTIONS,
+    useValue: {
+      expandedHeight: '64px',
+      collapsedHeight: '48px',
+      hideToggle: false
+    }
+  }
+]
+```
+
+## Best Practices
+
+1. **Clear headers**: Use descriptive titles and descriptions
+2. **Logical grouping**: Group related content together
+3. **Limit nesting**: Avoid deeply nested accordions
+4. **Performance**: Use lazy loading for heavy content
+5. **Initial state**: Consider which panels should be open initially
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.expansion-theme($theme);
+}
+```

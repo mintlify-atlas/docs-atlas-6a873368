@@ -1,0 +1,101 @@
+---
+title: Button
+description: Material Design button component for user interactions
+---
+
+Material Design button component. Users interact with a button to perform an action.
+
+## Import
+
+```typescript
+import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
+```
+
+## Basic Usage
+
+```html
+<button mat-button>Text Button</button>
+<button mat-raised-button>Elevated Button</button>
+<button mat-flat-button>Filled Button</button>
+<button mat-stroked-button>Outlined Button</button>
+```
+
+## Appearance
+
+Buttons support multiple appearance styles through the `matButton` attribute:
+
+```html
+<!-- Text appearance (default) -->
+<button matButton="text">Text</button>
+
+<!-- Filled appearance -->
+<button matButton="filled">Filled</button>
+
+<!-- Elevated appearance -->
+<button matButton="elevated">Elevated</button>
+
+<!-- Outlined appearance -->
+<button matButton="outlined">Outlined</button>
+
+<!-- Tonal appearance -->
+<button matButton="tonal">Tonal</button>
+```
+
+## API Reference
+
+### MatButton
+
+Selector: `button[matButton]`, `a[matButton]`, `button[mat-button]`, `button[mat-raised-button]`, `button[mat-flat-button]`, `button[mat-stroked-button]`
+
+Exported as: `matButton`, `matAnchor`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() appearance` | `MatButtonAppearance` | Appearance of the button. Options: 'text', 'filled', 'elevated', 'outlined', 'tonal' |
+| `@Input() color` | `ThemePalette` | Theme color. Options: 'primary', 'accent', 'warn' |
+| `@Input() disabled` | `boolean` | Whether the button is disabled |
+| `@Input() disableRipple` | `boolean` | Whether ripples are disabled |
+
+#### Types
+
+```typescript
+type MatButtonAppearance = 'text' | 'filled' | 'elevated' | 'outlined' | 'tonal';
+```
+
+## Examples
+
+### With Icons
+
+```html
+<button mat-raised-button>
+  <mat-icon>favorite</mat-icon>
+  Like
+</button>
+```
+
+### Anchor Button
+
+```html
+<a mat-button href="https://example.com">Link Button</a>
+```
+
+### Disabled State
+
+```html
+<button mat-button [disabled]="true">Disabled</button>
+```
+
+## Accessibility
+
+- Use semantic `<button>` elements for actions
+- Use `<a>` elements for navigation
+- Provide clear, descriptive button text
+- Use `aria-label` for icon-only buttons
+
+## Related Components
+
+
+- [Button Toggle](/components/button-toggle)

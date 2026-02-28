@@ -1,0 +1,132 @@
+---
+title: CdkStepper
+description: Step-by-step workflow component
+---
+
+The `CdkStepper` provides behavior for multi-step workflows.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {CdkStepperModule} from '@angular/cdk/stepper';
+```
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {CdkStepper} from '@angular/cdk/stepper';
+
+@Component({
+  selector: 'app-custom-stepper',
+  template: `
+    <section class="stepper-header">
+      <div *ngFor="let step of steps; let i = index"
+           [class.active]="selectedIndex === i"
+           (click)="selectStepByIndex(i)">
+        Step {{ i + 1 }}
+      </div>
+    </section>
+    
+    <div class="stepper-content">
+      <ng-container [ngTemplateOutlet]="selected?.content"></ng-container>
+    </div>
+    
+    <div class="stepper-actions">
+      <button (click)="previous()" [disabled]="!hasPrevious()">
+        Previous
+      </button>
+      <button (click)="next()" [disabled]="!hasNext()">
+        Next
+      </button>
+    </div>
+  `,
+  providers: [{provide: CdkStepper, useExisting: CustomStepper}]
+})
+export class CustomStepper extends CdkStepper {}
+
+@Component({
+  selector: 'app-stepper-example',
+  template: `
+    <app-custom-stepper>
+      <cdk-step><ng-template>Step 1 Content</ng-template></cdk-step>
+      <cdk-step><ng-template>Step 2 Content</ng-template></cdk-step>
+      <cdk-step><ng-template>Step 3 Content</ng-template></cdk-step>
+    </app-custom-stepper>
+  `,
+})
+export class StepperExample {}
+```
+
+## With Forms
+
+```typescript
+import {Component} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
+@Component({
+  template: `
+    <app-custom-stepper>
+      <cdk-step [stepControl]="personalForm">
+        <ng-template>
+          <form [formGroup]="personalForm">
+            <input formControlName="name" placeholder="Name">
+          </form>
+        </ng-template>
+      </cdk-step>
+      
+      <cdk-step [stepControl]="addressForm">
+        <ng-template>
+          <form [formGroup]="addressForm">
+            <input formControlName="address" placeholder="Address">
+          </form>
+        </ng-template>
+      </cdk-step>
+    </app-custom-stepper>
+  `,
+})
+export class FormStepperExample {
+  personalForm: FormGroup;
+  addressForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.personalForm = this.fb.group({
+      name: ['', Validators.required]
+    });
+    this.addressForm = this.fb.group({
+      address: ['', Validators.required]
+    });
+  }
+}
+```
+
+## API Reference
+
+### CdkStepper
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `selectedIndex` | `number` | Current step index |
+| `linear` | `boolean` | Require completion in order |
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `next()` | `void` | Go to next step |
+| `previous()` | `void` | Go to previous step |
+| `reset()` | `void` | Reset stepper |
+
+### CdkStep
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `stepControl` | `AbstractControl` | Form control for validation |
+| `optional` | `boolean` | Whether step is optional |
+| `completed` | `boolean` | Mark as completed |
+
+## See Also
+
+- [Angular Material Stepper](https://material.angular.io/components/stepper/overview)

@@ -1,0 +1,286 @@
+---
+title: Accessibility (A11y)
+description: Utilities for building accessible Angular components
+---
+
+The `@angular/cdk/a11y` package provides tools for improving application accessibility, including focus management, live announcements, and keyboard navigation.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {A11yModule} from '@angular/cdk/a11y';
+```
+
+## Key Features
+
+### FocusMonitor
+
+Monitors focus on elements and detects how they were focused (mouse, keyboard, touch, or programmatically).
+
+```typescript
+import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
+
+export class MyComponent implements OnInit, OnDestroy {
+  private focusMonitor = inject(FocusMonitor);
+  private elementRef = inject(ElementRef);
+
+  ngOnInit() {
+    this.focusMonitor.monitor(this.elementRef, true).subscribe(
+      (origin: FocusOrigin) => {
+        console.log('Element focused via:', origin);
+        // origin can be: 'mouse', 'keyboard', 'touch', 'program', or null
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.focusMonitor.stopMonitoring(this.elementRef);
+  }
+}
+```
+
+**FocusOrigin types**:
+- `'mouse'` - Focused via mouse click
+- `'keyboard'` - Focused via keyboard navigation (Tab key)
+- `'touch'` - Focused via touch interaction
+- `'program'` - Focused programmatically (e.g., `.focus()` call)
+- `null` - Element lost focus
+
+### LiveAnnouncer
+
+Announces messages to screen readers using an aria-live region.
+
+```typescript
+import {LiveAnnouncer, AriaLivePoliteness} from '@angular/cdk/a11y';
+
+export class MyComponent {
+  private announcer = inject(LiveAnnouncer);
+
+  announceAction() {
+    // Announce with default politeness ('polite')
+    this.announcer.announce('Item saved successfully');
+  }
+
+  announceUrgent() {
+    // Announce with 'assertive' politeness for urgent messages
+    this.announcer.announce('Error occurred!', 'assertive');
+  }
+
+  announceWithDuration() {
+    // Clear announcement after 3 seconds
+    this.announcer.announce('Temporary message', 'polite', 3000);
+  }
+
+  clearAnnouncement() {
+    this.announcer.clear();
+  }
+}
+```
+
+**Politeness levels**:
+- `'polite'` - Wait for current speech to finish (default)
+- `'assertive'` - Interrupt current speech
+- `'off'` - Do not announce
+
+### FocusTrap
+
+Traps focus within an element, useful for modal dialogs.
+
+```typescript
+import {FocusTrap, ConfigurableFocusTrapFactory} from '@angular/cdk/a11y';
+
+export class DialogComponent implements AfterViewInit, OnDestroy {
+  private focusTrapFactory = inject(ConfigurableFocusTrapFactory);
+  private elementRef = inject(ElementRef);
+  private focusTrap: FocusTrap;
+
+  ngAfterViewInit() {
+    this.focusTrap = this.focusTrapFactory.create(
+      this.elementRef.nativeElement
+    );
+    this.focusTrap.focusInitialElementWhenReady();
+  }
+
+  ngOnDestroy() {
+    this.focusTrap.destroy();
+  }
+}
+```
+
+**Or use the directive**:
+
+```html
+<div cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+  <button>First</button>
+  <button>Second</button>
+  <button>Last</button>
+</div>
+```
+
+### ListKeyManager / FocusKeyManager
+
+Manages keyboard navigation for lists of items.
+
+```typescript
+import {FocusKeyManager, FocusableOption} from '@angular/cdk/a11y';
+
+class MenuItem implements FocusableOption {
+  disabled = false;
+  focus() {
+    this.element.nativeElement.focus();
+  }
+}
+
+export class MenuComponent implements AfterViewInit {
+  @ViewChildren(MenuItem) items: QueryList<MenuItem>;
+  private keyManager: FocusKeyManager<MenuItem>;
+
+  ngAfterViewInit() {
+    this.keyManager = new FocusKeyManager(this.items)
+      .withWrap() // Wrap around to start/end
+      .withVerticalOrientation() // Arrow keys navigate vertically
+      .withHomeAndEnd(); // Home/End keys work
+  }
+
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    this.keyManager.onKeydown(event);
+  }
+}
+```
+
+### AriaDescriber
+
+Associates elements with descriptive text using `aria-describedby`.
+
+```typescript
+import {AriaDescriber} from '@angular/cdk/a11y';
+
+export class TooltipComponent {
+  private ariaDescriber = inject(AriaDescriber);
+  private elementRef = inject(ElementRef);
+
+  showTooltip(message: string) {
+    this.ariaDescriber.describe(this.elementRef.nativeElement, message);
+  }
+
+  hideTooltip() {
+    this.ariaDescriber.removeDescription(this.elementRef.nativeElement, message);
+  }
+}
+```
+
+### HighContrastModeDetector
+
+Detects high contrast mode for improved accessibility.
+
+```typescript
+import {HighContrastModeDetector, HighContrastMode} from '@angular/cdk/a11y';
+
+export class MyComponent implements OnInit {
+  private hcmDetector = inject(HighContrastModeDetector);
+
+  ngOnInit() {
+    const mode = this.hcmDetector.getHighContrastMode();
+    
+    if (mode === HighContrastMode.WHITE_ON_BLACK) {
+      console.log('White on black high contrast mode');
+    } else if (mode === HighContrastMode.BLACK_ON_WHITE) {
+      console.log('Black on white high contrast mode');
+    }
+  }
+}
+```
+
+### InteractivityChecker
+
+Determines if an element is focusable, visible, and enabled.
+
+```typescript
+import {InteractivityChecker} from '@angular/cdk/a11y';
+
+export class MyComponent {
+  private checker = inject(InteractivityChecker);
+
+  checkElement(element: HTMLElement) {
+    const isFocusable = this.checker.isFocusable(element);
+    const isTabbable = this.checker.isTabbable(element);
+    const isVisible = this.checker.isVisible(element);
+    const isDisabled = this.checker.isDisabled(element);
+  }
+}
+```
+
+## API Reference
+
+### FocusMonitor
+
+| Method | Description |
+|--------|-------------|
+| `monitor(element, checkChildren?)` | Start monitoring an element's focus |
+| `stopMonitoring(element)` | Stop monitoring an element |
+| `focusVia(element, origin, options?)` | Focus element with specific origin |
+
+### LiveAnnouncer
+
+| Method | Description |
+|--------|-------------|
+| `announce(message, politeness?, duration?)` | Announce message to screen readers |
+| `clear()` | Clear current announcement |
+
+### FocusTrap
+
+| Property | Description |
+|----------|-------------|
+| `enabled` | Whether the focus trap is active |
+
+| Method | Description |
+|--------|-------------|
+| `focusInitialElementWhenReady()` | Focus the first focusable element |
+| `focusFirstTabbableElement()` | Focus first tabbable element |
+| `focusLastTabbableElement()` | Focus last tabbable element |
+| `destroy()` | Clean up the focus trap |
+
+## Directives
+
+### cdkTrapFocus
+
+Traps focus within an element.
+
+```html
+<div cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+  <!-- Content -->
+</div>
+```
+
+**Inputs**:
+- `cdkTrapFocus: boolean` - Enable/disable trap
+- `cdkTrapFocusAutoCapture: boolean` - Auto-focus on init
+
+### cdkMonitorElementFocus / cdkMonitorSubtreeFocus
+
+Monitor focus on an element.
+
+```html
+<button cdkMonitorElementFocus (cdkFocusChange)="onFocusChange($event)">
+  Click me
+</button>
+```
+
+## Best Practices
+
+1. **Always announce dynamic changes** - Use `LiveAnnouncer` for status updates
+2. **Trap focus in modals** - Prevent keyboard users from tabbing outside dialogs
+3. **Provide keyboard navigation** - Use `FocusKeyManager` for lists
+4. **Test with screen readers** - Verify announcements work as expected
+5. **Use semantic HTML** - CDK enhances but doesn't replace proper markup
+
+## See Also
+
+- [FocusTrap](/cdk/a11y#focustrap)
+- [KeyManager](/cdk/a11y#listkeymanager--focuskeymanager)
+- [ARIA Best Practices](https://www.w3.org/WAI/ARIA/apg/)

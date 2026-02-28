@@ -1,0 +1,296 @@
+---
+title: Table
+description: Material Design data table component
+---
+
+Data table component that displays rows of data with Material Design styling.
+
+## Import
+
+```typescript
+import { MatTable } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
+```
+
+## Basic Usage
+
+```typescript
+export interface User {
+  name: string;
+  email: string;
+  age: number;
+}
+
+export class TableComponent {
+  displayedColumns: string[] = ['name', 'email', 'age'];
+  dataSource: User[] = [
+    { name: 'John', email: 'john@example.com', age: 30 },
+    { name: 'Jane', email: 'jane@example.com', age: 25 }
+  ];
+}
+```
+
+```html
+<table mat-table [dataSource]="dataSource">
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let user">{{user.name}}</td>
+  </ng-container>
+
+  <!-- Email Column -->
+  <ng-container matColumnDef="email">
+    <th mat-header-cell *matHeaderCellDef>Email</th>
+    <td mat-cell *matCellDef="let user">{{user.email}}</td>
+  </ng-container>
+
+  <!-- Age Column -->
+  <ng-container matColumnDef="age">
+    <th mat-header-cell *matHeaderCellDef>Age</th>
+    <td mat-cell *matCellDef="let user">{{user.age}}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+```
+
+## API Reference
+
+### MatTable
+
+Selector: `mat-table`, `table[mat-table]`
+
+Exported as: `matTable`
+
+Extends `CdkTable` from `@angular/cdk/table` - see [CDK Table documentation](https://material.angular.io/cdk/table) for full API.
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() dataSource` | `DataSource<T> \| Observable<T[]> \| T[]` | Data source for the table |
+| `@Input() fixedLayout` | `boolean` | Whether to use fixed table layout |
+
+## Column Definition
+
+Define columns using `matColumnDef`:
+
+```html
+<ng-container matColumnDef="columnName">
+  <th mat-header-cell *matHeaderCellDef>Header</th>
+  <td mat-cell *matCellDef="let element">{{element.property}}</td>
+</ng-container>
+```
+
+## Examples
+
+### With MatTableDataSource
+
+```typescript
+import { MatTableDataSource } from '@angular/material/table';
+
+export class TableComponent {
+  displayedColumns = ['name', 'email', 'age'];
+  dataSource = new MatTableDataSource<User>([
+    { name: 'John', email: 'john@example.com', age: 30 },
+    { name: 'Jane', email: 'jane@example.com', age: 25 }
+  ]);
+}
+```
+
+### With Actions Column
+
+```html
+<ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef>Actions</th>
+  <td mat-cell *matCellDef="let user">
+    <button mat-icon-button (click)="edit(user)">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button (click)="delete(user)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </td>
+</ng-container>
+```
+
+### Sticky Header
+
+```html
+<div class="table-container">
+  <table mat-table [dataSource]="dataSource">
+    <!-- Column definitions -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+```
+
+```css
+.table-container {
+  max-height: 400px;
+  overflow: auto;
+}
+```
+
+### Footer Row
+
+```html
+<table mat-table [dataSource]="dataSource">
+  <!-- Column definitions with footer -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let user">{{user.name}}</td>
+    <td mat-footer-cell *matFooterCellDef>Total</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+</table>
+```
+
+### Row Selection
+
+```typescript
+import { SelectionModel } from '@angular/cdk/collections';
+
+export class TableComponent {
+  selection = new SelectionModel<User>(true, []);
+  displayedColumns = ['select', 'name', 'email'];
+
+  isAllSelected() {
+    return this.selection.selected.length === this.dataSource.data.length;
+  }
+
+  toggleAllRows() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+}
+```
+
+```html
+<ng-container matColumnDef="select">
+  <th mat-header-cell *matHeaderCellDef>
+    <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                  [checked]="selection.hasValue() && isAllSelected()">
+    </mat-checkbox>
+  </th>
+  <td mat-cell *matCellDef="let row">
+    <mat-checkbox (click)="$event.stopPropagation()"
+                  (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)">
+    </mat-checkbox>
+  </td>
+</ng-container>
+```
+
+### Expandable Rows
+
+```typescript
+export class TableComponent {
+  expandedElement: User | null = null;
+}
+```
+
+```html
+<table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+  <!-- Regular columns -->
+  
+  <!-- Expanded Content Column -->
+  <ng-container matColumnDef="expandedDetail">
+    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+      <div class="element-detail" 
+           [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+        <div class="element-description">
+          {{element.description}}
+        </div>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+      (click)="expandedElement = expandedElement === element ? null : element">
+  </tr>
+  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+</table>
+```
+
+### No Data Row
+
+```html
+<table mat-table [dataSource]="dataSource">
+  <!-- Column definitions -->
+  
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+      No data available
+    </td>
+  </tr>
+</table>
+```
+
+## Styling
+
+### Table Styles
+
+```css
+table {
+  width: 100%;
+}
+
+.mat-column-age {
+  text-align: right;
+}
+
+tr.mat-row:hover {
+  background-color: #f5f5f5;
+}
+```
+
+## Accessibility
+
+- Use semantic table elements
+- Provide descriptive headers
+- Use `scope` attributes:
+
+```html
+<th mat-header-cell *matHeaderCellDef scope="col">Name</th>
+```
+
+- Add `caption` for context:
+
+```html
+<table mat-table [dataSource]="dataSource">
+  <caption>User List</caption>
+  <!-- columns -->
+</table>
+```
+
+## Performance
+
+For large datasets:
+
+```typescript
+import { MatTableDataSource } from '@angular/material/table';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+
+// Use virtual scrolling
+// Use trackBy function
+trackByFn(index: number, item: User) {
+  return item.id;
+}
+```
+
+## Related Components
+
+- [Sort](/components/sort) - Add sorting to table columns
+- [Paginator](/components/paginator) - Add pagination
+- [Form Field](/components/form-field) - For filtering

@@ -1,0 +1,280 @@
+---
+title: Select
+description: MatSelect is a form control for selecting a value from a set of options, similar to the native select element.
+---
+
+## Overview
+
+`<mat-select>` is a form control for selecting a value from a set of options, similar to the native `<select>` element. It is designed to work inside of a `<mat-form-field>` element.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Template">
+    ```html
+    <mat-form-field>
+      <mat-label>Choose an option</mat-label>
+      <mat-select>
+        <mat-option value="option1">Option 1</mat-option>
+        <mat-option value="option2">Option 2</mat-option>
+        <mat-option value="option3">Option 3</mat-option>
+      </mat-select>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-select-example',
+      template: `
+        <mat-form-field>
+          <mat-label>Favorite food</mat-label>
+          <mat-select [formControl]="foodControl">
+            <mat-option *ngFor="let food of foods" [value]="food.value">
+              {{ food.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      `
+    })
+    export class SelectExample {
+      foodControl = new FormControl('');
+      foods = [
+        {value: 'steak-0', label: 'Steak'},
+        {value: 'pizza-1', label: 'Pizza'},
+        {value: 'tacos-2', label: 'Tacos'}
+      ];
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatSelect
+
+Selector: `mat-select`
+
+Exported as: `matSelect`
+
+#### Inputs
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the select is disabled.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether ripples are disabled.
+</ParamField>
+
+<ParamField path="tabIndex" type="number" default="0">
+  Tab index for the select.
+</ParamField>
+
+<ParamField path="hideSingleSelectionIndicator" type="boolean">
+  Whether checkmark indicator for single-selection options is hidden.
+</ParamField>
+
+<ParamField path="placeholder" type="string">
+  Placeholder to be shown if no value has been selected.
+</ParamField>
+
+<ParamField path="required" type="boolean" default="false">
+  Whether the component is required.
+</ParamField>
+
+<ParamField path="multiple" type="boolean" default="false">
+  Whether the user should be allowed to select multiple options.
+</ParamField>
+
+<ParamField path="disableOptionCentering" type="boolean" default="false">
+  Whether to center the active option over the trigger.
+</ParamField>
+
+<ParamField path="compareWith" type="(o1: any, o2: any) => boolean">
+  Function to compare the option values with the selected values.
+</ParamField>
+
+<ParamField path="value" type="any">
+  Value of the select control.
+</ParamField>
+
+<ParamField path="panelClass" type="string | string[]">
+  Classes to be passed to the select panel.
+</ParamField>
+
+<ParamField path="id" type="string">
+  Unique id of the element.
+</ParamField>
+
+<ParamField path="errorStateMatcher" type="ErrorStateMatcher">
+  Object used to control when error messages are shown.
+</ParamField>
+
+<ParamField path="typeaheadDebounceInterval" type="number" default="200">
+  Time to wait in milliseconds after the last keystroke before moving focus to an item.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="openedChange" type="EventEmitter<boolean>">
+  Event emitted when the select panel has been toggled.
+</ParamField>
+
+<ParamField path="opened" type="EventEmitter<void>">
+  Event emitted when the select panel has been opened.
+</ParamField>
+
+<ParamField path="closed" type="EventEmitter<void>">
+  Event emitted when the select panel has been closed.
+</ParamField>
+
+<ParamField path="selectionChange" type="EventEmitter<MatSelectChange>">
+  Event emitted when the selected value has been changed by the user.
+</ParamField>
+
+#### Methods
+
+<ParamField path="focus()" type="void">
+  Focuses the select element.
+</ParamField>
+
+<ParamField path="open()" type="void">
+  Opens the select's panel.
+</ParamField>
+
+<ParamField path="close()" type="void">
+  Closes the select's panel.
+</ParamField>
+
+<ParamField path="toggle()" type="void">
+  Toggles the select's panel between open and closed.
+</ParamField>
+
+### MatSelectChange
+
+<ParamField path="source" type="MatSelect">
+  Reference to the select that emitted the change event.
+</ParamField>
+
+<ParamField path="value" type="any">
+  Current value of the select that emitted the event.
+</ParamField>
+
+## Multiple Selection
+
+```html
+<mat-form-field>
+  <mat-label>Toppings</mat-label>
+  <mat-select [formControl]="toppingsControl" multiple>
+    <mat-option *ngFor="let topping of toppingList" [value]="topping">
+      {{ topping }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+```
+
+## Option Groups
+
+```html
+<mat-form-field>
+  <mat-label>Pokemon</mat-label>
+  <mat-select>
+    <mat-optgroup *ngFor="let group of pokemonGroups" [label]="group.name">
+      <mat-option *ngFor="let pokemon of group.pokemon" [value]="pokemon">
+        {{ pokemon }}
+      </mat-option>
+    </mat-optgroup>
+  </mat-select>
+</mat-form-field>
+```
+
+## Accessibility
+
+- The select uses `role="combobox"` with appropriate ARIA attributes
+- The select panel uses `role="listbox"`
+- Options use `role="option"`
+- Keyboard navigation is fully supported:
+  - `ARROW_UP/DOWN`: Navigate through options
+  - `ENTER/SPACE`: Select the focused option
+  - `ESCAPE`: Close the panel
+  - Type to search for options (typeahead)
+- Screen readers announce the selected value and option count
+- Use `aria-label` or ensure the select has a label via `<mat-label>`
+
+## Advanced Usage
+
+### Custom Trigger
+
+```html
+<mat-form-field>
+  <mat-select [formControl]="foodControl">
+    <mat-select-trigger>
+      {{ foodControl.value?.label }}
+      <span *ngIf="foodControl.value?.emoji"> - {{ foodControl.value.emoji }}</span>
+    </mat-select-trigger>
+    <mat-option *ngFor="let food of foods" [value]="food">
+      {{ food.emoji }} {{ food.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+```
+
+### Disable Option Centering
+
+By default, the select centers the active option. Disable this behavior:
+
+```html
+<mat-select [disableOptionCentering]="true">
+  <!-- options -->
+</mat-select>
+```
+
+### Custom Comparison
+
+Provide a custom comparison function for object values:
+
+```typescript
+compareObjects(o1: any, o2: any) {
+  return o1.id === o2.id;
+}
+```
+
+```html
+<mat-select [compareWith]="compareObjects">
+  <!-- options -->
+</mat-select>
+```
+
+### Reset Option
+
+```html
+<mat-form-field>
+  <mat-label>State</mat-label>
+  <mat-select [(value)]="selectedValue">
+    <mat-option>None</mat-option>
+    <mat-option value="option1">Option 1</mat-option>
+    <mat-option value="option2">Option 2</mat-option>
+  </mat-select>
+</mat-form-field>
+```
+
+### Error Messages
+
+```html
+<mat-form-field>
+  <mat-label>Favorite food</mat-label>
+  <mat-select [formControl]="foodControl" required>
+    <mat-option *ngFor="let food of foods" [value]="food">
+      {{ food }}
+    </mat-option>
+  </mat-select>
+  <mat-error *ngIf="foodControl.hasError('required')">
+    Please select a food
+  </mat-error>
+</mat-form-field>
+```

@@ -1,0 +1,207 @@
+---
+title: Icon
+description: Display icons from icon fonts or SVG
+---
+
+Component to display icons. Supports SVG icons and font-based icon fonts like Material Icons.
+
+## Import
+
+```typescript
+import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
+```
+
+## Basic Usage
+
+```html
+<!-- Font icon -->
+<mat-icon>home</mat-icon>
+
+<!-- SVG icon -->
+<mat-icon svgIcon="custom-icon"></mat-icon>
+```
+
+## API Reference
+
+### MatIcon
+
+Selector: `mat-icon`
+
+Exported as: `matIcon`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() color` | `ThemePalette` | Theme color. Options: 'primary', 'accent', 'warn' |
+| `@Input() inline` | `boolean` | Whether icon should be inline (match font size) |
+| `@Input() svgIcon` | `string` | Name of SVG icon from registry |
+| `@Input() fontSet` | `string` | Font set the icon is part of |
+| `@Input() fontIcon` | `string` | Name of icon within font set |
+
+## Using Font Icons
+
+### Material Icons
+
+By default, MatIcon uses the Material Icons font:
+
+```html
+<mat-icon>favorite</mat-icon>
+<mat-icon>home</mat-icon>
+<mat-icon>menu</mat-icon>
+```
+
+Include the font in your `index.html`:
+
+```html
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+```
+
+### Custom Font Icon
+
+```html
+<mat-icon fontSet="fa" fontIcon="fa-home"></mat-icon>
+```
+
+## Using SVG Icons
+
+### Register SVG Icons
+
+```typescript
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
+
+export class AppComponent {
+  constructor(
+    private iconRegistry: MatIconRegistry,
+    private sanitizer: DomSanitizer
+  ) {
+    // Single icon
+    this.iconRegistry.addSvgIcon(
+      'custom-icon',
+      this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/custom.svg')
+    );
+
+    // Icon set
+    this.iconRegistry.addSvgIconSet(
+      this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/icon-set.svg')
+    );
+
+    // Namespaced icon
+    this.iconRegistry.addSvgIconInNamespace(
+      'custom',
+      'icon',
+      this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/custom/icon.svg')
+    );
+  }
+}
+```
+
+### Use SVG Icons
+
+```html
+<!-- From default namespace -->
+<mat-icon svgIcon="custom-icon"></mat-icon>
+
+<!-- From custom namespace -->
+<mat-icon svgIcon="custom:icon"></mat-icon>
+```
+
+## Examples
+
+### Colored Icons
+
+```html
+<mat-icon color="primary">favorite</mat-icon>
+<mat-icon color="accent">star</mat-icon>
+<mat-icon color="warn">warning</mat-icon>
+```
+
+### Inline Icons
+
+```html
+<p>
+  Click the <mat-icon inline>favorite</mat-icon> icon to save
+</p>
+```
+
+### Icon Sizes
+
+Use CSS to control icon size:
+
+```css
+.icon-sm {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.icon-lg {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+}
+```
+
+```html
+<mat-icon class="icon-sm">home</mat-icon>
+<mat-icon class="icon-lg">home</mat-icon>
+```
+
+### In Buttons
+
+```html
+<button mat-raised-button>
+  <mat-icon>save</mat-icon>
+  Save
+</button>
+
+<button mat-icon-button>
+  <mat-icon>more_vert</mat-icon>
+</button>
+```
+
+## Accessibility
+
+- Icons are `aria-hidden="true"` by default
+- Use `aria-label` on buttons containing icons:
+
+```html
+<button mat-icon-button aria-label="Delete">
+  <mat-icon>delete</mat-icon>
+</button>
+```
+
+- For informational icons, provide text alternatives:
+
+```html
+<mat-icon aria-hidden="false" aria-label="Success">check_circle</mat-icon>
+```
+
+## Configuration
+
+### Default Options
+
+```typescript
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_ICON_DEFAULT_OPTIONS,
+      useValue: {
+        color: 'primary',
+        fontSet: 'material-icons'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Icon Resources
+
+- [Material Icons](https://fonts.google.com/icons)
+- [Font Awesome](https://fontawesome.com/)
+- [Ionicons](https://ionic.io/ionicons)

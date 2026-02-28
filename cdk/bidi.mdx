@@ -1,0 +1,343 @@
+---
+title: Bidirectionality (Bidi)
+description: Support for right-to-left (RTL) and left-to-right (LTR) layouts
+---
+
+The `@angular/cdk/bidi` package provides utilities for handling bidirectional text and layouts, supporting both LTR (left-to-right) and RTL (right-to-left) orientations.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {BidiModule} from '@angular/cdk/bidi';
+```
+
+## Basic Usage
+
+### Directionality Service
+
+The `Directionality` service provides the current text direction.
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Directionality} from '@angular/cdk/bidi';
+
+@Component({
+  selector: 'app-my-component',
+  template: `
+    <div [style.text-align]="dir.value === 'rtl' ? 'right' : 'left'">
+      Content aligned based on direction: {{ dir.value }}
+    </div>
+  `,
+})
+export class MyComponent {
+  dir = inject(Directionality);
+
+  ngOnInit() {
+    console.log('Current direction:', this.dir.value); // 'ltr' or 'rtl'
+    
+    // Subscribe to direction changes
+    this.dir.change.subscribe(direction => {
+      console.log('Direction changed to:', direction);
+    });
+  }
+}
+```
+
+### Dir Directive
+
+Use the `[dir]` directive to set direction for a subtree.
+
+```html
+<!-- Set direction explicitly -->
+<div dir="rtl">
+  <p>This text is right-to-left</p>
+</div>
+
+<div dir="ltr">
+  <p>This text is left-to-right</p>
+</div>
+
+<!-- Auto-detect from locale -->
+<div dir="auto">
+  <p>Direction detected automatically</p>
+</div>
+```
+
+### Dynamic Direction
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-direction-toggle',
+  template: `
+    <button (click)="toggleDirection()">Toggle Direction</button>
+    
+    <div [dir]="currentDirection">
+      <p>This content changes direction: {{ currentDirection }}</p>
+    </div>
+  `,
+})
+export class DirectionToggle {
+  currentDirection: 'ltr' | 'rtl' = 'ltr';
+
+  toggleDirection() {
+    this.currentDirection = this.currentDirection === 'ltr' ? 'rtl' : 'ltr';
+  }
+}
+```
+
+## Detecting Direction
+
+```typescript
+import {Component, inject, OnInit} from '@angular/core';
+import {Directionality, Direction} from '@angular/cdk/bidi';
+
+@Component({
+  selector: 'app-direction-aware',
+  template: `
+    <div class="container" [class.rtl]="isRtl">
+      <p>Content adapts to {{ direction }} layout</p>
+    </div>
+  `,
+  styles: [`
+    .container { padding-left: 20px; }
+    .container.rtl { 
+      padding-left: 0;
+      padding-right: 20px; 
+    }
+  `]
+})
+export class DirectionAware implements OnInit {
+  private directionality = inject(Directionality);
+  
+  direction: Direction;
+  isRtl: boolean;
+
+  ngOnInit() {
+    this.direction = this.directionality.value;
+    this.isRtl = this.direction === 'rtl';
+    
+    // React to direction changes
+    this.directionality.change.subscribe(dir => {
+      this.direction = dir;
+      this.isRtl = dir === 'rtl';
+    });
+  }
+}
+```
+
+## Using with Signals
+
+The `Directionality` service provides a signal for reactive direction tracking.
+
+```typescript
+import {Component, inject, computed} from '@angular/core';
+import {Directionality} from '@angular/cdk/bidi';
+
+@Component({
+  selector: 'app-signal-example',
+  template: `
+    <div [style.margin-left.px]="marginStart()">
+      Content with {{ dir.valueSignal() }} layout
+    </div>
+  `,
+})
+export class SignalExample {
+  dir = inject(Directionality);
+  
+  // Computed signal based on direction
+  marginStart = computed(() => {
+    return this.dir.valueSignal() === 'rtl' ? 0 : 20;
+  });
+}
+```
+
+## RTL Styling Patterns
+
+### Logical Properties (Recommended)
+
+Use CSS logical properties for automatic RTL support:
+
+```css
+/* Instead of margin-left/margin-right */
+.element {
+  margin-inline-start: 20px;  /* Becomes margin-right in RTL */
+  margin-inline-end: 10px;    /* Becomes margin-left in RTL */
+  padding-inline: 15px;       /* Horizontal padding */
+  border-inline-start: 1px solid #ccc;
+}
+
+/* Instead of left/right positioning */
+.positioned {
+  inset-inline-start: 0;  /* left in LTR, right in RTL */
+  inset-inline-end: 0;    /* right in LTR, left in RTL */
+}
+```
+
+### RTL-Specific Styles
+
+```scss
+.my-component {
+  margin-left: 20px;
+  
+  &[dir="rtl"] {
+    margin-left: 0;
+    margin-right: 20px;
+  }
+}
+
+// Or with class
+.my-component {
+  margin-left: 20px;
+  
+  .rtl & {
+    margin-left: 0;
+    margin-right: 20px;
+  }
+}
+```
+
+## API Reference
+
+### Directionality Service
+
+**Injectable**: `{providedIn: 'root'}`
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `value` | `Direction` | Current direction ('ltr' or 'rtl') |
+| `valueSignal` | `Signal<Direction>` | Direction as a signal |
+| `change` | `EventEmitter<Direction>` | Emits when direction changes |
+
+### Dir Directive
+
+**Selector**: `[dir]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `dir` | `'ltr' \| 'rtl' \| 'auto'` | The text direction |
+
+**Output**:
+
+| Event | Type | Description |
+|-------|------|-------------|
+| `dirChange` | `Direction` | Emits when direction changes |
+
+### Type: Direction
+
+```typescript
+type Direction = 'ltr' | 'rtl';
+```
+
+## Auto-Detection
+
+When using `dir="auto"`, the direction is detected from the browser's locale:
+
+```typescript
+// Detects RTL from locale patterns
+const RTL_LOCALES = /^(ar|ckb|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi)/;
+
+// These locales automatically get RTL:
+// - Arabic (ar)
+// - Hebrew (he)
+// - Persian/Farsi (fa)
+// - Urdu (ur)
+// - And others...
+```
+
+## Global Configuration
+
+Set direction globally on the document:
+
+```html
+<!-- In index.html -->
+<html dir="rtl">
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+```
+
+Or dynamically:
+
+```typescript
+import {Component, inject, DOCUMENT} from '@angular/core';
+
+@Component({/*...*/})
+export class AppComponent {
+  private document = inject(DOCUMENT);
+
+  setGlobalDirection(dir: 'ltr' | 'rtl') {
+    this.document.documentElement.dir = dir;
+  }
+}
+```
+
+## Testing
+
+```typescript
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {Directionality} from '@angular/cdk/bidi';
+
+describe('MyComponent', () => {
+  let fixture: ComponentFixture<MyComponent>;
+  let directionality: Directionality;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [MyComponent],
+      providers: [
+        {
+          provide: Directionality,
+          useValue: {value: 'rtl', change: new EventEmitter()}
+        }
+      ]
+    });
+
+    fixture = TestBed.createComponent(MyComponent);
+    directionality = TestBed.inject(Directionality);
+  });
+
+  it('should handle RTL layout', () => {
+    expect(directionality.value).toBe('rtl');
+  });
+});
+```
+
+## Best Practices
+
+1. **Use logical properties** - Prefer `margin-inline-start` over `margin-left`
+2. **Test both directions** - Always test your app in both LTR and RTL
+3. **Avoid hardcoded directions** - Use the Directionality service instead
+4. **Icon mirroring** - Some icons (arrows) should flip in RTL
+5. **Number formatting** - Numbers may need different formatting in RTL locales
+
+## Standalone Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {BidiModule} from '@angular/cdk/bidi';
+
+@Component({
+  selector: 'app-standalone-bidi',
+  standalone: true,
+  imports: [BidiModule],
+  template: `
+    <div dir="rtl">
+      RTL content
+    </div>
+  `,
+})
+export class StandaloneBidi {}
+```
+
+## See Also
+
+- [Angular i18n Guide](https://angular.dev/guide/i18n)
+- [CSS Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties)
+- [RTL Web Development](https://rtlstyling.com/)

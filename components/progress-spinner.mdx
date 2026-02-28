@@ -1,0 +1,211 @@
+---
+title: Progress Spinner
+description: Circular progress indicator
+---
+
+Circular progress indicator that can show determinate or indeterminate progress.
+
+## Import
+
+```typescript
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+```
+
+## Basic Usage
+
+```html
+<mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+<mat-spinner></mat-spinner> <!-- Alias for indeterminate spinner -->
+```
+
+## API Reference
+
+### MatProgressSpinner
+
+Selector: `mat-progress-spinner`, `mat-spinner`
+
+Exported as: `matProgressSpinner`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() color` | `ThemePalette` | Theme color. Options: 'primary', 'accent', 'warn' |
+| `@Input() mode` | `ProgressSpinnerMode` | Mode. Options: 'determinate', 'indeterminate' |
+| `@Input() value` | `number` | Progress value (0-100) for determinate mode |
+| `@Input() diameter` | `number` | Diameter of the spinner in pixels. Default: 100 |
+| `@Input() strokeWidth` | `number` | Stroke width as percentage of diameter |
+
+## Modes
+
+### Indeterminate
+
+Shows continuous spinning animation:
+
+```html
+<mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+
+<!-- Or use the mat-spinner alias -->
+<mat-spinner></mat-spinner>
+```
+
+### Determinate
+
+Shows specific progress value:
+
+```html
+<mat-progress-spinner 
+  mode="determinate" 
+  [value]="progressValue">
+</mat-progress-spinner>
+```
+
+```typescript
+export class SpinnerComponent {
+  progressValue = 75;
+}
+```
+
+## Examples
+
+### Different Sizes
+
+```html
+<!-- Small -->
+<mat-spinner [diameter]="30"></mat-spinner>
+
+<!-- Medium (default) -->
+<mat-spinner [diameter]="50"></mat-spinner>
+
+<!-- Large -->
+<mat-spinner [diameter]="100"></mat-spinner>
+```
+
+### With Color
+
+```html
+<mat-spinner color="primary"></mat-spinner>
+<mat-spinner color="accent"></mat-spinner>
+<mat-spinner color="warn"></mat-spinner>
+```
+
+### Custom Stroke Width
+
+```html
+<mat-progress-spinner 
+  [diameter]="100"
+  [strokeWidth]="5">
+</mat-progress-spinner>
+```
+
+### Loading Overlay
+
+```typescript
+export class LoadingComponent {
+  isLoading = false;
+
+  loadData() {
+    this.isLoading = true;
+    this.dataService.fetch().subscribe({
+      next: () => this.isLoading = false,
+      error: () => this.isLoading = false
+    });
+  }
+}
+```
+
+```html
+<div class="container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <mat-spinner></mat-spinner>
+    </div>
+  }
+  <div class="content">
+    <!-- Your content -->
+  </div>
+</div>
+```
+
+```css
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+}
+```
+
+### Determinate Progress
+
+```typescript
+export class ProgressComponent {
+  progress = 0;
+
+  startProgress() {
+    const interval = setInterval(() => {
+      this.progress += 5;
+      if (this.progress >= 100) {
+        clearInterval(interval);
+      }
+    }, 100);
+  }
+}
+```
+
+```html
+<mat-progress-spinner 
+  mode="determinate" 
+  [value]="progress">
+</mat-progress-spinner>
+<p>{{progress}}%</p>
+```
+
+## Accessibility
+
+- Has `role="progressbar"`
+- Uses `aria-valuemin`, `aria-valuemax`, `aria-valuenow`
+- `aria-valuenow` is only set in determinate mode
+- Tab index set to -1 for screen reader compatibility
+- Consider adding `aria-label` for context:
+
+```html
+<mat-spinner aria-label="Loading data"></mat-spinner>
+```
+
+## Configuration
+
+```typescript
+import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS } from '@angular/material/progress-spinner';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+      useValue: {
+        diameter: 50,
+        strokeWidth: 10,
+        color: 'primary'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Types
+
+```typescript
+type ProgressSpinnerMode = 'determinate' | 'indeterminate';
+```
+
+## Related Components
+
+- [Progress Bar](/components/progress-bar)

@@ -1,0 +1,252 @@
+---
+title: 'ARIA Tabs'
+description: 'Accessible tabs component for layered content sections'
+---
+
+# ARIA Tabs
+
+The ARIA Tabs provides an accessible tabbed interface for organizing content into layered sections following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Tabs
+
+The main container for a tabbed interface.
+
+**Selector**: `[ngTabs]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/tabs/tabs.ts:46`
+
+### TabList
+
+Container for tab headers.
+
+**Selector**: `[ngTabList]`
+
+#### Inputs
+
+- `selectedTab` (model) - The currently selected tab value. Use two-way binding with `[(selectedTab)]`
+- `orientation` ('horizontal' | 'vertical') - Tab list orientation
+- `disabled` (boolean) - Whether the tab list is disabled
+
+### Tab
+
+An individual tab header.
+
+**Selector**: `[ngTab]`
+
+#### Inputs
+
+- `value` (required) - Unique identifier for this tab
+- `disabled` (boolean) - Whether this tab is disabled
+
+### TabPanel
+
+Content panel associated with a tab.
+
+**Selector**: `[ngTabPanel]`
+
+#### Inputs
+
+- `value` (required) - Value matching the corresponding tab
+- `preserveContent` (boolean) - Whether to preserve content when panel is hidden
+
+### TabContent
+
+Directive for lazy-loaded tab content.
+
+**Selector**: `[ngTabContent]`
+
+## Basic Usage
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Tabs, TabList, Tab, TabPanel, TabContent} from '@angular/aria';
+
+@Component({
+  selector: 'app-tabs-example',
+  imports: [Tabs, TabList, Tab, TabPanel, TabContent],
+  template: `
+    <div ngTabs>
+      <ul ngTabList [(selectedTab)]="selectedTab">
+        <li ngTab value="tab1">Tab 1</li>
+        <li ngTab value="tab2">Tab 2</li>
+        <li ngTab value="tab3">Tab 3</li>
+      </ul>
+
+      <div ngTabPanel value="tab1">
+        <ng-template ngTabContent>
+          <p>Content for Tab 1</p>
+        </ng-template>
+      </div>
+      
+      <div ngTabPanel value="tab2">
+        <ng-template ngTabContent>
+          <p>Content for Tab 2</p>
+        </ng-template>
+      </div>
+      
+      <div ngTabPanel value="tab3">
+        <ng-template ngTabContent>
+          <p>Content for Tab 3</p>
+        </ng-template>
+      </div>
+    </div>
+    
+    <p>Current tab: {{selectedTab()}}</p>
+  `
+})
+export class TabsExample {
+  selectedTab = signal('tab1');
+}
+```
+
+## Vertical Tabs
+
+```html
+<div ngTabs>
+  <ul ngTabList [(selectedTab)]="selected" orientation="vertical">
+    <li ngTab value="profile">Profile</li>
+    <li ngTab value="settings">Settings</li>
+    <li ngTab value="notifications">Notifications</li>
+  </ul>
+
+  <div ngTabPanel value="profile">
+    <ng-template ngTabContent>
+      <h2>Profile Settings</h2>
+    </ng-template>
+  </div>
+  
+  <div ngTabPanel value="settings">
+    <ng-template ngTabContent>
+      <h2>General Settings</h2>
+    </ng-template>
+  </div>
+  
+  <div ngTabPanel value="notifications">
+    <ng-template ngTabContent>
+      <h2>Notification Preferences</h2>
+    </ng-template>
+  </div>
+</div>
+```
+
+## Dynamic Tabs
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {Tabs, TabList, Tab, TabPanel, TabContent} from '@angular/aria';
+
+@Component({
+  selector: 'app-dynamic-tabs',
+  imports: [Tabs, TabList, Tab, TabPanel, TabContent],
+  template: `
+    <div ngTabs>
+      <ul ngTabList [(selectedTab)]="selectedTab">
+        @for (tab of tabs; track tab.id) {
+          <li ngTab [value]="tab.id">{{tab.label}}</li>
+        }
+      </ul>
+
+      @for (tab of tabs; track tab.id) {
+        <div ngTabPanel [value]="tab.id">
+          <ng-template ngTabContent>
+            <div [innerHTML]="tab.content"></div>
+          </ng-template>
+        </div>
+      }
+    </div>
+  `
+})
+export class DynamicTabsExample {
+  selectedTab = signal('home');
+  
+  tabs = [
+    {id: 'home', label: 'Home', content: '<p>Home content</p>'},
+    {id: 'about', label: 'About', content: '<p>About content</p>'},
+    {id: 'contact', label: 'Contact', content: '<p>Contact content</p>'}
+  ];
+}
+```
+
+## Disabled Tabs
+
+```html
+<div ngTabs>
+  <ul ngTabList [(selectedTab)]="selected">
+    <li ngTab value="available">Available</li>
+    <li ngTab value="locked" [disabled]="true">Locked</li>
+    <li ngTab value="active">Active</li>
+  </ul>
+  
+  <!-- Tab panels -->
+</div>
+```
+
+## Keyboard Navigation
+
+### Horizontal Tabs
+- **Arrow Left/Right** - Navigate between tabs
+- **Home** - Focus first tab
+- **End** - Focus last tab
+- **Tab** - Move focus to active tab panel
+
+### Vertical Tabs
+- **Arrow Up/Down** - Navigate between tabs
+- **Home** - Focus first tab
+- **End** - Focus last tab
+- **Tab** - Move focus to active tab panel
+
+## Accessibility Features
+
+- Implements ARIA tabs pattern
+- Proper roles: `tablist`, `tab`, `tabpanel`
+- `aria-selected` for active tab
+- `aria-controls` linking tabs to panels
+- `aria-labelledby` linking panels to tabs
+- `aria-orientation` for layout direction
+- Focus management
+- Full keyboard navigation
+- Screen reader announcements
+- Hidden panels use `inert` attribute
+
+## Lazy Loading
+
+By default, tab panel content is lazy-loaded using the `ngTabContent` directive. Content is only rendered when the tab is first activated:
+
+```html
+<div ngTabPanel value="expensive">
+  <ng-template ngTabContent>
+    <!-- This content is only rendered when tab is activated -->
+    <expensive-component></expensive-component>
+  </ng-template>
+</div>
+```
+
+To preserve content after it's been loaded (prevent re-rendering):
+
+```html
+<div ngTabPanel value="preserve" [preserveContent]="true">
+  <ng-template ngTabContent>
+    <!-- Content is kept in DOM after first load -->
+  </ng-template>
+</div>
+```
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [tabs.ts](https://github.com/angular/components/tree/main/src/aria/tabs/tabs.ts)
+- [tab-list.ts](https://github.com/angular/components/tree/main/src/aria/tabs/tab-list.ts)
+- [tab.ts](https://github.com/angular/components/tree/main/src/aria/tabs/tab.ts)
+- [tab-panel.ts](https://github.com/angular/components/tree/main/src/aria/tabs/tab-panel.ts)

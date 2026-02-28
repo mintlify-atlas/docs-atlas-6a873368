@@ -1,0 +1,274 @@
+---
+title: Testing
+description: Component test harnesses for reliable testing
+---
+
+The `@angular/cdk/testing` package provides utilities for creating component test harnesses that interact with components in tests.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {ComponentHarness} from '@angular/cdk/testing';
+import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+```
+
+## Creating a Test Harness
+
+### Basic Harness
+
+```typescript
+import {ComponentHarness} from '@angular/cdk/testing';
+
+// Component to test
+@Component({
+  selector: 'app-counter',
+  template: `
+    <div class="count">{{ count }}</div>
+    <button class="increment" (click)="increment()">+</button>
+    <button class="decrement" (click)="decrement()">-</button>
+  `,
+})
+export class CounterComponent {
+  count = 0;
+  increment() { this.count++; }
+  decrement() { this.count--; }
+}
+
+// Test harness
+export class CounterHarness extends ComponentHarness {
+  static hostSelector = 'app-counter';
+
+  private getIncrementButton = this.locatorFor('.increment');
+  private getDecrementButton = this.locatorFor('.decrement');
+  private getCountDisplay = this.locatorFor('.count');
+
+  async increment(): Promise<void> {
+    const button = await this.getIncrementButton();
+    return button.click();
+  }
+
+  async decrement(): Promise<void> {
+    const button = await this.getDecrementButton();
+    return button.click();
+  }
+
+  async getCount(): Promise<number> {
+    const display = await this.getCountDisplay();
+    const text = await display.text();
+    return parseInt(text, 10);
+  }
+}
+```
+
+### Using the Harness
+
+```typescript
+import {TestBed} from '@angular/core/testing';
+import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+
+describe('CounterComponent', () => {
+  let harness: CounterHarness;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [CounterComponent]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(CounterComponent);
+    harness = await TestbedHarnessEnvironment.harnessForFixture(
+      fixture,
+      CounterHarness
+    );
+  });
+
+  it('should increment count', async () => {
+    await harness.increment();
+    expect(await harness.getCount()).toBe(1);
+  });
+
+  it('should decrement count', async () => {
+    await harness.decrement();
+    expect(await harness.getCount()).toBe(-1);
+  });
+});
+```
+
+## Advanced Harnesses
+
+### Form Harness
+
+```typescript
+export class LoginFormHarness extends ComponentHarness {
+  static hostSelector = 'app-login-form';
+
+  private getUsernameInput = this.locatorFor('input[name="username"]');
+  private getPasswordInput = this.locatorFor('input[name="password"]');
+  private getSubmitButton = this.locatorFor('button[type="submit"]');
+
+  async setUsername(value: string): Promise<void> {
+    const input = await this.getUsernameInput();
+    await input.clear();
+    return input.sendKeys(value);
+  }
+
+  async setPassword(value: string): Promise<void> {
+    const input = await this.getPasswordInput();
+    await input.clear();
+    return input.sendKeys(value);
+  }
+
+  async submit(): Promise<void> {
+    const button = await this.getSubmitButton();
+    return button.click();
+  }
+
+  async isSubmitDisabled(): Promise<boolean> {
+    const button = await this.getSubmitButton();
+    return button.getProperty<boolean>('disabled');
+  }
+}
+
+// Usage in tests
+it('should enable submit when form is valid', async () => {
+  await harness.setUsername('user@example.com');
+  await harness.setPassword('password123');
+  expect(await harness.isSubmitDisabled()).toBe(false);
+});
+```
+
+### Nested Harnesses
+
+```typescript
+// Child harness
+export class ButtonHarness extends ComponentHarness {
+  static hostSelector = 'button';
+
+  async click(): Promise<void> {
+    const host = await this.host();
+    return host.click();
+  }
+
+  async getText(): Promise<string> {
+    const host = await this.host();
+    return host.text();
+  }
+}
+
+// Parent harness
+export class ToolbarHarness extends ComponentHarness {
+  static hostSelector = 'app-toolbar';
+
+  private getButtons = this.locatorForAll(ButtonHarness);
+
+  async getButtonCount(): Promise<number> {
+    const buttons = await this.getButtons();
+    return buttons.length;
+  }
+
+  async clickButton(index: number): Promise<void> {
+    const buttons = await this.getButtons();
+    return buttons[index].click();
+  }
+}
+```
+
+## Harness Loaders
+
+### Document Root Loader
+
+```typescript
+import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+
+const loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+const dialog = await loader.getHarness(DialogHarness);
+```
+
+### Child Harness Loader
+
+```typescript
+export class ParentHarness extends ComponentHarness {
+  static hostSelector = 'app-parent';
+
+  async getChildHarness(): Promise<ChildHarness> {
+    const loader = await this.loader();
+    return loader.getHarness(ChildHarness);
+  }
+}
+```
+
+## API Reference
+
+### ComponentHarness
+
+**Base Methods**:
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `host()` | `Promise<TestElement>` | Get host element |
+| `locatorFor(selector)` | `AsyncFactoryFn<TestElement>` | Locate single element |
+| `locatorForOptional(selector)` | `AsyncFactoryFn<TestElement \| null>` | Locate optional element |
+| `locatorForAll(selector)` | `AsyncFactoryFn<TestElement[]>` | Locate all elements |
+
+### TestElement
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `click()` | `Promise<void>` | Click element |
+| `sendKeys(...keys)` | `Promise<void>` | Send keyboard input |
+| `clear()` | `Promise<void>` | Clear input value |
+| `text()` | `Promise<string>` | Get text content |
+| `getAttribute(name)` | `Promise<string \| null>` | Get attribute |
+| `hasClass(name)` | `Promise<boolean>` | Check if has class |
+| `getDimensions()` | `Promise<ElementDimensions>` | Get element size |
+| `getProperty<T>(name)` | `Promise<T>` | Get property value |
+| `blur()` | `Promise<void>` | Blur element |
+| `focus()` | `Promise<void>` | Focus element |
+| `isFocused()` | `Promise<boolean>` | Check if focused |
+
+## Best Practices
+
+1. **Use harnesses over direct DOM access** - More maintainable and reliable
+2. **Create reusable harnesses** - Share harnesses across tests
+3. **Test user interactions** - Click, type, navigate like a real user
+4. **Avoid implementation details** - Test public API, not internals
+5. **Async/await** - All harness methods are asynchronous
+
+## Common Patterns
+
+### Wait for Condition
+
+```typescript
+import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+
+await TestbedHarnessEnvironment.waitForTasksOutsideAngular();
+```
+
+### Parallel Harness Creation
+
+```typescript
+const [header, footer] = await parallel(() => [
+  loader.getHarness(HeaderHarness),
+  loader.getHarness(FooterHarness),
+]);
+```
+
+### Optional Elements
+
+```typescript
+const errorMessage = await this.locatorForOptional('.error')();
+if (errorMessage) {
+  const text = await errorMessage.text();
+  console.log('Error:', text);
+}
+```
+
+## See Also
+
+- [Angular Testing Guide](https://angular.dev/guide/testing)
+- [Angular Material Test Harnesses](https://material.angular.io/guide/using-component-harnesses)
+- [Karma](https://karma-runner.github.io/)
+- [Jasmine](https://jasmine.github.io/)

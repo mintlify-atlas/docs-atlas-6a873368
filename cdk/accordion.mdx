@@ -1,0 +1,243 @@
+---
+title: CdkAccordion
+description: Unstyled accordion component for expandable panels
+---
+
+The `CdkAccordion` provides behavior for creating expandable accordion panels without any specific visual styling.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {CdkAccordionModule} from '@angular/cdk/accordion';
+```
+
+## Basic Usage
+
+```html
+<cdk-accordion>
+  <cdk-accordion-item
+    *ngFor="let item of items"
+    [expanded]="item.expanded"
+    (expandedChange)="onExpandedChange($event, item)">
+    
+    <button (click)="accordionItem.toggle()">
+      {{ item.title }}
+    </button>
+    
+    <div [style.display]="accordionItem.expanded ? 'block' : 'none'">
+      {{ item.content }}
+    </div>
+  </cdk-accordion-item>
+</cdk-accordion>
+```
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-accordion-example',
+  templateUrl: './accordion-example.component.html',
+})
+export class AccordionExample {
+  items = [
+    {title: 'Section 1', content: 'Content 1', expanded: false},
+    {title: 'Section 2', content: 'Content 2', expanded: false},
+    {title: 'Section 3', content: 'Content 3', expanded: false},
+  ];
+
+  onExpandedChange(expanded: boolean, item: any) {
+    item.expanded = expanded;
+  }
+}
+```
+
+## Multi-Expansion Mode
+
+By default, only one item can be expanded at a time. Enable `multi` to allow multiple items.
+
+```html
+<cdk-accordion [multi]="true">
+  <cdk-accordion-item>
+    <button (click)="item1.toggle()">Item 1</button>
+    <div [hidden]="!item1.expanded">Content 1</div>
+  </cdk-accordion-item>
+  
+  <cdk-accordion-item>
+    <button (click)="item2.toggle()">Item 2</button>
+    <div [hidden]="!item2.expanded">Content 2</div>
+  </cdk-accordion-item>
+</cdk-accordion>
+```
+
+## Programmatic Control
+
+```typescript
+import {Component, ViewChild} from '@angular/core';
+import {CdkAccordion} from '@angular/cdk/accordion';
+
+@Component({
+  selector: 'app-controlled-accordion',
+  template: `
+    <button (click)="accordion.openAll()">Expand All</button>
+    <button (click)="accordion.closeAll()">Collapse All</button>
+    
+    <cdk-accordion #accordion [multi]="true">
+      <cdk-accordion-item #item1>
+        <button (click)="item1.toggle()">Panel 1</button>
+        <div [hidden]="!item1.expanded">Panel 1 content</div>
+      </cdk-accordion-item>
+      
+      <cdk-accordion-item #item2>
+        <button (click)="item2.toggle()">Panel 2</button>
+        <div [hidden]="!item2.expanded">Panel 2 content</div>
+      </cdk-accordion-item>
+    </cdk-accordion>
+  `,
+})
+export class ControlledAccordion {
+  @ViewChild('accordion') accordion: CdkAccordion;
+}
+```
+
+## With Animations
+
+```typescript
+import {Component} from '@angular/core';
+import {trigger, state, style, transition, animate} from '@angular/animations';
+
+@Component({
+  selector: 'app-animated-accordion',
+  template: `
+    <cdk-accordion>
+      <cdk-accordion-item #item1>
+        <button (click)="item1.toggle()">
+          {{ item1.expanded ? 'Collapse' : 'Expand' }}
+        </button>
+        <div [@expand]="item1.expanded ? 'expanded' : 'collapsed'">
+          <p>Animated content here</p>
+        </div>
+      </cdk-accordion-item>
+    </cdk-accordion>
+  `,
+  animations: [
+    trigger('expand', [
+      state('collapsed', style({height: '0', overflow: 'hidden'})),
+      state('expanded', style({height: '*'})),
+      transition('collapsed <=> expanded', animate('300ms ease-in-out')),
+    ]),
+  ],
+})
+export class AnimatedAccordion {}
+```
+
+## API Reference
+
+### CdkAccordion
+
+**Selector**: `cdk-accordion, [cdkAccordion]`
+
+**Properties**:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `multi` | `boolean` | Whether multiple items can be expanded simultaneously |
+| `id` | `string` | Unique ID for the accordion (auto-generated) |
+
+**Methods**:
+
+| Method | Description |
+|--------|-------------|
+| `openAll()` | Opens all enabled accordion items (only works when `multi` is true) |
+| `closeAll()` | Closes all enabled accordion items |
+
+### CdkAccordionItem
+
+**Selector**: `cdk-accordion-item, [cdkAccordionItem]`
+
+**Properties**:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `expanded` | `boolean` | Whether the accordion item is expanded |
+| `disabled` | `boolean` | Whether the accordion item is disabled |
+| `id` | `string` | Unique ID for the item (auto-generated) |
+
+**Events**:
+
+| Event | Type | Description |
+|-------|------|-------------|
+| `opened` | `void` | Emitted when the item is opened |
+| `closed` | `void` | Emitted when the item is closed |
+| `destroyed` | `void` | Emitted when the item is destroyed |
+| `expandedChange` | `boolean` | Emitted when the expanded state changes |
+
+**Methods**:
+
+| Method | Description |
+|--------|-------------|
+| `toggle()` | Toggles the expanded state |
+| `open()` | Sets expanded to true |
+| `close()` | Sets expanded to false |
+
+## Accessibility
+
+The CDK accordion provides the behavior, but you must add appropriate ARIA attributes:
+
+```html
+<cdk-accordion>
+  <cdk-accordion-item #item1>
+    <button 
+      (click)="item1.toggle()"
+      [attr.aria-expanded]="item1.expanded"
+      [attr.aria-controls]="'content-' + item1.id">
+      Section Title
+    </button>
+    
+    <div 
+      [id]="'content-' + item1.id"
+      role="region"
+      [attr.aria-labelledby]="'header-' + item1.id"
+      [hidden]="!item1.expanded">
+      Content here
+    </div>
+  </cdk-accordion-item>
+</cdk-accordion>
+```
+
+## Standalone Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {CdkAccordionModule} from '@angular/cdk/accordion';
+
+@Component({
+  selector: 'app-standalone-accordion',
+  standalone: true,
+  imports: [CdkAccordionModule],
+  template: `
+    <cdk-accordion>
+      <cdk-accordion-item>
+        <!-- content -->
+      </cdk-accordion-item>
+    </cdk-accordion>
+  `,
+})
+export class StandaloneAccordion {}
+```
+
+## Best Practices
+
+1. **Add ARIA attributes** - The CDK provides behavior, you provide accessibility
+2. **Use animations** - Enhance UX with smooth expand/collapse transitions
+3. **Keyboard navigation** - Ensure buttons are keyboard accessible
+4. **Visual indicators** - Show expand/collapse state clearly (arrows, icons)
+5. **Performance** - For many items, consider virtual scrolling
+
+## See Also
+
+- [Angular Material Expansion Panel](https://material.angular.io/components/expansion/overview)
+- [ARIA: Accordion Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/)

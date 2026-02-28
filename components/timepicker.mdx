@@ -1,0 +1,280 @@
+---
+title: Timepicker
+description: MatTimepicker allows users to select a time of day from a dropdown list.
+---
+
+## Overview
+
+`<mat-timepicker>` renders a listbox that can be used to select a time of day. It is intended to be used together with `MatTimepickerInput` directive.
+
+## Basic Usage
+
+```typescript
+import { Component } from '@angular/core';
+import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
+@Component({
+  selector: 'app-timepicker-example',
+  standalone: true,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatTimepickerModule
+  ],
+  template: `
+    <mat-form-field>
+      <mat-label>Select time</mat-label>
+      <input matInput [matTimepicker]="picker">
+      <mat-timepicker-toggle matIconSuffix [for]="picker"></mat-timepicker-toggle>
+      <mat-timepicker #picker></mat-timepicker>
+    </mat-form-field>
+  `
+})
+export class TimepickerExample {}
+```
+
+## API Reference
+
+### MatTimepicker
+
+Selector: `mat-timepicker`
+
+Exported as: `matTimepicker`
+
+#### Inputs
+
+<ParamField path="interval" type="number | string | null">
+  Interval between each option in the timepicker. The value can either be an amount of seconds (e.g. 90) or a number with a unit (e.g. 45m). Supported units are `s` for seconds, `m` for minutes or `h` for hours.
+</ParamField>
+
+<ParamField path="options" type="readonly MatTimepickerOption<D>[] | null" default="null">
+  Array of pre-defined options that the user can select from, as an alternative to using the `interval` input. An error will be thrown if both `options` and `interval` are specified.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether ripples within the timepicker should be disabled.
+</ParamField>
+
+<ParamField path="aria-label" type="string | null" default="null">
+  ARIA label for the timepicker panel.
+</ParamField>
+
+<ParamField path="aria-labelledby" type="string | null" default="null">
+  ID of the label element for the timepicker panel.
+</ParamField>
+
+<ParamField path="panelClass" type="string | string[]">
+  Classes to be passed to the timepicker panel.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="selected" type="OutputEmitterRef<MatTimepickerSelected<D>>">
+  Emits when the user selects a time.
+</ParamField>
+
+<ParamField path="opened" type="OutputEmitterRef<void>">
+  Emits when the timepicker is opened.
+</ParamField>
+
+<ParamField path="closed" type="OutputEmitterRef<void>">
+  Emits when the timepicker is closed.
+</ParamField>
+
+#### Properties
+
+<ParamField path="isOpen" type="Signal<boolean>" readonly>
+  Whether the timepicker is open.
+</ParamField>
+
+<ParamField path="disabled" type="Signal<boolean>" readonly>
+  Whether the timepicker is currently disabled.
+</ParamField>
+
+<ParamField path="activeDescendant" type="Signal<string | null>" readonly>
+  ID of the active descendant option.
+</ParamField>
+
+<ParamField path="panelId" type="string" readonly>
+  Unique ID of the timepicker's panel.
+</ParamField>
+
+#### Methods
+
+<ParamField path="open()" type="void">
+  Opens the timepicker.
+</ParamField>
+
+<ParamField path="close()" type="void">
+  Closes the timepicker.
+</ParamField>
+
+## Usage Examples
+
+### Custom Interval
+
+<Tabs>
+  <Tab title="15 Minutes">
+    ```html
+    <mat-timepicker [interval]="15m"></mat-timepicker>
+    <!-- or -->
+    <mat-timepicker [interval]="900"></mat-timepicker>
+    ```
+  </Tab>
+  
+  <Tab title="30 Minutes">
+    ```html
+    <mat-timepicker [interval]="30m"></mat-timepicker>
+    <!-- or -->
+    <mat-timepicker [interval]="1800"></mat-timepicker>
+    ```
+  </Tab>
+  
+  <Tab title="1 Hour">
+    ```html
+    <mat-timepicker [interval]="1h"></mat-timepicker>
+    <!-- or -->
+    <mat-timepicker [interval]="3600"></mat-timepicker>
+    ```
+  </Tab>
+</Tabs>
+
+### Custom Options
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-timepicker-custom-options',
+  template: `
+    <mat-form-field>
+      <mat-label>Meeting time</mat-label>
+      <input matInput [matTimepicker]="picker">
+      <mat-timepicker #picker [options]="customOptions"></mat-timepicker>
+    </mat-form-field>
+  `
+})
+export class TimepickerCustomOptionsExample {
+  customOptions = [
+    { value: new Date(2024, 0, 1, 9, 0), label: '9:00 AM - Morning' },
+    { value: new Date(2024, 0, 1, 13, 0), label: '1:00 PM - Lunch' },
+    { value: new Date(2024, 0, 1, 17, 0), label: '5:00 PM - Evening' }
+  ];
+}
+```
+
+### Reactive Forms
+
+```typescript
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-timepicker-reactive',
+  template: `
+    <mat-form-field>
+      <mat-label>Appointment time</mat-label>
+      <input matInput [matTimepicker]="picker" [formControl]="timeControl">
+      <mat-timepicker-toggle matIconSuffix [for]="picker"></mat-timepicker-toggle>
+      <mat-timepicker #picker [interval]="15m"></mat-timepicker>
+    </mat-form-field>
+    <p>Selected time: {{ timeControl.value | date:'shortTime' }}</p>
+  `
+})
+export class TimepickerReactiveExample {
+  timeControl = new FormControl(new Date());
+}
+```
+
+## Accessibility
+
+- The timepicker input uses `role="combobox"` with appropriate ARIA attributes
+- The timepicker panel uses `role="listbox"`
+- Options use `role="option"`
+- Full keyboard navigation support:
+  - `ARROW_UP/DOWN`: Navigate through time options
+  - `HOME`: Jump to first option
+  - `END`: Jump to last option
+  - `PAGE_UP/DOWN`: Navigate by page
+  - `ENTER`: Select the focused time
+  - `ESCAPE`: Close the timepicker
+- Screen readers announce the selected time and navigation actions
+- Use `aria-label` or ensure the input has a label via `<mat-label>`
+
+## Advanced Usage
+
+### Min and Max Times
+
+```typescript
+export class TimepickerMinMaxExample {
+  minTime = new Date(2024, 0, 1, 9, 0);  // 9:00 AM
+  maxTime = new Date(2024, 0, 1, 17, 0); // 5:00 PM
+}
+```
+
+```html
+<mat-form-field>
+  <input matInput [matTimepicker]="picker" [min]="minTime" [max]="maxTime">
+  <mat-timepicker #picker></mat-timepicker>
+</mat-form-field>
+```
+
+### Event Handling
+
+```typescript
+export class TimepickerEventsExample {
+  onTimeSelected(event: MatTimepickerSelected<Date>) {
+    console.log('Time selected:', event.value);
+  }
+  
+  onOpened() {
+    console.log('Timepicker opened');
+  }
+  
+  onClosed() {
+    console.log('Timepicker closed');
+  }
+}
+```
+
+```html
+<mat-timepicker 
+  (selected)="onTimeSelected($event)"
+  (opened)="onOpened()"
+  (closed)="onClosed()">
+</mat-timepicker>
+```
+
+### Custom Panel Classes
+
+```html
+<mat-timepicker [panelClass]="['custom-timepicker-panel', 'elevated']">
+</mat-timepicker>
+```
+
+### Disable Ripple
+
+```html
+<mat-timepicker [disableRipple]="true"></mat-timepicker>
+```
+
+### Global Configuration
+
+```typescript
+import { MAT_TIMEPICKER_CONFIG } from '@angular/material/timepicker';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_TIMEPICKER_CONFIG,
+      useValue: {
+        interval: '30m',
+        disableRipple: false
+      }
+    }
+  ]
+})
+export class AppModule {}
+```

@@ -1,0 +1,338 @@
+---
+title: MatSidenav
+description: Sidenav component for Angular Material - provides side navigation drawer with multiple display modes.
+---
+
+# MatSidenav
+
+The `mat-sidenav` is a collapsible side content component that can display navigation or any custom content. It supports three display modes: `over`, `push`, and `side`.
+
+## Basic Usage
+
+```typescript
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'sidenav-example',
+  imports: [MatSidenavModule, MatButtonModule],
+  template: `
+    <mat-sidenav-container>
+      <mat-sidenav #sidenav mode="side" opened>
+        <p>Sidenav content</p>
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        <button mat-button (click)="sidenav.toggle()">Toggle</button>
+        <p>Main content</p>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `,
+  styles: [`
+    mat-sidenav-container {
+      height: 100%;
+    }
+    mat-sidenav {
+      width: 250px;
+    }
+  `]
+})
+export class SidenavExample {}
+```
+
+## API Reference
+
+### MatSidenav
+
+Selector: `mat-sidenav`
+
+Extends: `MatDrawer`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `position` | `'start' \| 'end'` | `'start'` | The side that the drawer is attached to |
+| `mode` | `'over' \| 'push' \| 'side'` | `'over'` | Mode of the drawer |
+| `opened` | `boolean` | `false` | Whether the drawer is opened |
+| `disableClose` | `boolean` | `false` | Whether the drawer can be closed with the escape key or by clicking on the backdrop |
+| `autoFocus` | `AutoFocusTarget \| string \| boolean` | - | Whether the drawer should focus the first focusable element automatically when opened |
+| `fixedInViewport` | `boolean` | `false` | Whether the sidenav is fixed in the viewport |
+| `fixedTopGap` | `number` | `0` | The gap between the top of the sidenav and the top of the viewport when in fixed mode |
+| `fixedBottomGap` | `number` | `0` | The gap between the bottom of the sidenav and the bottom of the viewport when in fixed mode |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `openedChange` | `EventEmitter<boolean>` | Event emitted when the drawer open state is changed |
+| `opened` | `Observable<void>` | Event emitted when the drawer has been opened |
+| `closed` | `Observable<void>` | Event emitted when the drawer has been closed |
+| `openedStart` | `Observable<void>` | Event emitted when the drawer has started opening |
+| `closedStart` | `Observable<void>` | Event emitted when the drawer has started closing |
+| `positionChanged` | `EventEmitter<void>` | Event emitted when the drawer's position changes |
+
+#### Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `open(openedVia?: FocusOrigin)` | `Promise<MatDrawerToggleResult>` | Open the drawer |
+| `close()` | `Promise<MatDrawerToggleResult>` | Close the drawer |
+| `toggle(isOpen?: boolean, openedVia?: FocusOrigin)` | `Promise<MatDrawerToggleResult>` | Toggle the drawer |
+
+### MatSidenavContainer
+
+Selector: `mat-sidenav-container`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `autosize` | `boolean` | `false` | Whether to automatically resize the container whenever the size of any of its drawers changes |
+| `hasBackdrop` | `boolean \| null` | - | Whether the drawer container should have a backdrop |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `backdropClick` | `EventEmitter<void>` | Event emitted when the drawer backdrop is clicked |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `open(): void` | Calls `open` of both start and end drawers |
+| `close(): void` | Calls `close` of both start and end drawers |
+| `updateContentMargins(): void` | Recalculates and updates the inline styles for the content |
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `start` | `MatSidenav \| null` | The drawer child with the `start` position |
+| `end` | `MatSidenav \| null` | The drawer child with the `end` position |
+| `scrollable` | `CdkScrollable` | Reference to the CdkScrollable instance that wraps the scrollable content |
+
+### MatSidenavContent
+
+Selector: `mat-sidenav-content`
+
+Provides scrollable content area within the sidenav container.
+
+### MatDrawer
+
+Selector: `mat-drawer`
+
+Base drawer component that `MatSidenav` extends.
+
+## Examples
+
+### Responsive Navigation
+
+```typescript
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+@Component({
+  template: `
+    <mat-sidenav-container>
+      <mat-sidenav 
+        #sidenav 
+        [mode]="isHandset ? 'over' : 'side'"
+        [opened]="!isHandset">
+        <mat-nav-list>
+          <a mat-list-item href="#">Home</a>
+          <a mat-list-item href="#">About</a>
+          <a mat-list-item href="#">Contact</a>
+        </mat-nav-list>
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        <button mat-icon-button (click)="sidenav.toggle()" *ngIf="isHandset">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class ResponsiveNavExample {
+  isHandset = false;
+
+  constructor(private breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isHandset = result.matches;
+      });
+  }
+}
+```
+
+### Fixed Sidenav
+
+```typescript
+@Component({
+  template: `
+    <mat-sidenav-container>
+      <mat-sidenav 
+        mode="side" 
+        opened 
+        fixedInViewport
+        [fixedTopGap]="64"
+        [fixedBottomGap]="0">
+        Navigation with fixed position
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        Main content that scrolls independently
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class FixedSidenavExample {}
+```
+
+### Dual Sidenav
+
+```typescript
+@Component({
+  template: `
+    <mat-sidenav-container>
+      <mat-sidenav position="start" mode="side" opened>
+        Left sidenav
+      </mat-sidenav>
+
+      <mat-sidenav position="end" mode="side" opened>
+        Right sidenav
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        Content with both left and right sidebars
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class DualSidenavExample {}
+```
+
+### Sidenav with Custom Backdrop
+
+```typescript
+@Component({
+  template: `
+    <mat-sidenav-container [hasBackdrop]="true">
+      <mat-sidenav #sidenav mode="over">
+        Sidenav content
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        <button mat-button (click)="sidenav.open()">Open with Backdrop</button>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  `
+})
+export class BackdropSidenavExample {}
+```
+
+## Display Modes
+
+### Over
+
+The sidenav floats over the main content and is usually accompanied by a backdrop:
+
+```html
+<mat-sidenav mode="over" opened>
+```
+
+### Push
+
+The sidenav pushes the main content to make room for itself:
+
+```html
+<mat-sidenav mode="push" opened>
+```
+
+### Side
+
+The sidenav sits side-by-side with the main content, shrinking the content to make room:
+
+```html
+<mat-sidenav mode="side" opened>
+```
+
+## Accessibility
+
+### Keyboard Interaction
+
+- `ESCAPE`: Closes the drawer when `disableClose` is `false`
+- `TAB`: Moves focus through interactive elements within the drawer
+
+### ARIA
+
+The sidenav has `role="navigation"` by default. The drawer has `tabindex="-1"` for focus management.
+
+### Focus Management
+
+By default, when a sidenav opens:
+- In `side` mode, focus stays on the triggering element
+- In `over` or `push` mode, focus moves to the first focusable element in the sidenav
+
+When closed, focus returns to the element that opened it.
+
+## Styling
+
+The sidenav container must have an explicit height:
+
+```scss
+mat-sidenav-container {
+  height: 100vh;
+}
+
+mat-sidenav {
+  width: 280px;
+  padding: 16px;
+}
+
+mat-sidenav-content {
+  padding: 16px;
+}
+```
+
+## Types
+
+### MatDrawerMode
+
+```typescript
+type MatDrawerMode = 'over' | 'push' | 'side';
+```
+
+### MatDrawerToggleResult
+
+```typescript
+type MatDrawerToggleResult = 'open' | 'close';
+```
+
+### AutoFocusTarget
+
+```typescript
+type AutoFocusTarget = 'dialog' | 'first-tabbable' | 'first-heading';
+```
+
+## Injection Tokens
+
+### MAT_DRAWER_DEFAULT_AUTOSIZE
+
+```typescript
+const MAT_DRAWER_DEFAULT_AUTOSIZE: InjectionToken<boolean>;
+```
+
+Configures whether drawers should use auto sizing by default:
+
+```typescript
+providers: [
+  {
+    provide: MAT_DRAWER_DEFAULT_AUTOSIZE,
+    useValue: true
+  }
+]
+```

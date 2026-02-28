@@ -1,0 +1,366 @@
+---
+title: "Theming Your Components"
+description: "Learn how to style custom components to match your Material Design theme"
+---
+
+Angular Material provides two approaches to styling custom components to match the application's theme:
+
+- **CSS variables** included by `mat.theme()` prefixed with `--mat-sys`
+- **Utility classes** included by `mat.system-classes()` for applying styles directly in templates
+
+<Info>
+  By using system tokens, your application will automatically support both light and dark mode using the `color-scheme` CSS property.
+</Info>
+
+## Colors
+
+Material Design uses color to create accessible, personal color schemes that communicate your product's hierarchy, state, and brand.
+
+### Primary Colors
+
+Primary backgrounds are useful for key components with greater importance:
+
+<CodeGroup>
+```css CSS Variable
+.mat-bg-primary {
+  background-color: var(--mat-sys-primary);
+}
+```
+
+```html Utility Class
+<div class="mat-bg-primary mat-text-on-primary">
+  Primary background with contrasting text
+</div>
+```
+</CodeGroup>
+
+<Note>
+  Always use `on-primary` text color with primary backgrounds to ensure good contrast and accessibility.
+</Note>
+
+### Secondary Colors
+
+Secondary backgrounds are useful for less prominent components:
+
+```css
+.mat-bg-secondary {
+  background-color: var(--mat-sys-secondary);
+}
+
+.mat-bg-secondary-container {
+  background-color: var(--mat-sys-secondary-container);
+}
+```
+
+### Error Colors
+
+Error backgrounds indicate error states or important notifications:
+
+```css
+.mat-bg-error {
+  background-color: var(--mat-sys-error);
+}
+
+.mat-text-error {
+  color: var(--mat-sys-error);
+}
+```
+
+### Surface Colors
+
+Surfaces provide backgrounds for components with varying elevation levels:
+
+<Accordion title="Surface Hierarchy">
+  - `surface-container-lowest` - Least emphasis
+  - `surface-container-low` - Less emphasis  
+  - `surface-container` - Default surface
+  - `surface-container-high` - More emphasis
+  - `surface-container-highest` - Most emphasis
+</Accordion>
+
+```css
+.mat-bg-surface-container-high {
+  background-color: var(--mat-sys-surface-container-high);
+}
+```
+
+## Typography
+
+Material Design provides five categories of font types with three sizes each:
+
+<CardGroup cols={3}>
+  <Card title="Body" icon="text">
+    Default text content
+  </Card>
+  <Card title="Display" icon="heading">
+    Large, impactful text
+  </Card>
+  <Card title="Headline" icon="h1">
+    Page and section titles
+  </Card>
+  <Card title="Label" icon="tag">
+    Buttons and UI labels
+  </Card>
+  <Card title="Title" icon="bold">
+    Card and component titles
+  </Card>
+</CardGroup>
+
+### Body Typography
+
+<CodeGroup>
+```css Small Body
+.mat-font-body-sm {
+  font: var(--mat-sys-body-small);
+  letter-spacing: var(--mat-sys-body-small-tracking);
+}
+```
+
+```css Medium Body
+.mat-font-body-md {
+  font: var(--mat-sys-body-medium);
+  letter-spacing: var(--mat-sys-body-medium-tracking);
+}
+```
+
+```css Large Body
+.mat-font-body-lg {
+  font: var(--mat-sys-body-large);
+  letter-spacing: var(--mat-sys-body-large-tracking);
+}
+```
+</CodeGroup>
+
+### Display Typography
+
+Display typefaces are useful for short, high-impact text:
+
+```css
+.mat-font-display-lg {
+  font: var(--mat-sys-display-large);
+  letter-spacing: var(--mat-sys-display-large-tracking);
+}
+```
+
+### Label Typography
+
+Labels are useful for buttons, chips, and menu items:
+
+```css
+.mat-font-label-lg {
+  font: var(--mat-sys-label-large);
+  letter-spacing: var(--mat-sys-label-large-tracking);
+}
+```
+
+## Shape
+
+Material Design uses border radius to help direct attention and communicate state:
+
+<Tabs>
+  <Tab title="Extra Small">
+    ```css
+    .mat-corner-xs {
+      border-radius: var(--mat-sys-corner-extra-small);
+    }
+    ```
+    Used for: snackbars, tooltips
+  </Tab>
+  <Tab title="Small">
+    ```css
+    .mat-corner-sm {
+      border-radius: var(--mat-sys-corner-small);
+    }
+    ```
+    Used for: text fields
+  </Tab>
+  <Tab title="Medium">
+    ```css
+    .mat-corner-md {
+      border-radius: var(--mat-sys-corner-medium);
+    }
+    ```
+    Used for: buttons, cards
+  </Tab>
+  <Tab title="Large">
+    ```css
+    .mat-corner-lg {
+      border-radius: var(--mat-sys-corner-large);
+    }
+    ```
+    Used for: FABs, datepickers
+  </Tab>
+  <Tab title="Full">
+    ```css
+    .mat-corner-full {
+      border-radius: var(--mat-sys-corner-full);
+    }
+    ```
+    Used for: avatars, badges
+  </Tab>
+</Tabs>
+
+## Elevation
+
+Material Design uses borders and shadows to create depth and hierarchy.
+
+### Borders
+
+```css
+.mat-border {
+  border: 1px solid var(--mat-sys-outline);
+}
+
+.mat-border-subtle {
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+```
+
+### Shadows
+
+<Steps>
+  <Step title="Level 1">
+    Slight elevation for cards
+    ```css
+    .mat-shadow-1 {
+      box-shadow: var(--mat-sys-level1);
+    }
+    ```
+  </Step>
+  <Step title="Level 2">
+    Standard elevation for menus
+    ```css
+    .mat-shadow-2 {
+      box-shadow: var(--mat-sys-level2);
+    }
+    ```
+  </Step>
+  <Step title="Level 3">
+    Raised elevation for FABs
+    ```css
+    .mat-shadow-3 {
+      box-shadow: var(--mat-sys-level3);
+    }
+    ```
+  </Step>
+  <Step title="Level 4-5">
+    Reserved for hover/focus states
+  </Step>
+</Steps>
+
+## Practical Examples
+
+### Using CSS Variables
+
+```scss
+.widget-a  {
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);    
+  font: var(--mat-sys-body-medium);
+}
+
+.widget-b {
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+```
+
+### Using Utility Classes
+
+```html
+<widget-a class="mat-bg-surface mat-text-on-surface mat-font-body-medium"/>
+
+<widget-b class="mat-bg-primary mat-text-on-primary"/>
+```
+
+## Material Design 2 Support
+
+<Warning>
+  If using Material Design 2 APIs with theme configs, you need to enable system tokens:
+</Warning>
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: mat.define-palette(mat.$indigo-palette, 500),
+  ),
+  ...
+));
+
+html {
+  @include mat.core-theme($theme);
+  @include mat.button-theme($theme);
+  ...
+  @include mat.m2-theme($theme);
+  @include mat.system-classes();
+}
+```
+
+## Available System Tokens
+
+<AccordionGroup>
+  <Accordion title="Color Tokens">
+    ```css
+    /* Primary */
+    --mat-sys-primary
+    --mat-sys-on-primary
+    --mat-sys-primary-container
+    --mat-sys-on-primary-container
+
+    /* Secondary */
+    --mat-sys-secondary
+    --mat-sys-on-secondary
+    --mat-sys-secondary-container
+
+    /* Error */
+    --mat-sys-error
+    --mat-sys-on-error
+    --mat-sys-error-container
+
+    /* Surface */
+    --mat-sys-surface
+    --mat-sys-on-surface
+    --mat-sys-surface-variant
+    ```
+  </Accordion>
+
+  <Accordion title="Typography Tokens">
+    Each category has: font, line-height, size, tracking, and weight
+    
+    - body-small, body-medium, body-large
+    - display-small, display-medium, display-large
+    - headline-small, headline-medium, headline-large
+    - label-small, label-medium, label-large
+    - title-small, title-medium, title-large
+  </Accordion>
+
+  <Accordion title="Shape Tokens">
+    ```css
+    --mat-sys-corner-extra-small: 4px
+    --mat-sys-corner-small: 8px
+    --mat-sys-corner-medium: 12px
+    --mat-sys-corner-large: 16px
+    --mat-sys-corner-extra-large: 28px
+    --mat-sys-corner-full: 9999px
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Learn More
+
+<CardGroup cols={2}>
+  <Card title="Material Design Color" icon="palette" href="https://m3.material.io/styles/color/roles">
+    Official Material Design 3 color guidance
+  </Card>
+  <Card title="Typography" icon="text" href="https://m3.material.io/styles/typography/applying-type">
+    Material Design typography system
+  </Card>
+  <Card title="Shape" icon="shapes" href="https://m3.material.io/styles/shape/corner-radius-scale">
+    Corner radius scale documentation
+  </Card>
+  <Card title="Elevation" icon="layer-group" href="https://m3.material.io/styles/elevation/applying-elevation">
+    Elevation and shadows guide
+  </Card>
+</CardGroup>

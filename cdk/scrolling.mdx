@@ -1,0 +1,364 @@
+---
+title: Scrolling
+description: Virtual scrolling and scroll detection utilities
+---
+
+The `@angular/cdk/scrolling` package provides utilities for virtual scrolling and detecting scroll events.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {ScrollingModule} from '@angular/cdk/scrolling';
+```
+
+## Virtual Scrolling
+
+### Basic Virtual Scroll
+
+Render large lists efficiently by only rendering visible items:
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-virtual-scroll',
+  template: `
+    <cdk-virtual-scroll-viewport itemSize="50" class="viewport">
+      <div *cdkVirtualFor="let item of items" class="item">
+        {{ item }}
+      </div>
+    </cdk-virtual-scroll-viewport>
+  `,
+  styles: [`
+    .viewport {
+      height: 400px;
+      width: 100%;
+      border: 1px solid #ccc;
+    }
+    .item {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+  `]
+})
+export class VirtualScrollExample {
+  items = Array.from({length: 100000}, (_, i) => `Item #${i}`);
+}
+```
+
+### Fixed Size Items
+
+```html
+<cdk-virtual-scroll-viewport itemSize="50" class="viewport">
+  <div *cdkVirtualFor="let item of items" class="item">
+    {{ item.name }}
+  </div>
+</cdk-virtual-scroll-viewport>
+```
+
+### Variable Size Items
+
+For items with different heights, use `autosize`:
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-variable-scroll',
+  template: `
+    <cdk-virtual-scroll-viewport autosize class="viewport">
+      <div *cdkVirtualFor="let item of items" class="item" [style.height.px]="item.height">
+        {{ item.name }}
+      </div>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+export class VariableScrollExample {
+  items = [
+    {name: 'Item 1', height: 50},
+    {name: 'Item 2', height: 100},
+    {name: 'Item 3', height: 75},
+    // ...
+  ];
+}
+```
+
+### Horizontal Scrolling
+
+```html
+<cdk-virtual-scroll-viewport 
+  itemSize="200" 
+  orientation="horizontal"
+  class="horizontal-viewport">
+  <div *cdkVirtualFor="let item of items" class="horizontal-item">
+    {{ item }}
+  </div>
+</cdk-virtual-scroll-viewport>
+```
+
+```css
+.horizontal-viewport {
+  height: 200px;
+  width: 100%;
+}
+.horizontal-item {
+  width: 200px;
+  display: inline-block;
+}
+```
+
+## Advanced Virtual Scrolling
+
+### Track By Function
+
+```html
+<cdk-virtual-scroll-viewport itemSize="50">
+  <div *cdkVirtualFor="let item of items; trackBy: trackByFn" class="item">
+    {{ item.name }}
+  </div>
+</cdk-virtual-scroll-viewport>
+```
+
+```typescript
+trackByFn(index: number, item: any) {
+  return item.id;
+}
+```
+
+### Template Context
+
+```html
+<cdk-virtual-scroll-viewport itemSize="50">
+  <div *cdkVirtualFor="let item of items; let i = index; let even = even" 
+       class="item"
+       [class.even]="even">
+    {{ i }}: {{ item }}
+  </div>
+</cdk-virtual-scroll-viewport>
+```
+
+### Scroll to Index
+
+```typescript
+import {Component, ViewChild} from '@angular/core';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+
+@Component({
+  selector: 'app-scroll-to',
+  template: `
+    <button (click)="scrollToIndex(50)">Scroll to #50</button>
+    <button (click)="scrollToTop()">Scroll to Top</button>
+    
+    <cdk-virtual-scroll-viewport itemSize="50" class="viewport">
+      <div *cdkVirtualFor="let item of items" class="item">
+        {{ item }}
+      </div>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+export class ScrollToExample {
+  @ViewChild(CdkVirtualScrollViewport) viewport: CdkVirtualScrollViewport;
+  items = Array.from({length: 100000}, (_, i) => `Item #${i}`);
+
+  scrollToIndex(index: number) {
+    this.viewport.scrollToIndex(index, 'smooth');
+  }
+
+  scrollToTop() {
+    this.viewport.scrollTo({top: 0, behavior: 'smooth'});
+  }
+}
+```
+
+### Scroll Events
+
+```typescript
+import {Component, ViewChild} from '@angular/core';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+
+@Component({
+  selector: 'app-scroll-events',
+  template: `
+    <cdk-virtual-scroll-viewport 
+      itemSize="50" 
+      (scrolledIndexChange)="onScrolledIndexChange($event)">
+      <div *cdkVirtualFor="let item of items" class="item">
+        {{ item }}
+      </div>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+export class ScrollEventsExample {
+  @ViewChild(CdkVirtualScrollViewport) viewport: CdkVirtualScrollViewport;
+  items = Array.from({length: 10000}, (_, i) => `Item #${i}`);
+
+  ngAfterViewInit() {
+    this.viewport.elementScrolled().subscribe(() => {
+      console.log('Scrolled:', this.viewport.measureScrollOffset());
+    });
+  }
+
+  onScrolledIndexChange(index: number) {
+    console.log('First visible index:', index);
+  }
+}
+```
+
+## Scroll Detection
+
+### CdkScrollable Directive
+
+```html
+<div class="scrollable-container" cdkScrollable>
+  <div class="content">
+    <!-- Long content -->
+  </div>
+</div>
+```
+
+### ScrollDispatcher
+
+Listen to scroll events globally:
+
+```typescript
+import {Component, inject, OnInit, OnDestroy} from '@angular/core';
+import {ScrollDispatcher} from '@angular/cdk/scrolling';
+import {Subscription} from 'rxjs';
+
+@Component({
+  selector: 'app-scroll-listener',
+  template: `<div>Scroll offset: {{ scrollOffset }}</div>`,
+})
+export class ScrollListener implements OnInit, OnDestroy {
+  private scrollDispatcher = inject(ScrollDispatcher);
+  private scrollSubscription: Subscription;
+  scrollOffset = 0;
+
+  ngOnInit() {
+    this.scrollSubscription = this.scrollDispatcher
+      .scrolled()
+      .subscribe(scrollable => {
+        if (scrollable) {
+          this.scrollOffset = scrollable.measureScrollOffset('top');
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.scrollSubscription.unsubscribe();
+  }
+}
+```
+
+### ViewportRuler
+
+Get viewport dimensions:
+
+```typescript
+import {Component, inject, OnInit} from '@angular/core';
+import {ViewportRuler} from '@angular/cdk/scrolling';
+
+@Component({
+  selector: 'app-viewport-info',
+  template: `
+    <div>Viewport: {{ viewportWidth }}x{{ viewportHeight }}</div>
+  `,
+})
+export class ViewportInfo implements OnInit {
+  private viewportRuler = inject(ViewportRuler);
+  viewportWidth = 0;
+  viewportHeight = 0;
+
+  ngOnInit() {
+    const size = this.viewportRuler.getViewportSize();
+    this.viewportWidth = size.width;
+    this.viewportHeight = size.height;
+
+    // Listen to viewport changes
+    this.viewportRuler.change(200).subscribe(() => {
+      const newSize = this.viewportRuler.getViewportSize();
+      this.viewportWidth = newSize.width;
+      this.viewportHeight = newSize.height;
+    });
+  }
+}
+```
+
+## API Reference
+
+### CdkVirtualScrollViewport
+
+**Selector**: `cdk-virtual-scroll-viewport`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `itemSize` | `number` | Size of each item in pixels |
+| `minBufferPx` | `number` | Minimum buffer size |
+| `maxBufferPx` | `number` | Maximum buffer size |
+| `orientation` | `'vertical' \| 'horizontal'` | Scroll orientation |
+| `appendOnly` | `boolean` | Only append new items |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `scrolledIndexChange` | `number` | Emits first visible index |
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `scrollToIndex(index, behavior?)` | `void` | Scroll to index |
+| `scrollToOffset(offset, behavior?)` | `void` | Scroll to pixel offset |
+| `scrollTo(options)` | `void` | Scroll with options |
+| `measureScrollOffset(from?)` | `number` | Get current scroll offset |
+| `elementScrolled()` | `Observable<Event>` | Scroll event observable |
+| `getRenderedRange()` | `ListRange` | Get visible range |
+| `getDataLength()` | `number` | Get total item count |
+
+### cdkVirtualFor Directive
+
+**Selector**: `[cdkVirtualFor]`
+
+Similar to `*ngFor` but for virtual scrolling.
+
+### CdkScrollable Directive
+
+**Selector**: `[cdkScrollable]`
+
+Marks an element as scrollable for the `ScrollDispatcher`.
+
+## Performance Tips
+
+1. **Use trackBy** - Essential for performance
+2. **Fixed item sizes** - Faster than autosize
+3. **Buffer size** - Adjust `minBufferPx` and `maxBufferPx`
+4. **OnPush change detection** - Use for list items
+5. **Avoid complex templates** - Keep item templates simple
+
+## Best Practices
+
+```typescript
+// Good: Fixed size, trackBy, OnPush
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <cdk-virtual-scroll-viewport itemSize="50">
+      <div *cdkVirtualFor="let item of items; trackBy: trackById">
+        {{ item.name }}
+      </div>
+    </cdk-virtual-scroll-viewport>
+  `,
+})
+export class OptimizedList {
+  items: Item[];
+  trackById = (i: number, item: Item) => item.id;
+}
+```
+
+## See Also
+
+- [Angular Material Virtual Scroll](https://material.angular.io/cdk/scrolling/overview)
+- [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)

@@ -1,0 +1,389 @@
+---
+title: MatDivider
+description: Divider component for Angular Material - provides visual separation between content.
+---
+
+# MatDivider
+
+The `mat-divider` is a component that provides a visual divider for separating content, either horizontally or vertically.
+
+## Basic Usage
+
+```typescript
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
+
+@Component({
+  selector: 'divider-example',
+  imports: [MatDividerModule, MatListModule],
+  template: `
+    <mat-list>
+      <mat-list-item>Item 1</mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>Item 2</mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>Item 3</mat-list-item>
+    </mat-list>
+  `
+})
+export class DividerExample {}
+```
+
+## API Reference
+
+### MatDivider
+
+Selector: `mat-divider`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `vertical` | `boolean` | `false` | Whether the divider is vertically aligned |
+| `inset` | `boolean` | `false` | Whether the divider is an inset divider |
+
+#### Host Attributes
+
+| Attribute | Value | Description |
+|-----------|-------|-------------|
+| `role` | `'separator'` | ARIA role for the divider |
+| `aria-orientation` | `'vertical' \| 'horizontal'` | Orientation based on `vertical` input |
+
+## Examples
+
+### Horizontal Divider (Default)
+
+```typescript
+@Component({
+  template: `
+    <div>
+      <p>Section 1</p>
+      <mat-divider></mat-divider>
+      <p>Section 2</p>
+      <mat-divider></mat-divider>
+      <p>Section 3</p>
+    </div>
+  `
+})
+export class HorizontalDividerExample {}
+```
+
+### Vertical Divider
+
+```typescript
+@Component({
+  template: `
+    <div class="vertical-layout">
+      <span>Left</span>
+      <mat-divider [vertical]="true"></mat-divider>
+      <span>Middle</span>
+      <mat-divider [vertical]="true"></mat-divider>
+      <span>Right</span>
+    </div>
+  `,
+  styles: [`
+    .vertical-layout {
+      display: flex;
+      align-items: center;
+      height: 100px;
+      gap: 16px;
+    }
+    mat-divider {
+      height: 100%;
+    }
+  `]
+})
+export class VerticalDividerExample {}
+```
+
+### Inset Divider
+
+```typescript
+@Component({
+  template: `
+    <mat-list>
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Photos</div>
+      </mat-list-item>
+      <mat-divider [inset]="true"></mat-divider>
+      
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Documents</div>
+      </mat-list-item>
+      <mat-divider [inset]="true"></mat-divider>
+      
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Downloads</div>
+      </mat-list-item>
+    </mat-list>
+  `
+})
+export class InsetDividerExample {}
+```
+
+### Divider in Card
+
+```typescript
+import { MatCardModule } from '@angular/material/card';
+
+@Component({
+  imports: [MatDividerModule, MatCardModule],
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Card Title</mat-card-title>
+      </mat-card-header>
+      
+      <mat-divider></mat-divider>
+      
+      <mat-card-content>
+        <p>Card content section 1</p>
+      </mat-card-content>
+      
+      <mat-divider></mat-divider>
+      
+      <mat-card-content>
+        <p>Card content section 2</p>
+      </mat-card-content>
+      
+      <mat-divider></mat-divider>
+      
+      <mat-card-actions>
+        <button mat-button>ACTION</button>
+      </mat-card-actions>
+    </mat-card>
+  `
+})
+export class CardDividerExample {}
+```
+
+### Divider in Menu
+
+```typescript
+import { MatMenuModule } from '@angular/material/menu';
+
+@Component({
+  imports: [MatDividerModule, MatMenuModule],
+  template: `
+    <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>Item 1</button>
+      <button mat-menu-item>Item 2</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>Item 3</button>
+      <button mat-menu-item>Item 4</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>Settings</button>
+    </mat-menu>
+  `
+})
+export class MenuDividerExample {}
+```
+
+### Divider in Toolbar
+
+```typescript
+import { MatToolbarModule } from '@angular/material/toolbar';
+
+@Component({
+  imports: [MatDividerModule, MatToolbarModule],
+  template: `
+    <mat-toolbar>
+      <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>App Title</span>
+      
+      <mat-divider [vertical]="true" class="toolbar-divider"></mat-divider>
+      
+      <button mat-button>Home</button>
+      <button mat-button>About</button>
+      
+      <span class="spacer"></span>
+      
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+  `,
+  styles: [`
+    .toolbar-divider {
+      height: 32px;
+      margin: 0 16px;
+    }
+    .spacer {
+      flex: 1 1 auto;
+    }
+  `]
+})
+export class ToolbarDividerExample {}
+```
+
+### Styled Dividers
+
+```typescript
+@Component({
+  template: `
+    <div>
+      <p>Default divider</p>
+      <mat-divider></mat-divider>
+      
+      <p>Thick divider</p>
+      <mat-divider class="thick-divider"></mat-divider>
+      
+      <p>Colored divider</p>
+      <mat-divider class="colored-divider"></mat-divider>
+      
+      <p>Dashed divider</p>
+      <mat-divider class="dashed-divider"></mat-divider>
+    </div>
+  `,
+  styles: [`
+    .thick-divider {
+      border-top-width: 2px;
+    }
+    .colored-divider {
+      border-top-color: #3f51b5;
+    }
+    .dashed-divider {
+      border-top-style: dashed;
+    }
+  `]
+})
+export class StyledDividersExample {}
+```
+
+## Accessibility
+
+The divider has `role="separator"` and appropriate `aria-orientation` attributes automatically applied. These attributes make the divider accessible to screen readers.
+
+For purely decorative dividers, you can hide them from screen readers:
+
+```html
+<mat-divider aria-hidden="true"></mat-divider>
+```
+
+## Styling
+
+### Basic Styling
+
+```scss
+mat-divider {
+  margin: 16px 0;
+}
+
+// Customize color
+mat-divider {
+  border-top-color: rgba(0, 0, 0, 0.12);
+}
+
+// Customize thickness
+mat-divider {
+  border-top-width: 2px;
+}
+```
+
+### Vertical Divider Styling
+
+```scss
+mat-divider.mat-divider-vertical {
+  margin: 0 16px;
+  height: 100%;
+}
+```
+
+### Inset Divider Styling
+
+The inset divider adds left margin:
+
+```scss
+mat-divider.mat-divider-inset {
+  margin-left: 80px;
+}
+```
+
+## Use Cases
+
+### Lists
+
+Separate items in lists:
+
+```html
+<mat-list>
+  <mat-list-item>Item 1</mat-list-item>
+  <mat-divider></mat-divider>
+  <mat-list-item>Item 2</mat-list-item>
+</mat-list>
+```
+
+### Menus
+
+Group related menu items:
+
+```html
+<mat-menu>
+  <button mat-menu-item>Edit</button>
+  <button mat-menu-item>Copy</button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item>Delete</button>
+</mat-menu>
+```
+
+### Cards
+
+Separate sections within cards:
+
+```html
+<mat-card>
+  <mat-card-header>Header</mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>Content</mat-card-content>
+</mat-card>
+```
+
+### Sidebars
+
+Separate navigation sections:
+
+```html
+<mat-nav-list>
+  <a mat-list-item>Home</a>
+  <a mat-list-item>Profile</a>
+  <mat-divider></mat-divider>
+  <a mat-list-item>Settings</a>
+  <a mat-list-item>Logout</a>
+</mat-nav-list>
+```
+
+## Best Practices
+
+1. **Use sparingly**: Too many dividers can make content appear cluttered
+2. **Consistent spacing**: Maintain consistent margins around dividers
+3. **Semantic separation**: Use dividers to separate semantically different content
+4. **Consider alternatives**: Sometimes whitespace or other visual cues work better
+5. **Vertical dividers**: Ensure parent container has defined height
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.divider-theme($theme);
+}
+
+// Custom divider color
+mat-divider {
+  border-top-color: mat.get-theme-color($theme, primary, 50);
+}
+```

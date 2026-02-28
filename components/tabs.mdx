@@ -1,0 +1,387 @@
+---
+title: MatTabs
+description: Tabs component for Angular Material - organize content into separate views with tab navigation.
+---
+
+# MatTabs
+
+The `mat-tab-group` component organizes content into separate views where only one view can be visible at a time. Users can switch between views by selecting tabs.
+
+## Basic Usage
+
+```typescript
+import { MatTabsModule } from '@angular/material/tabs';
+
+@Component({
+  selector: 'tabs-example',
+  imports: [MatTabsModule],
+  template: `
+    <mat-tab-group>
+      <mat-tab label="First">Content 1</mat-tab>
+      <mat-tab label="Second">Content 2</mat-tab>
+      <mat-tab label="Third">Content 3</mat-tab>
+    </mat-tab-group>
+  `
+})
+export class TabsExample {}
+```
+
+## API Reference
+
+### MatTabGroup
+
+Selector: `mat-tab-group`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `selectedIndex` | `number \| null` | `0` | The index of the active tab |
+| `color` | `ThemePalette` | - | Theme color for the tab group (M2 only) |
+| `backgroundColor` | `ThemePalette` | - | **Deprecated** Background color (M2 only) |
+| `headerPosition` | `'above' \| 'below'` | `'above'` | Position of the tab header |
+| `animationDuration` | `string` | `'500ms'` | Duration for the tab animation |
+| `contentTabIndex` | `number \| null` | `null` | Tabindex for the tab content wrapper |
+| `disablePagination` | `boolean` | `false` | Whether pagination should be disabled |
+| `disableRipple` | `boolean` | `false` | Whether ripples in the tab group are disabled |
+| `preserveContent` | `boolean` | `false` | Whether to keep tab content in the DOM when off-screen |
+| `dynamicHeight` | `boolean` | `false` | Whether the tab group should grow to the size of the active tab |
+| `fitInkBarToContent` | `boolean` | `false` | Whether the ink bar should fit its width to the size of the tab label content |
+| `stretchTabs` | `boolean` | `true` | Whether tabs should be stretched to fill the header |
+| `alignTabs` | `string \| null` | `null` | Alignment for tabs label |
+| `aria-label` | `string` | - | Aria label for the inner tablist |
+| `aria-labelledby` | `string` | - | Sets the aria-labelledby of the inner tablist |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `selectedIndexChange` | `EventEmitter<number>` | Output to enable support for two-way binding on selectedIndex |
+| `selectedTabChange` | `EventEmitter<MatTabChangeEvent>` | Event emitted when the tab selection has changed |
+| `focusChange` | `EventEmitter<MatTabChangeEvent>` | Event emitted when focus has changed within a tab group |
+| `animationDone` | `EventEmitter<void>` | Event emitted when the body animation has completed |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `realignInkBar(): void` | Re-aligns the ink bar to the selected tab element |
+| `updatePagination(): void` | Recalculates the tab group's pagination dimensions |
+| `focusTab(index: number): void` | Sets focus to a particular tab |
+
+### MatTab
+
+Selector: `mat-tab`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | - | Plain text label for the tab |
+| `disabled` | `boolean` | `false` | Whether the tab is disabled |
+| `aria-label` | `string` | - | Aria label for the tab |
+| `aria-labelledby` | `string` | - | Reference to the element that the tab is labelled by |
+| `labelClass` | `string \| string[]` | - | Classes to be passed to the tab label |
+| `bodyClass` | `string \| string[]` | - | Classes to be passed to the tab body container |
+| `id` | `string \| null` | - | Custom ID for the tab |
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `templateLabel` | `MatTabLabel` | Content for the tab label given by `<ng-template mat-tab-label>` |
+| `content` | `TemplatePortal \| null` | Portal that will be the hosted content of the tab |
+| `position` | `number \| null` | The relatively indexed position |
+| `isActive` | `boolean` | Whether the tab is currently active |
+
+### MatTabLabel
+
+Directive: `[mat-tab-label]`
+
+Used to provide a custom label template for a tab:
+
+```html
+<mat-tab>
+  <ng-template mat-tab-label>
+    <mat-icon>thumb_up</mat-icon>
+    Custom Label
+  </ng-template>
+  Content
+</mat-tab>
+```
+
+### MatTabContent
+
+Directive: `[matTabContent]`
+
+Decorator for tab content to enable lazy loading:
+
+```html
+<mat-tab label="Lazy">
+  <ng-template matTabContent>
+    <div>Loaded lazily when tab is activated</div>
+  </ng-template>
+</mat-tab>
+```
+
+## Examples
+
+### Tabs with Icons
+
+```typescript
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  imports: [MatTabsModule, MatIconModule],
+  template: `
+    <mat-tab-group>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>home</mat-icon>
+          Home
+        </ng-template>
+        Home content
+      </mat-tab>
+      
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>person</mat-icon>
+          Profile
+        </ng-template>
+        Profile content
+      </mat-tab>
+      
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>settings</mat-icon>
+          Settings
+        </ng-template>
+        Settings content
+      </mat-tab>
+    </mat-tab-group>
+  `
+})
+export class TabsIconsExample {}
+```
+
+### Dynamic Tabs
+
+```typescript
+@Component({
+  template: `
+    <mat-tab-group [(selectedIndex)]="selectedIndex">
+      <mat-tab *ngFor="let tab of tabs" [label]="tab.label">
+        {{ tab.content }}
+      </mat-tab>
+    </mat-tab-group>
+
+    <button mat-button (click)="addTab()">Add Tab</button>
+    <button mat-button (click)="removeTab()" [disabled]="tabs.length === 0">
+      Remove Tab
+    </button>
+  `
+})
+export class DynamicTabsExample {
+  tabs = [
+    { label: 'First', content: 'Content 1' },
+    { label: 'Second', content: 'Content 2' },
+  ];
+  selectedIndex = 0;
+
+  addTab() {
+    this.tabs.push({
+      label: `Tab ${this.tabs.length + 1}`,
+      content: `Content ${this.tabs.length + 1}`
+    });
+  }
+
+  removeTab() {
+    this.tabs.pop();
+  }
+}
+```
+
+### Lazy Loading Tabs
+
+```typescript
+@Component({
+  template: `
+    <mat-tab-group>
+      <mat-tab label="Eager">
+        <div>Loaded immediately</div>
+      </mat-tab>
+      
+      <mat-tab label="Lazy">
+        <ng-template matTabContent>
+          <div>Loaded when tab is activated</div>
+          <expensive-component></expensive-component>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  `
+})
+export class LazyTabsExample {}
+```
+
+### Tab Header Below Content
+
+```typescript
+@Component({
+  template: `
+    <mat-tab-group headerPosition="below">
+      <mat-tab label="First">Content 1</mat-tab>
+      <mat-tab label="Second">Content 2</mat-tab>
+      <mat-tab label="Third">Content 3</mat-tab>
+    </mat-tab-group>
+  `
+})
+export class TabsHeaderBelowExample {}
+```
+
+### Tabs with Observable
+
+```typescript
+import { AsyncPipe } from '@angular/common';
+import { Observable, of } from 'rxjs';
+
+interface Tab {
+  label: string;
+  content: string;
+}
+
+@Component({
+  imports: [MatTabsModule, AsyncPipe],
+  template: `
+    <mat-tab-group>
+      <mat-tab *ngFor="let tab of tabs$ | async" [label]="tab.label">
+        {{ tab.content }}
+      </mat-tab>
+    </mat-tab-group>
+  `
+})
+export class AsyncTabsExample {
+  tabs$: Observable<Tab[]> = of([
+    { label: 'First', content: 'Content 1' },
+    { label: 'Second', content: 'Content 2' },
+    { label: 'Third', content: 'Content 3' },
+  ]);
+}
+```
+
+### Preserve Content
+
+```typescript
+@Component({
+  template: `
+    <mat-tab-group [preserveContent]="true">
+      <mat-tab label="Video">
+        <video src="video.mp4" controls></video>
+      </mat-tab>
+      <mat-tab label="Text">Text content</mat-tab>
+    </mat-tab-group>
+  `
+})
+export class PreserveContentExample {}
+```
+
+## Accessibility
+
+### Keyboard Interaction
+
+- `LEFT_ARROW`: Move focus to previous tab
+- `RIGHT_ARROW`: Move focus to next tab
+- `HOME`: Move focus to first tab
+- `END`: Move focus to last tab
+- `SPACE` or `ENTER`: Activate focused tab
+
+### ARIA
+
+The tab group has `role="tablist"`, each tab has `role="tab"`, and tab content has `role="tabpanel"`. Use `aria-label` or `aria-labelledby` to describe the tab group:
+
+```html
+<mat-tab-group aria-label="Dashboard sections">
+  <mat-tab label="Overview">Content</mat-tab>
+  <mat-tab label="Analytics">Content</mat-tab>
+</mat-tab-group>
+```
+
+### Labels
+
+Provide clear, concise labels for each tab. Use `aria-label` on tabs with only icons:
+
+```html
+<mat-tab aria-label="Home">
+  <ng-template mat-tab-label>
+    <mat-icon>home</mat-icon>
+  </ng-template>
+  Content
+</mat-tab>
+```
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.tabs-theme($theme);
+}
+```
+
+## Types
+
+### MatTabHeaderPosition
+
+```typescript
+type MatTabHeaderPosition = 'above' | 'below';
+```
+
+### MatTabChangeEvent
+
+```typescript
+class MatTabChangeEvent {
+  index: number;
+  tab: MatTab;
+}
+```
+
+## Injection Tokens
+
+### MAT_TABS_CONFIG
+
+```typescript
+const MAT_TABS_CONFIG: InjectionToken<MatTabsConfig>;
+
+interface MatTabsConfig {
+  animationDuration?: string;
+  disablePagination?: boolean;
+  dynamicHeight?: boolean;
+  contentTabIndex?: number | null;
+  preserveContent?: boolean;
+  fitInkBarToContent?: boolean;
+  stretchTabs?: boolean;
+  alignTabs?: string | null;
+}
+```
+
+Configure default options:
+
+```typescript
+providers: [
+  {
+    provide: MAT_TABS_CONFIG,
+    useValue: {
+      animationDuration: '300ms',
+      dynamicHeight: true,
+      fitInkBarToContent: true
+    }
+  }
+]
+```

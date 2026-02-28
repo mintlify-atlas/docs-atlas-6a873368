@@ -1,0 +1,167 @@
+---
+title: 'YouTube Player Installation'
+description: 'Install and configure Angular YouTube Player'
+---
+
+# Installation
+
+This guide will help you install and configure the Angular YouTube Player component.
+
+## Install the Package
+
+The easiest way to install is using Angular CLI:
+
+```bash
+ng add @angular/youtube-player
+```
+
+Or install manually using npm:
+
+```bash
+npm install @angular/youtube-player
+```
+
+## Import the Component
+
+### Standalone Components
+
+For standalone components, import `YouTubePlayer`:
+
+```typescript
+import {Component} from '@angular/core';
+import {YouTubePlayer} from '@angular/youtube-player';
+
+@Component({
+  selector: 'app-video',
+  imports: [YouTubePlayer],
+  template: `
+    <youtube-player videoId="dQw4w9WgXcQ" />
+  `
+})
+export class VideoComponent {}
+```
+
+### NgModule
+
+For NgModule-based apps, import `YouTubePlayerModule`:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {YouTubePlayerModule} from '@angular/youtube-player';
+
+@NgModule({
+  imports: [YouTubePlayerModule],
+  // ...
+})
+export class AppModule {}
+```
+
+## Load the YouTube API (Optional)
+
+The component will automatically load the YouTube iframe API when needed. However, if you want to preload it, add this script to your `index.html`:
+
+```html
+<script src="https://www.youtube.com/iframe_api"></script>
+```
+
+## Verify Installation
+
+Create a simple player to verify everything is working:
+
+```typescript
+import {Component} from '@angular/core';
+import {YouTubePlayer} from '@angular/youtube-player';
+
+@Component({
+  selector: 'app-root',
+  imports: [YouTubePlayer],
+  template: `
+    <h1>My First Video</h1>
+    <youtube-player 
+      videoId="dQw4w9WgXcQ"
+      width="640"
+      height="390" />
+  `
+})
+export class AppComponent {}
+```
+
+If you see a YouTube video player, you're all set!
+
+## Global Configuration
+
+You can configure default behavior globally using the `YOUTUBE_PLAYER_CONFIG` injection token:
+
+```typescript
+import {ApplicationConfig} from '@angular/core';
+import {YOUTUBE_PLAYER_CONFIG} from '@angular/youtube-player';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    {
+      provide: YOUTUBE_PLAYER_CONFIG,
+      useValue: {
+        loadApi: true,
+        disablePlaceholder: false,
+        placeholderButtonLabel: 'Play video',
+        placeholderImageQuality: 'standard'
+      }
+    }
+  ]
+};
+```
+
+For NgModule apps:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {YouTubePlayerModule, YOUTUBE_PLAYER_CONFIG} from '@angular/youtube-player';
+
+@NgModule({
+  imports: [YouTubePlayerModule],
+  providers: [
+    {
+      provide: YOUTUBE_PLAYER_CONFIG,
+      useValue: {
+        loadApi: true,
+        disablePlaceholder: false,
+        placeholderButtonLabel: 'Play video',
+        placeholderImageQuality: 'standard'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## TypeScript Types
+
+The YouTube Player uses types from the YouTube iframe API. You may want to install the types:
+
+```bash
+npm install --save-dev @types/youtube
+```
+
+## Troubleshooting
+
+### Video Not Loading
+
+1. **Check Video ID**: Ensure the video ID is correct
+2. **Check Console**: Look for errors in the browser console
+3. **Check Embedding**: Some videos have embedding disabled
+4. **Check Privacy**: Age-restricted videos may not load
+
+### API Not Loading
+
+If the YouTube API fails to load:
+
+1. **Check Network**: Ensure you have internet connectivity
+2. **Check Blockers**: Ad blockers may prevent the API from loading
+3. **Check CSP**: Content Security Policy may block the script
+4. **Manual Load**: Try manually loading the API in `index.html`
+
+## Next Steps
+
+- Learn about the [YouTube Player API](/youtube-player/api)
+- Explore player configuration options
+- Add event handlers for player events

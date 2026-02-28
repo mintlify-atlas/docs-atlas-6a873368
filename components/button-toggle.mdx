@@ -1,0 +1,145 @@
+---
+title: Button Toggle
+description: Exclusive selection button toggle group that behaves like radio buttons or checkboxes
+---
+
+Button toggle group that allows single or multiple selection, behaving like a radio button group or checkbox group with a button appearance.
+
+## Import
+
+```typescript
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+```
+
+## Basic Usage
+
+```html
+<mat-button-toggle-group>
+  <mat-button-toggle value="left">Left</mat-button-toggle>
+  <mat-button-toggle value="center">Center</mat-button-toggle>
+  <mat-button-toggle value="right">Right</mat-button-toggle>
+</mat-button-toggle-group>
+```
+
+## API Reference
+
+### MatButtonToggleGroup
+
+Selector: `mat-button-toggle-group`
+
+Exported as: `matButtonToggleGroup`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() appearance` | `MatButtonToggleAppearance` | Appearance style. Options: 'legacy', 'standard' |
+| `@Input() name` | `string` | Name attribute for underlying input elements |
+| `@Input() vertical` | `boolean` | Whether the toggle group is vertical |
+| `@Input() value` | `any` | Value of the toggle group |
+| `@Input() multiple` | `boolean` | Whether multiple toggles can be selected |
+| `@Input() disabled` | `boolean` | Whether the group is disabled |
+| `@Input() disabledInteractive` | `boolean` | Whether buttons remain interactive when disabled |
+| `@Input() hideSingleSelectionIndicator` | `boolean` | Hide checkmark for single-selection |
+| `@Input() hideMultipleSelectionIndicator` | `boolean` | Hide checkmark for multiple-selection |
+| `@Output() change` | `EventEmitter<MatButtonToggleChange>` | Event emitted when value changes |
+| `@Output() valueChange` | `EventEmitter<any>` | Event for two-way data binding |
+
+#### Properties (read-only)
+
+| Name | Type | Description |
+|------|------|-------------|
+| `selected` | `MatButtonToggle \| MatButtonToggle[]` | Selected toggle(s) |
+
+### MatButtonToggle
+
+Selector: `mat-button-toggle`
+
+Exported as: `matButtonToggle`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() id` | `string` | Unique ID for the toggle |
+| `@Input() name` | `string` | Name attribute |
+| `@Input() value` | `any` | Value assigned to the toggle |
+| `@Input() tabIndex` | `number` | Tab index |
+| `@Input() disableRipple` | `boolean` | Whether ripples are disabled |
+| `@Input() appearance` | `MatButtonToggleAppearance` | Appearance style |
+| `@Input() checked` | `boolean` | Whether the toggle is checked |
+| `@Input() disabled` | `boolean` | Whether the toggle is disabled |
+| `@Input() disabledInteractive` | `boolean` | Whether toggle remains interactive when disabled |
+| `@Output() change` | `EventEmitter<MatButtonToggleChange>` | Event emitted when checked state changes |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `focus(options?: FocusOptions): void` | Focuses the button toggle |
+
+## Examples
+
+### Multiple Selection
+
+```html
+<mat-button-toggle-group multiple>
+  <mat-button-toggle value="bold">Bold</mat-button-toggle>
+  <mat-button-toggle value="italic">Italic</mat-button-toggle>
+  <mat-button-toggle value="underline">Underline</mat-button-toggle>
+</mat-button-toggle-group>
+```
+
+### With ngModel
+
+```html
+<mat-button-toggle-group [(ngModel)]="selectedValue">
+  <mat-button-toggle value="option1">Option 1</mat-button-toggle>
+  <mat-button-toggle value="option2">Option 2</mat-button-toggle>
+</mat-button-toggle-group>
+```
+
+### Vertical Orientation
+
+```html
+<mat-button-toggle-group vertical>
+  <mat-button-toggle value="top">Top</mat-button-toggle>
+  <mat-button-toggle value="middle">Middle</mat-button-toggle>
+  <mat-button-toggle value="bottom">Bottom</mat-button-toggle>
+</mat-button-toggle-group>
+```
+
+### With Icons
+
+```html
+<mat-button-toggle-group>
+  <mat-button-toggle value="align-left">
+    <mat-icon>format_align_left</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="align-center">
+    <mat-icon>format_align_center</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="align-right">
+    <mat-icon>format_align_right</mat-icon>
+  </mat-button-toggle>
+</mat-button-toggle-group>
+```
+
+## Accessibility
+
+- Single-selection groups use `role="radiogroup"`
+- Multiple-selection groups use `role="group"`
+- Keyboard navigation with arrow keys (single-selection mode)
+- Space/Enter to toggle selection
+
+## Types
+
+```typescript
+type MatButtonToggleAppearance = 'legacy' | 'standard';
+
+interface MatButtonToggleChange {
+  source: MatButtonToggle;
+  value: any;
+}
+```

@@ -1,0 +1,153 @@
+---
+title: Badge
+description: Small status descriptors for UI elements
+---
+
+Directive to display a text badge on UI elements to show notifications or status.
+
+## Import
+
+```typescript
+import { MatBadge } from '@angular/material/badge';
+import { MatBadgeModule } from '@angular/material/badge';
+```
+
+## Basic Usage
+
+```html
+<button mat-icon-button [matBadge]="3">
+  <mat-icon>notifications</mat-icon>
+</button>
+```
+
+## API Reference
+
+### MatBadge
+
+Selector: `[matBadge]`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() matBadge` | `string \| number \| null \| undefined` | Badge content to display |
+| `@Input() matBadgeColor` | `ThemePalette` | Theme color. Options: 'primary', 'accent', 'warn' |
+| `@Input() matBadgeOverlap` | `boolean` | Whether badge should overlap its contents. Default: true |
+| `@Input() matBadgeDisabled` | `boolean` | Whether the badge is disabled |
+| `@Input() matBadgePosition` | `MatBadgePosition` | Position of the badge. Default: 'above after' |
+| `@Input() matBadgeDescription` | `string` | Message for aria-describedby |
+| `@Input() matBadgeSize` | `MatBadgeSize` | Size of the badge. Options: 'small', 'medium', 'large'. Default: 'medium' |
+| `@Input() matBadgeHidden` | `boolean` | Whether the badge is hidden |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `getBadgeElement(): HTMLElement \| undefined` | Gets the badge content element |
+| `isAbove(): boolean` | Whether the badge is above the host |
+| `isAfter(): boolean` | Whether the badge is after the host |
+
+## Position Options
+
+The badge can be positioned in 8 different locations:
+
+```html
+<!-- Above positions -->
+<button matBadge="1" matBadgePosition="above after">Above After</button>
+<button matBadge="1" matBadgePosition="above before">Above Before</button>
+
+<!-- Below positions -->
+<button matBadge="1" matBadgePosition="below after">Below After</button>
+<button matBadge="1" matBadgePosition="below before">Below Before</button>
+
+<!-- Simplified positions -->
+<button matBadge="1" matBadgePosition="above">Above</button>
+<button matBadge="1" matBadgePosition="below">Below</button>
+<button matBadge="1" matBadgePosition="before">Before</button>
+<button matBadge="1" matBadgePosition="after">After</button>
+```
+
+## Examples
+
+### With Color
+
+```html
+<button mat-icon-button 
+        [matBadge]="5" 
+        matBadgeColor="warn">
+  <mat-icon>shopping_cart</mat-icon>
+</button>
+```
+
+### Different Sizes
+
+```html
+<button mat-icon-button [matBadge]="1" matBadgeSize="small">
+  <mat-icon>mail</mat-icon>
+</button>
+
+<button mat-icon-button [matBadge]="10" matBadgeSize="medium">
+  <mat-icon>mail</mat-icon>
+</button>
+
+<button mat-icon-button [matBadge]="100" matBadgeSize="large">
+  <mat-icon>mail</mat-icon>
+</button>
+```
+
+### Dynamic Content
+
+```typescript
+export class BadgeComponent {
+  notificationCount = 15;
+}
+```
+
+```html
+<button mat-icon-button [matBadge]="notificationCount">
+  <mat-icon>notifications</mat-icon>
+</button>
+```
+
+### Hidden Badge
+
+```html
+<button mat-icon-button 
+        [matBadge]="count" 
+        [matBadgeHidden]="count === 0">
+  <mat-icon>mail</mat-icon>
+</button>
+```
+
+### With Description
+
+```html
+<button mat-icon-button 
+        [matBadge]="3" 
+        matBadgeDescription="3 unread messages">
+  <mat-icon>mail</mat-icon>
+</button>
+```
+
+## Accessibility
+
+- Badge uses `aria-describedby` for interactive elements
+- For non-interactive elements, description is added inline
+- Badge element itself is `aria-hidden="true"`
+- Avoid placing badges on `mat-icon` elements with `aria-hidden="true"`
+
+## Types
+
+```typescript
+type MatBadgePosition = 
+  | 'above after'
+  | 'above before' 
+  | 'below before'
+  | 'below after'
+  | 'before'
+  | 'after'
+  | 'above'
+  | 'below';
+
+type MatBadgeSize = 'small' | 'medium' | 'large';
+```

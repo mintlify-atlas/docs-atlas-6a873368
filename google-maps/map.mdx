@@ -1,0 +1,254 @@
+---
+title: 'GoogleMap Component'
+description: 'Main Google Maps component for displaying interactive maps'
+---
+
+# GoogleMap Component
+
+The `GoogleMap` component wraps the [`google.maps.Map` class](https://developers.google.com/maps/documentation/javascript/reference/map) from the Google Maps JavaScript API.
+
+**Source**: `/home/daytona/workspace/source/src/google-maps/google-map/README.md`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'google-map-demo',
+  imports: [GoogleMap],
+  template: `
+    <google-map
+      height="400px"
+      width="750px"
+      [center]="center"
+      [zoom]="zoom"
+      (mapClick)="moveMap($event)"
+      (mapMousemove)="move($event)" />
+
+    <div>Latitude: {{display?.lat}}</div>
+    <div>Longitude: {{display?.lng}}</div>
+  `
+})
+export class GoogleMapDemo {
+  center: google.maps.LatLngLiteral = {lat: 24, lng: 12};
+  zoom = 4;
+  display: google.maps.LatLngLiteral;
+
+  moveMap(event: google.maps.MapMouseEvent) {
+    this.center = (event.latLng.toJSON());
+  }
+
+  move(event: google.maps.MapMouseEvent) {
+    this.display = event.latLng.toJSON();
+  }
+}
+```
+
+## Inputs
+
+### Size
+- `height` (string) - Height of the map (e.g., "400px", "100%")
+- `width` (string) - Width of the map (e.g., "750px", "100%")
+
+### Map Configuration
+- `center` (google.maps.LatLngLiteral | google.maps.LatLng) - Map center position
+- `zoom` (number) - Zoom level (0-22, depending on location)
+- `options` (google.maps.MapOptions) - Full map configuration options
+
+## Outputs (Events)
+
+All native Google Maps events are available with a "map" prefix to avoid colliding with native DOM events:
+
+### Mouse Events
+- `mapClick` - User clicks on the map
+- `mapDblclick` - User double-clicks on the map
+- `mapRightclick` - User right-clicks on the map
+- `mapMousemove` - Mouse moves over the map
+- `mapMouseover` - Mouse enters the map
+- `mapMouseout` - Mouse leaves the map
+
+### Map State Events
+- `boundsChanged` - Map bounds change
+- `centerChanged` - Map center changes
+- `zoomChanged` - Zoom level changes
+- `headingChanged` - Heading changes (for 45° imagery)
+- `idle` - Map becomes idle after panning/zooming
+- `mapTypeIdChanged` - Map type changes
+- `projectionChanged` - Projection changes
+- `tilesloaded` - All tiles have loaded
+
+### Drag Events
+- `mapDrag` - User drags the map
+- `mapDragend` - User stops dragging
+- `mapDragstart` - User starts dragging
+
+## Options Object
+
+You can configure the map using a `google.maps.MapOptions` object:
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'map-with-options',
+  imports: [GoogleMap],
+  template: `<google-map [options]="options" />`
+})
+export class MapWithOptions {
+  options: google.maps.MapOptions = {
+    center: {lat: 40, lng: -20},
+    zoom: 4,
+    mapTypeId: 'satellite',
+    disableDefaultUI: true,
+    zoomControl: true,
+    styles: [
+      {
+        featureType: 'water',
+        elementType: 'geometry',
+        stylers: [{color: '#004f70'}]
+      }
+    ]
+  };
+}
+```
+
+## Accessing the Map Instance
+
+You can access the underlying `google.maps.Map` instance using `ViewChild` or `viewChild`:
+
+```typescript
+import {Component, ViewChild, AfterViewInit} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'map-access',
+  imports: [GoogleMap],
+  template: `<google-map #map />`
+})
+export class MapAccess implements AfterViewInit {
+  @ViewChild(GoogleMap) mapComponent!: GoogleMap;
+
+  ngAfterViewInit() {
+    // Access the native google.maps.Map instance
+    const map = this.mapComponent.googleMap;
+    
+    // Call any google.maps.Map methods
+    map?.panTo({lat: 40, lng: -20});
+  }
+}
+```
+
+Or with signals:
+
+```typescript
+import {Component, viewChild, effect} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'map-access',
+  imports: [GoogleMap],
+  template: `<google-map />`
+})
+export class MapAccess {
+  map = viewChild(GoogleMap);
+
+  constructor() {
+    effect(() => {
+      const mapInstance = this.map()?.googleMap;
+      mapInstance?.panTo({lat: 40, lng: -20});
+    });
+  }
+}
+```
+
+## Map Types
+
+Google Maps supports different map types:
+
+```typescript
+options: google.maps.MapOptions = {
+  mapTypeId: 'roadmap' // 'roadmap', 'satellite', 'hybrid', 'terrain'
+};
+```
+
+## Custom Styling
+
+You can customize the map appearance with styled maps:
+
+```typescript
+options: google.maps.MapOptions = {
+  styles: [
+    {
+      featureType: 'all',
+      elementType: 'labels',
+      stylers: [{visibility: 'off'}]
+    },
+    {
+      featureType: 'water',
+      elementType: 'geometry',
+      stylers: [{color: '#004f70'}, {lightness: 17}]
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [{color: '#ffffff'}, {lightness: 18}]
+    }
+  ]
+};
+```
+
+## Responsive Maps
+
+Make maps responsive using percentage-based dimensions:
+
+```html
+<google-map
+  height="100%"
+  width="100%"
+  [center]="center"
+  [zoom]="zoom" />
+```
+
+```css
+:host {
+  display: block;
+  height: 500px;
+}
+```
+
+## Map Controls
+
+Configure built-in map controls:
+
+```typescript
+options: google.maps.MapOptions = {
+  disableDefaultUI: true,  // Hide all default controls
+  zoomControl: true,       // Show zoom control
+  mapTypeControl: true,    // Show map type switcher
+  streetViewControl: true, // Show street view control
+  fullscreenControl: true  // Show fullscreen control
+};
+```
+
+## Common MapOptions
+
+- `center` - Initial center position
+- `zoom` - Initial zoom level
+- `mapTypeId` - Map type ('roadmap', 'satellite', 'hybrid', 'terrain')
+- `disableDefaultUI` - Hide all default controls
+- `zoomControl` - Show/hide zoom control
+- `mapTypeControl` - Show/hide map type control
+- `streetViewControl` - Show/hide street view control
+- `fullscreenControl` - Show/hide fullscreen control
+- `styles` - Custom map styling
+- `gestureHandling` - How gestures are handled ('greedy', 'cooperative', 'none', 'auto')
+- `minZoom` - Minimum zoom level
+- `maxZoom` - Maximum zoom level
+- `restriction` - Restrict map bounds
+
+## Source Code
+
+View the [GoogleMap source code](https://github.com/angular/components/tree/main/src/google-maps/google-map)

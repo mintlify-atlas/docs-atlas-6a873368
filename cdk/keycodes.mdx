@@ -1,0 +1,377 @@
+---
+title: Keycodes
+description: Keyboard key constants and utilities
+---
+
+The `@angular/cdk/keycodes` package provides constants for keyboard key codes and utilities for keyboard event handling.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {ENTER, SPACE, ESCAPE} from '@angular/cdk/keycodes';
+```
+
+## Available Key Constants
+
+### Navigation Keys
+
+```typescript
+import {
+  UP_ARROW,
+  DOWN_ARROW,
+  LEFT_ARROW,
+  RIGHT_ARROW,
+  PAGE_UP,
+  PAGE_DOWN,
+  HOME,
+  END,
+} from '@angular/cdk/keycodes';
+```
+
+### Action Keys
+
+```typescript
+import {
+  ENTER,
+  SPACE,
+  ESCAPE,
+  TAB,
+  BACKSPACE,
+  DELETE,
+} from '@angular/cdk/keycodes';
+```
+
+### Modifier Keys
+
+```typescript
+import {
+  SHIFT,
+  CONTROL,
+  ALT,
+  META,  // Command on Mac, Windows key on PC
+} from '@angular/cdk/keycodes';
+```
+
+### Letter and Number Keys
+
+```typescript
+import {
+  A, B, C, D, E, F, G, H, I, J, K, L, M,
+  N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+  ZERO, ONE, TWO, THREE, FOUR,
+  FIVE, SIX, SEVEN, EIGHT, NINE,
+} from '@angular/cdk/keycodes';
+```
+
+## Usage Examples
+
+### Keyboard Navigation
+
+```typescript
+import {Component, HostListener} from '@angular/core';
+import {UP_ARROW, DOWN_ARROW, ENTER} from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-navigable-list',
+  template: `
+    <div *ngFor="let item of items; let i = index"
+         [class.focused]="i === focusedIndex"
+         (click)="onSelect(i)">
+      {{ item }}
+    </div>
+  `,
+})
+export class NavigableListComponent {
+  items = ['Item 1', 'Item 2', 'Item 3'];
+  focusedIndex = 0;
+
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    switch (event.keyCode) {
+      case UP_ARROW:
+        event.preventDefault();
+        this.focusedIndex = Math.max(0, this.focusedIndex - 1);
+        break;
+      
+      case DOWN_ARROW:
+        event.preventDefault();
+        this.focusedIndex = Math.min(this.items.length - 1, this.focusedIndex + 1);
+        break;
+      
+      case ENTER:
+        event.preventDefault();
+        this.onSelect(this.focusedIndex);
+        break;
+    }
+  }
+
+  onSelect(index: number) {
+    console.log('Selected:', this.items[index]);
+  }
+}
+```
+
+### Modal Dialog Escape
+
+```typescript
+import {Component, HostListener} from '@angular/core';
+import {ESCAPE} from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-modal',
+  template: `
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <h2>{{ title }}</h2>
+        <button (click)="close()">Close</button>
+      </div>
+    </div>
+  `,
+})
+export class ModalComponent {
+  @Input() title: string;
+  @Output() closed = new EventEmitter<void>();
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (event.keyCode === ESCAPE) {
+      this.close();
+    }
+  }
+
+  close() {
+    this.closed.emit();
+  }
+}
+```
+
+### Keyboard Shortcuts
+
+```typescript
+import {Component, HostListener} from '@angular/core';
+import {S, CONTROL, META} from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-editor',
+  template: `
+    <textarea [(ngModel)]="content"></textarea>
+    <p *ngIf="saved">Saved!</p>
+  `,
+})
+export class EditorComponent {
+  content = '';
+  saved = false;
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    // Ctrl+S or Cmd+S to save
+    if ((event.ctrlKey || event.metaKey) && event.keyCode === S) {
+      event.preventDefault();
+      this.save();
+    }
+  }
+
+  save() {
+    console.log('Saving:', this.content);
+    this.saved = true;
+    setTimeout(() => this.saved = false, 2000);
+  }
+}
+```
+
+### Custom Dropdown
+
+```typescript
+import {Component, HostListener} from '@angular/core';
+import {ENTER, SPACE, ESCAPE, UP_ARROW, DOWN_ARROW} from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-dropdown',
+  template: `
+    <button (click)="toggleOpen()" #trigger>
+      {{ selected || 'Select...' }}
+    </button>
+    
+    <div *ngIf="isOpen" class="dropdown">
+      <div *ngFor="let option of options; let i = index"
+           [class.highlighted]="i === highlightedIndex"
+           (click)="selectOption(option)"
+           (mouseenter)="highlightedIndex = i">
+        {{ option }}
+      </div>
+    </div>
+  `,
+})
+export class DropdownComponent {
+  options = ['Option 1', 'Option 2', 'Option 3'];
+  selected: string;
+  isOpen = false;
+  highlightedIndex = 0;
+
+  toggleOpen() {
+    this.isOpen = !this.isOpen;
+    if (this.isOpen) {
+      this.highlightedIndex = 0;
+    }
+  }
+
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (!this.isOpen) {
+      if (event.keyCode === ENTER || event.keyCode === SPACE) {
+        event.preventDefault();
+        this.toggleOpen();
+      }
+      return;
+    }
+
+    switch (event.keyCode) {
+      case UP_ARROW:
+        event.preventDefault();
+        this.highlightedIndex = Math.max(0, this.highlightedIndex - 1);
+        break;
+      
+      case DOWN_ARROW:
+        event.preventDefault();
+        this.highlightedIndex = Math.min(this.options.length - 1, this.highlightedIndex + 1);
+        break;
+      
+      case ENTER:
+      case SPACE:
+        event.preventDefault();
+        this.selectOption(this.options[this.highlightedIndex]);
+        break;
+      
+      case ESCAPE:
+        event.preventDefault();
+        this.isOpen = false;
+        break;
+    }
+  }
+
+  selectOption(option: string) {
+    this.selected = option;
+    this.isOpen = false;
+  }
+}
+```
+
+## Utility Functions
+
+### hasModifierKey
+
+Check if a modifier key is pressed:
+
+```typescript
+import {Component, HostListener} from '@angular/core';
+import {hasModifierKey} from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-modifier-demo',
+  template: `<div>Click with modifiers</div>`,
+})
+export class ModifierDemo {
+  @HostListener('click', ['$event'])
+  onClick(event: MouseEvent) {
+    if (hasModifierKey(event)) {
+      console.log('Clicked with modifier key');
+    }
+    
+    if (hasModifierKey(event, 'shiftKey')) {
+      console.log('Shift key is pressed');
+    }
+    
+    if (hasModifierKey(event, 'ctrlKey', 'altKey')) {
+      console.log('Ctrl or Alt is pressed');
+    }
+  }
+}
+```
+
+## Complete Key Constants List
+
+```typescript
+// Navigation
+UP_ARROW = 38
+DOWN_ARROW = 40
+LEFT_ARROW = 37
+RIGHT_ARROW = 39
+PAGE_UP = 33
+PAGE_DOWN = 34
+HOME = 36
+END = 35
+
+// Actions
+ENTER = 13
+SPACE = 32
+ESCAPE = 27
+TAB = 9
+BACKSPACE = 8
+DELETE = 46
+
+// Modifiers
+SHIFT = 16
+CONTROL = 17
+ALT = 18
+META = 91  // Windows key or Command key
+
+// Letters (A-Z = 65-90)
+A = 65
+B = 66
+// ... and so on
+
+// Numbers (0-9 = 48-57)
+ZERO = 48
+ONE = 49
+// ... and so on
+```
+
+## Best Practices
+
+1. **Prevent default** - Call `event.preventDefault()` when handling navigation keys
+2. **Accessibility** - Support keyboard navigation for all interactive elements
+3. **Cross-platform** - Use `hasModifierKey` for cross-platform modifier detection
+4. **Focus management** - Ensure proper focus when handling keyboard events
+5. **Standard shortcuts** - Follow platform conventions (Ctrl on Windows, Cmd on Mac)
+
+## Common Patterns
+
+### List Navigation
+
+```typescript
+case UP_ARROW:
+  event.preventDefault();
+  this.focusPrevious();
+  break;
+case DOWN_ARROW:
+  event.preventDefault();
+  this.focusNext();
+  break;
+```
+
+### Close on Escape
+
+```typescript
+if (event.keyCode === ESCAPE) {
+  this.close();
+}
+```
+
+### Submit on Enter
+
+```typescript
+if (event.keyCode === ENTER && !event.shiftKey) {
+  event.preventDefault();
+  this.submit();
+}
+```
+
+## See Also
+
+- [Accessibility](/cdk/a11y)
+- [ARIA Keyboard Patterns](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/)
+- [KeyboardEvent API](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent)

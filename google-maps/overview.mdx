@@ -1,0 +1,140 @@
+---
+title: 'Angular Google Maps'
+description: 'Angular component for Google Maps JavaScript API'
+---
+
+# Angular Google Maps
+
+The Angular Google Maps component provides a wrapper around the [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/tutorial) for Angular applications.
+
+## Installation
+
+To install the package, run:
+
+```bash
+ng add @angular/google-maps
+```
+
+## Getting an API Key
+
+Follow [these steps](https://developers.google.com/maps/gmp-get-started) to get an API key that can be used to load Google Maps.
+
+## Loading the API
+
+Include the [Dynamic Library Import script](https://developers.google.com/maps/documentation/javascript/load-maps-js-api#dynamic-library-import) in the `index.html` of your app:
+
+```html
+<!-- index.html -->
+<!DOCTYPE html>
+<body>
+  ...
+  <script>
+    (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({{
+      v: "weekly",
+      key: YOUR_API_KEY_GOES_HERE
+    }});
+  </script>
+</body>
+</html>
+```
+
+**Note:** The component also supports loading the API using the [legacy script tag](https://developers.google.com/maps/documentation/javascript/load-maps-js-api#use-legacy-tag), however it isn't recommended because it requires all of the Google Maps JavaScript to be loaded up-front.
+
+## Available Components
+
+### Core Components
+- **GoogleMap** - Main map component
+- **MapMarker** - Marker on the map (deprecated, use MapAdvancedMarker)
+- **MapAdvancedMarker** - Advanced marker with customization
+- **MapInfoWindow** - Information window popup
+
+### Shapes & Overlays
+- **MapPolyline** - Line on the map
+- **MapPolygon** - Polygon shape
+- **MapRectangle** - Rectangle shape
+- **MapCircle** - Circle shape
+- **MapGroundOverlay** - Image overlay on the map
+
+### Layers
+- **MapKmlLayer** - KML/KMZ layer
+- **MapTrafficLayer** - Real-time traffic layer
+- **MapTransitLayer** - Transit lines layer
+- **MapBicyclingLayer** - Bicycling routes layer
+- **MapHeatmapLayer** - Heatmap visualization
+
+### Other
+- **MapDirectionsRenderer** - Route directions display
+- **MapMarkerClusterer** - Marker clustering
+- **MapGeocoder** - Geocoding service
+
+## The Options Input
+
+The Google Maps components implement all of the options for their respective objects from the Google Maps JavaScript API through an `options` input, but they also have specific inputs for some of the most common options.
+
+For example, you can set options using an options object:
+
+```typescript
+options: google.maps.MapOptions = {
+  center: {lat: 40, lng: -20},
+  zoom: 4
+};
+```
+
+```html
+<google-map [options]="options" />
+```
+
+Or using individual inputs:
+
+```typescript
+center: google.maps.LatLngLiteral = {lat: 40, lng: -20};
+zoom = 4;
+```
+
+```html
+<google-map [center]="center" [zoom]="zoom" />
+```
+
+Not every option has its own input. See the API documentation for each component to see if an option has a dedicated input or if it should be set in the options input.
+
+## Basic Example
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'app-map',
+  imports: [GoogleMap],
+  template: `
+    <google-map
+      height="400px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom" />
+  `
+})
+export class MapComponent {
+  center: google.maps.LatLngLiteral = {lat: 40, lng: -20};
+  zoom = 4;
+}
+```
+
+## Terms of Service
+
+This library uses Google Maps Platform services. Use of Google Maps Platform services through this library is subject to the Google Maps Platform [Terms of Service](https://cloud.google.com/maps-platform/terms).
+
+This library is not a Google Maps Platform Core Service. Therefore, the Google Maps Platform Terms of Service (e.g. Technical Support Services, Service Level Agreements, and Deprecation Policy) do not apply to the code in this library.
+
+### European Economic Area (EEA) Developers
+
+If your billing address is in the European Economic Area, effective on 8 July 2025, the [Google Maps Platform EEA Terms of Service](https://cloud.google.com/terms/maps-platform/eea) will apply to your use of the Services. Functionality varies by region. [Learn more](https://developers.google.com/maps/comms/eea/faq).
+
+## Repository
+
+File any bugs against the [angular/components repo](https://github.com/angular/components/issues).
+
+## Source Code
+
+View the source code on GitHub:
+- [Google Maps Components](https://github.com/angular/components/tree/main/src/google-maps)

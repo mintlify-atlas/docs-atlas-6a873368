@@ -1,0 +1,307 @@
+---
+title: Dialog
+description: Service to open Material Design modal dialogs
+---
+
+Service to open modal dialogs with Material Design styling and animations.
+
+## Import
+
+```typescript
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+```
+
+## Basic Usage
+
+```typescript
+import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-root',
+  template: '<button (click)="openDialog()">Open Dialog</button>'
+})
+export class AppComponent {
+  constructor(private dialog: MatDialog) {}
+
+  openDialog() {
+    this.dialog.open(DialogComponent);
+  }
+}
+
+@Component({
+  selector: 'app-dialog',
+  template: `
+    <h2 mat-dialog-title>Dialog Title</h2>
+    <mat-dialog-content>
+      Dialog content
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>
+  `
+})
+export class DialogComponent {}
+```
+
+## API Reference
+
+### MatDialog (Service)
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `openDialogs` | `MatDialogRef[]` | Currently open dialogs |
+| `afterOpened` | `Subject<MatDialogRef>` | Stream when dialog opens |
+| `afterAllClosed` | `Observable<void>` | Stream when all dialogs close |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `open<T>(component: ComponentType<T>, config?: MatDialogConfig): MatDialogRef<T>` | Opens component in dialog |
+| `open<T>(template: TemplateRef<T>, config?: MatDialogConfig): MatDialogRef<T>` | Opens template in dialog |
+| `closeAll(): void` | Closes all open dialogs |
+| `getDialogById(id: string): MatDialogRef \| undefined` | Finds dialog by ID |
+
+### MatDialogRef
+
+Reference to the opened dialog.
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `id` | `string` | Unique ID |
+| `componentInstance` | `T` | Component instance |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `close(result?: R): void` | Closes the dialog |
+| `afterClosed(): Observable<R>` | Observable that emits after close |
+| `afterOpened(): Observable<void>` | Observable that emits after open |
+| `beforeClosed(): Observable<R>` | Observable that emits before close |
+| `backdropClick(): Observable<MouseEvent>` | Observable for backdrop clicks |
+| `keydownEvents(): Observable<KeyboardEvent>` | Observable for keydown events |
+
+### MatDialogConfig
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `data` | `any` | Data to pass to dialog |
+| `width` | `string` | Width of dialog |
+| `height` | `string` | Height of dialog |
+| `minWidth` | `string \| number` | Minimum width |
+| `minHeight` | `string \| number` | Minimum height |
+| `maxWidth` | `string \| number` | Maximum width. Default: '80vw' |
+| `maxHeight` | `string \| number` | Maximum height |
+| `position` | `DialogPosition` | Dialog position |
+| `panelClass` | `string \| string[]` | Custom CSS classes |
+| `backdropClass` | `string` | Backdrop CSS class |
+| `disableClose` | `boolean` | Disable close on backdrop/ESC |
+| `autoFocus` | `boolean \| string \| AutoFocusTarget` | Auto focus strategy |
+| `restoreFocus` | `boolean` | Restore focus on close |
+| `id` | `string` | Dialog ID |
+| `ariaLabel` | `string` | ARIA label |
+| `ariaDescribedBy` | `string` | ARIA described by |
+| `direction` | `Direction` | Layout direction |
+
+## Examples
+
+### With Data
+
+```typescript
+export class AppComponent {
+  openDialog() {
+    this.dialog.open(DialogComponent, {
+      data: { name: 'John', age: 30 }
+    });
+  }
+}
+
+@Component({...})
+export class DialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+}
+```
+
+### Returning Data
+
+```typescript
+export class AppComponent {
+  openDialog() {
+    const dialogRef = this.dialog.open(DialogComponent);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog result:', result);
+    });
+  }
+}
+
+@Component({
+  template: `
+    <button mat-button [mat-dialog-close]="'confirm'">Confirm</button>
+    <button mat-button [mat-dialog-close]="'cancel'">Cancel</button>
+  `
+})
+export class DialogComponent {}
+```
+
+### Custom Size
+
+```typescript
+this.dialog.open(DialogComponent, {
+  width: '600px',
+  height: '400px',
+  maxWidth: '90vw'
+});
+```
+
+### Custom Position
+
+```typescript
+this.dialog.open(DialogComponent, {
+  position: {
+    top: '100px',
+    right: '20px'
+  }
+});
+```
+
+### Disable Close
+
+```typescript
+this.dialog.open(DialogComponent, {
+  disableClose: true // Requires explicit close action
+});
+```
+
+### Confirm Dialog
+
+```typescript
+@Component({
+  template: `
+    <h2 mat-dialog-title>Confirm Action</h2>
+    <mat-dialog-content>
+      Are you sure you want to proceed?
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="false">Cancel</button>
+      <button mat-raised-button color="primary" [mat-dialog-close]="true">Confirm</button>
+    </mat-dialog-actions>
+  `
+})
+export class ConfirmDialogComponent {}
+
+export class AppComponent {
+  confirm() {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Confirmed');
+      }
+    });
+  }
+}
+```
+
+### Form Dialog
+
+```typescript
+@Component({
+  template: `
+    <h2 mat-dialog-title>User Form</h2>
+    <mat-dialog-content>
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.name" placeholder="Name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput [(ngModel)]="data.email" placeholder="Email">
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-raised-button [mat-dialog-close]="data">Save</button>
+    </mat-dialog-actions>
+  `
+})
+export class FormDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+}
+```
+
+### Fullscreen Dialog
+
+```typescript
+this.dialog.open(DialogComponent, {
+  width: '100vw',
+  maxWidth: '100vw',
+  height: '100vh',
+  panelClass: 'fullscreen-dialog'
+});
+```
+
+```css
+.fullscreen-dialog {
+  max-width: 100vw !important;
+}
+```
+
+## Dialog Content Directives
+
+```html
+<h2 mat-dialog-title>Title</h2>
+<mat-dialog-content>Content</mat-dialog-content>
+<mat-dialog-actions>Actions</mat-dialog-actions>
+```
+
+### mat-dialog-close
+
+```html
+<button mat-button mat-dialog-close>Close</button>
+<button mat-button [mat-dialog-close]="'result'">Close with result</button>
+```
+
+## Accessibility
+
+- Dialog has `role="dialog"`
+- Focus trapped within dialog
+- ESC key closes dialog by default
+- Use `aria-label` or `aria-labelledby`:
+
+```typescript
+this.dialog.open(DialogComponent, {
+  ariaLabel: 'User settings dialog'
+});
+```
+
+## Configuration
+
+```typescript
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: {
+        hasBackdrop: true,
+        disableClose: false,
+        autoFocus: true,
+        maxWidth: '80vw'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Related Components
+
+- [Bottom Sheet](/components/bottom-sheet)
+- [Snack Bar](/components/snack-bar)

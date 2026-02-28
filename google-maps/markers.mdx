@@ -1,0 +1,339 @@
+---
+title: 'Map Markers'
+description: 'Add markers and info windows to Google Maps'
+---
+
+# Map Markers
+
+Markers identify locations on the map. Angular Google Maps provides components for both standard and advanced markers.
+
+## MapMarker (Deprecated)
+
+The `MapMarker` component wraps the [`google.maps.Marker` class](https://developers.google.com/maps/documentation/javascript/reference/marker#Marker).
+
+**Note:** As of 2024, Google Maps has deprecated the `Marker` class. Consider using `MapAdvancedMarker` instead.
+
+**Source**: `/home/daytona/workspace/source/src/google-maps/map-marker/README.md`
+
+### Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapMarker} from '@angular/google-maps';
+
+@Component({
+  selector: 'google-map-demo',
+  imports: [GoogleMap, MapMarker],
+  template: `
+    <google-map
+      height="400px"
+      width="750px"
+      [center]="center"
+      [zoom]="zoom"
+      (mapClick)="addMarker($event)">
+      @for (position of markerPositions; track position) {
+        <map-marker [position]="position" [options]="markerOptions" />
+      }
+    </google-map>
+  `
+})
+export class GoogleMapDemo {
+  center: google.maps.LatLngLiteral = {lat: 24, lng: 12};
+  zoom = 4;
+  markerOptions: google.maps.MarkerOptions = {draggable: false};
+  markerPositions: google.maps.LatLngLiteral[] = [];
+
+  addMarker(event: google.maps.MapMouseEvent) {
+    this.markerPositions.push(event.latLng.toJSON());
+  }
+}
+```
+
+### MapMarker Inputs
+
+- `position` (google.maps.LatLngLiteral | google.maps.LatLng) - Marker position
+- `title` (string) - Tooltip text on hover
+- `label` (string | google.maps.MarkerLabel) - Label displayed on marker
+- `clickable` (boolean) - Whether marker is clickable. Default: `true`
+- `options` (google.maps.MarkerOptions) - Full marker options
+
+### MapMarker Outputs
+
+- `mapClick` - Marker is clicked
+- `mapDblclick` - Marker is double-clicked
+- `mapRightclick` - Marker is right-clicked
+- `mapDrag` - Marker is being dragged
+- `mapDragend` - Marker drag ends
+- `mapDragstart` - Marker drag starts
+- `mapMouseover` - Mouse enters marker
+- `mapMouseout` - Mouse leaves marker
+- `positionChanged` - Marker position changes
+- `titleChanged` - Marker title changes
+
+### Custom Marker Icons
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapMarker} from '@angular/google-maps';
+
+@Component({
+  selector: 'custom-markers',
+  imports: [GoogleMap, MapMarker],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-marker 
+        [position]="center" 
+        [options]="customIcon" />
+    </google-map>
+  `
+})
+export class CustomMarkers {
+  center = {lat: 40, lng: -74};
+  zoom = 12;
+  
+  customIcon: google.maps.MarkerOptions = {
+    icon: {
+      url: '/assets/custom-marker.png',
+      scaledSize: new google.maps.Size(40, 40)
+    }
+  };
+}
+```
+
+### Draggable Markers
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {GoogleMap, MapMarker} from '@angular/google-maps';
+
+@Component({
+  selector: 'draggable-marker',
+  imports: [GoogleMap, MapMarker],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-marker 
+        [position]="markerPosition()" 
+        [options]="{draggable: true}"
+        (mapDragend)="updatePosition($event)" />
+    </google-map>
+    
+    <p>Marker position: {{markerPosition().lat}}, {{markerPosition().lng}}</p>
+  `
+})
+export class DraggableMarker {
+  center = {lat: 40, lng: -74};
+  zoom = 12;
+  markerPosition = signal({lat: 40, lng: -74});
+  
+  updatePosition(event: google.maps.MapMouseEvent) {
+    this.markerPosition.set(event.latLng!.toJSON());
+  }
+}
+```
+
+## MapAdvancedMarker (Recommended)
+
+The advanced marker provides more customization options and better performance.
+
+### Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapAdvancedMarker} from '@angular/google-maps';
+
+@Component({
+  selector: 'advanced-markers',
+  imports: [GoogleMap, MapAdvancedMarker],
+  template: `
+    <google-map [center]="center" [zoom]="zoom" [options]="mapOptions">
+      @for (marker of markers; track marker.id) {
+        <map-advanced-marker 
+          [position]="marker.position"
+          [title]="marker.title" />
+      }
+    </google-map>
+  `
+})
+export class AdvancedMarkers {
+  center = {lat: 37.7749, lng: -122.4194};
+  zoom = 12;
+  
+  mapOptions: google.maps.MapOptions = {
+    mapId: 'YOUR_MAP_ID' // Required for advanced markers
+  };
+  
+  markers = [
+    {id: 1, position: {lat: 37.7749, lng: -122.4194}, title: 'San Francisco'},
+    {id: 2, position: {lat: 37.7849, lng: -122.4094}, title: 'North Beach'},
+    {id: 3, position: {lat: 37.7649, lng: -122.4294}, title: 'Mission District'}
+  ];
+}
+```
+
+## MapInfoWindow
+
+Display information in a popup when clicking markers.
+
+### Basic Usage
+
+```typescript
+import {Component, ViewChild} from '@angular/core';
+import {GoogleMap, MapMarker, MapInfoWindow} from '@angular/google-maps';
+
+@Component({
+  selector: 'marker-with-info',
+  imports: [GoogleMap, MapMarker, MapInfoWindow],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      @for (marker of markers; track marker.id) {
+        <map-marker 
+          [position]="marker.position"
+          [title]="marker.title"
+          (mapClick)="openInfo(infoWindow, marker)" />
+      }
+      
+      <map-info-window #infoWindow>
+        <div>
+          <h3>{{selectedMarker?.title}}</h3>
+          <p>{{selectedMarker?.description}}</p>
+        </div>
+      </map-info-window>
+    </google-map>
+  `
+})
+export class MarkerWithInfo {
+  @ViewChild(MapInfoWindow) infoWindow!: MapInfoWindow;
+  
+  center = {lat: 40, lng: -74};
+  zoom = 10;
+  selectedMarker: any;
+  
+  markers = [
+    {
+      id: 1,
+      position: {lat: 40.7128, lng: -74.0060},
+      title: 'New York City',
+      description: 'The Big Apple'
+    },
+    {
+      id: 2,
+      position: {lat: 40.7580, lng: -73.9855},
+      title: 'Times Square',
+      description: 'The Crossroads of the World'
+    }
+  ];
+  
+  openInfo(infoWindow: MapInfoWindow, marker: any) {
+    this.selectedMarker = marker;
+    infoWindow.open();
+  }
+}
+```
+
+### MapInfoWindow Inputs
+
+- `options` (google.maps.InfoWindowOptions) - Info window configuration
+- `position` (google.maps.LatLngLiteral | google.maps.LatLng) - Position (if not attached to marker)
+
+### MapInfoWindow Outputs
+
+- `closeclick` - Info window is closed
+- `contentChanged` - Content changes
+- `domready` - DOM is ready
+- `positionChanged` - Position changes
+- `zindexChanged` - Z-index changes
+
+## MapMarkerClusterer
+
+Group nearby markers into clusters for better performance with many markers.
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapMarker, MapMarkerClusterer} from '@angular/google-maps';
+
+@Component({
+  selector: 'marker-clustering',
+  imports: [GoogleMap, MapMarkerClusterer, MapMarker],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-marker-clusterer>
+        @for (position of positions; track $index) {
+          <map-marker [position]="position" />
+        }
+      </map-marker-clusterer>
+    </google-map>
+  `
+})
+export class MarkerClustering {
+  center = {lat: 40, lng: -100};
+  zoom = 4;
+  
+  // Generate many random positions
+  positions = Array.from({length: 100}, () => ({
+    lat: 40 + (Math.random() - 0.5) * 20,
+    lng: -100 + (Math.random() - 0.5) * 40
+  }));
+}
+```
+
+### Cluster Options
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapMarkerClusterer} from '@angular/google-maps';
+
+@Component({
+  selector: 'custom-clusters',
+  imports: [GoogleMap, MapMarkerClusterer],
+  template: `
+    <google-map [center]="center" [zoom]="zoom">
+      <map-marker-clusterer [options]="clusterOptions">
+        <!-- markers -->
+      </map-marker-clusterer>
+    </google-map>
+  `
+})
+export class CustomClusters {
+  center = {lat: 40, lng: -100};
+  zoom = 4;
+  
+  clusterOptions = {
+    minimumClusterSize: 3,
+    maxZoom: 15,
+    styles: [
+      {
+        width: 30,
+        height: 30,
+        className: 'custom-cluster-small'
+      },
+      {
+        width: 40,
+        height: 40,
+        className: 'custom-cluster-medium'
+      },
+      {
+        width: 50,
+        height: 50,
+        className: 'custom-cluster-large'
+      }
+    ]
+  };
+}
+```
+
+## Best Practices
+
+1. **Use Advanced Markers** when possible for better performance and features
+2. **Cluster markers** when displaying many markers (>100)
+3. **Lazy load marker data** for large datasets
+4. **Optimize marker icons** by using appropriate image sizes
+5. **Reuse info windows** instead of creating multiple instances
+6. **Remove markers** when zooming out to reduce clutter
+
+## Source Code
+
+View the source code:
+- [MapMarker](https://github.com/angular/components/tree/main/src/google-maps/map-marker)
+- [MapAdvancedMarker](https://github.com/angular/components/tree/main/src/google-maps/map-advanced-marker)
+- [MapInfoWindow](https://github.com/angular/components/tree/main/src/google-maps/map-info-window)
+- [MapMarkerClusterer](https://github.com/angular/components/tree/main/src/google-maps/map-marker-clusterer)

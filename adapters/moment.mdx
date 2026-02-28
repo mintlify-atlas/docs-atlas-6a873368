@@ -1,0 +1,378 @@
+---
+title: 'Moment.js Adapter'
+description: 'Use Moment.js with Angular Material date components'
+---
+
+# Moment.js Adapter
+
+The Moment.js adapter allows you to use the [Moment.js](https://momentjs.com/) library with Angular Material date components like Datepicker and Timepicker.
+
+**Source**: `/home/daytona/workspace/source/src/material-moment-adapter/adapter/moment-date-adapter.ts`
+
+## Important Note
+
+**Moment.js is now in maintenance mode.** The Moment.js team recommends using alternatives like Luxon or date-fns for new projects. However, the adapter is still maintained for existing projects.
+
+From the Moment.js documentation:
+> We now generally consider Moment to be a legacy project in maintenance mode. It is not dead, but it is indeed done.
+
+## Installation
+
+```bash
+npm install @angular/material-moment-adapter moment
+```
+
+## Setup
+
+### Standalone Components
+
+Provide the adapter in your component or at the application level:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@Component({
+  selector: 'app-datepicker',
+  imports: [MatDatepickerModule],
+  providers: [provideMomentDateAdapter()],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+  `
+})
+export class DatepickerComponent {}
+```
+
+### NgModule
+
+Provide the adapter in your module:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@NgModule({
+  imports: [MatDatepickerModule],
+  providers: [
+    {provide: DateAdapter, useClass: MomentDateAdapter},
+    {provide: MAT_DATE_LOCALE, useValue: 'en-US'}
+  ]
+})
+export class AppModule {}
+```
+
+## Adapter Options
+
+Configure the adapter using `MAT_MOMENT_DATE_ADAPTER_OPTIONS`:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideMomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideMomentDateAdapter(),
+    {
+      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+      useValue: {
+        strict: true,
+        useUtc: false
+      }
+    }
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+### Option Properties
+
+**Source**: `/home/daytona/workspace/source/src/material-moment-adapter/adapter/moment-date-adapter.ts:22`
+
+- `strict` (boolean) - Enable strict parsing mode. Default: `false`
+- `useUtc` (boolean) - Use UTC dates instead of local time. Default: `false`
+
+## Localization
+
+Moment.js has built-in locales. Set the locale using `MAT_DATE_LOCALE`:
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import 'moment/locale/fr'; // Import French locale
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideMomentDateAdapter(),
+    {provide: MAT_DATE_LOCALE, useValue: 'fr'}
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+Common locales:
+```typescript
+import 'moment/locale/es'; // Spanish
+import 'moment/locale/de'; // German
+import 'moment/locale/ja'; // Japanese
+import 'moment/locale/zh-cn'; // Chinese (Simplified)
+import 'moment/locale/fr'; // French
+import 'moment/locale/it'; // Italian
+import 'moment/locale/pt'; // Portuguese
+```
+
+## Strict Parsing Mode
+
+Strict mode requires dates to exactly match the format:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideMomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideMomentDateAdapter(),
+    {
+      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+      useValue: {strict: true}
+    }
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+## UTC Mode
+
+Work with UTC dates:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideMomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
+import moment from 'moment';
+
+@Component({
+  selector: 'app-utc-datepicker',
+  providers: [
+    provideMomentDateAdapter(),
+    {
+      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+      useValue: {useUtc: true}
+    }
+  ],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="utcDate" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+  `
+})
+export class UtcDatepickerComponent {
+  utcDate = moment.utc();
+}
+```
+
+## Custom Date Formats
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+
+const CUSTOM_DATE_FORMATS = {
+  parse: {
+    dateInput: 'MM/DD/YYYY',
+  },
+  display: {
+    dateInput: 'MM/DD/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideMomentDateAdapter(),
+    {provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS}
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+## MomentDateAdapter API
+
+The `MomentDateAdapter` class extends Angular Material's `DateAdapter`.
+
+### Key Methods
+
+Implemented from `/home/daytona/workspace/source/src/material-moment-adapter/adapter/moment-date-adapter.ts:58`:
+
+- `getYear(date: Moment): number` - Get the year
+- `getMonth(date: Moment): number` - Get the month (0-11)
+- `getDate(date: Moment): number` - Get the day of month
+- `getDayOfWeek(date: Moment): number` - Get day of week
+- `getMonthNames(style)` - Get month names
+- `getDateNames()` - Get array of date names
+- `getDayOfWeekNames(style)` - Get day names
+- `getYearName(date: Moment): string` - Get year as string
+- `getFirstDayOfWeek(): number` - Get first day of week
+- `getNumDaysInMonth(date: Moment): number` - Get days in month
+- `clone(date: Moment): Moment` - Clone a date (always clones with correct locale)
+- `createDate(year, month, date): Moment` - Create a new date
+- `today(): Moment` - Get today's date
+- `parse(value, parseFormat)` - Parse a date string
+- `format(date, displayFormat): string` - Format a date
+- `addCalendarYears(date, years): Moment` - Add years
+- `addCalendarMonths(date, months): Moment` - Add months
+- `addCalendarDays(date, days): Moment` - Add days
+- `toIso8601(date): string` - Convert to ISO 8601 string
+- `isDateInstance(obj): boolean` - Check if value is a Moment
+- `isValid(date): boolean` - Check if date is valid
+- `invalid(): Moment` - Create an invalid date
+
+### Time Support
+
+- `setTime(target, hours, minutes, seconds): Moment`
+- `getHours(date): number`
+- `getMinutes(date): number`
+- `getSeconds(date): number`
+- `parseTime(value, parseFormat)`
+- `addSeconds(date, amount): Moment`
+
+## Moment.js Format Tokens
+
+Common Moment.js format tokens:
+
+- `M` - Month number (1-12)
+- `MM` - Month number with leading zero (01-12)
+- `MMM` - Short month name (Jan-Dec)
+- `MMMM` - Full month name (January-December)
+- `D` - Day of month (1-31)
+- `DD` - Day of month with leading zero (01-31)
+- `d` - Day of week (0-6)
+- `dd` - Min day name (Su-Sa)
+- `ddd` - Short day name (Sun-Sat)
+- `dddd` - Full day name (Sunday-Saturday)
+- `YY` - 2-digit year
+- `YYYY` - 4-digit year
+- `h` - Hour 12-hour (1-12)
+- `hh` - Hour 12-hour with leading zero
+- `H` - Hour 24-hour (0-23)
+- `HH` - Hour 24-hour with leading zero
+- `m` - Minutes (0-59)
+- `mm` - Minutes with leading zero
+- `s` - Seconds (0-59)
+- `ss` - Seconds with leading zero
+- `A` - AM/PM
+- `a` - am/pm
+
+See the [Moment.js format documentation](https://momentjs.com/docs/#/displaying/format/) for all tokens.
+
+## Example with Datepicker
+
+```typescript
+import {Component} from '@angular/core';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import moment, {Moment} from 'moment';
+
+@Component({
+  selector: 'app-date-form',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule
+  ],
+  providers: [provideMomentDateAdapter()],
+  template: `
+    <mat-form-field>
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker" [formControl]="dateControl" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+    
+    @if (dateControl.value) {
+      <p>Selected: {{dateControl.value.format('MMMM D, YYYY')}}</p>
+      <p>From now: {{dateControl.value.fromNow()}}</p>
+    }
+  `
+})
+export class DateFormComponent {
+  dateControl = new FormControl<Moment>(moment());
+}
+```
+
+## Migration Path
+
+If you're using Moment.js and want to migrate:
+
+### To Luxon
+
+```bash
+npm uninstall @angular/material-moment-adapter moment
+npm install @angular/material-luxon-adapter luxon
+```
+
+Update providers:
+```typescript
+// Before
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+
+// After  
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+```
+
+### To date-fns
+
+```bash
+npm uninstall @angular/material-moment-adapter moment
+npm install @angular/material-date-fns-adapter date-fns
+```
+
+Update providers:
+```typescript
+// Before
+import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
+
+// After
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+```
+
+## Why Moment.js is in Maintenance Mode
+
+From the Moment.js team:
+
+1. **Large bundle size** - Moment.js is quite large and not tree-shakeable
+2. **Mutable API** - Moment objects are mutable, leading to bugs
+3. **Better alternatives** - Modern libraries like Luxon and date-fns exist
+4. **Native improvements** - JavaScript's `Intl` and `Temporal` APIs are improving
+
+## When to Use Moment.js Adapter
+
+- **Existing projects** - You're already using Moment.js extensively
+- **Legacy code** - Migrating would be too costly
+- **Temporary solution** - You plan to migrate eventually
+
+## Source Code
+
+View the [MomentDateAdapter source code](https://github.com/angular/components/tree/main/src/material-moment-adapter) on GitHub.

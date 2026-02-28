@@ -1,0 +1,297 @@
+---
+title: MatMenu
+description: Menu component for Angular Material - displays a contextual menu with keyboard navigation and accessibility support.
+---
+
+# MatMenu
+
+The `mat-menu` is a floating panel containing list of menu items. It provides contextual commands with keyboard navigation, focus management, and screen reader support.
+
+## Basic Usage
+
+```typescript
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'menu-example',
+  imports: [MatMenuModule, MatButtonModule],
+  template: `
+    <button mat-button [matMenuTriggerFor]="menu">Menu</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>Item 1</button>
+      <button mat-menu-item>Item 2</button>
+      <button mat-menu-item>Item 3</button>
+    </mat-menu>
+  `
+})
+export class MenuExample {}
+```
+
+## API Reference
+
+### MatMenu
+
+Selector: `mat-menu`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `xPosition` | `'before' \| 'after'` | `'after'` | Position of the menu in the X axis |
+| `yPosition` | `'above' \| 'below'` | `'below'` | Position of the menu in the Y axis |
+| `overlapTrigger` | `boolean` | `false` | Whether the menu should overlap its trigger |
+| `hasBackdrop` | `boolean \| undefined` | - | Whether the menu has a backdrop |
+| `backdropClass` | `string` | - | Class to be added to the backdrop element |
+| `panelClass` | `string` | - | Classes to be added to the overlay panel |
+| `classList` | `string` | - | **Deprecated** Use `panelClass` instead |
+| `aria-label` | `string` | - | Aria label for the menu panel |
+| `aria-labelledby` | `string` | - | Aria labelledby for the menu panel |
+| `aria-describedby` | `string` | - | Aria describedby for the menu panel |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `closed` | `EventEmitter<MenuCloseReason>` | Event emitted when the menu is closed |
+| `close` | `EventEmitter<MenuCloseReason>` | **Deprecated** Switch to `closed` instead |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `focusFirstItem(origin?: FocusOrigin): void` | Focus the first item in the menu |
+| `resetActiveItem(): void` | Resets the active item in the menu |
+| `setPositionClasses(posX?: MenuPositionX, posY?: MenuPositionY): void` | Adds classes based on position |
+
+### MatMenuTrigger
+
+Directive: `[matMenuTriggerFor]`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `matMenuTriggerFor` | `MatMenuPanel` | - | References the menu instance that the trigger is associated with |
+| `matMenuTriggerData` | `any` | - | Data to be passed along to any lazily-rendered content |
+| `matMenuTriggerRestoreFocus` | `boolean` | `true` | Whether focus should be restored when the menu is closed |
+
+#### Outputs
+
+| Name | Type | Description |
+|------|------|-------------|
+| `menuOpened` | `EventEmitter<void>` | Event emitted when the associated menu is opened |
+| `menuClosed` | `EventEmitter<void>` | Event emitted when the associated menu is closed |
+| `onMenuOpen` | `EventEmitter<void>` | **Deprecated** Switch to `menuOpened` instead |
+| `onMenuClose` | `EventEmitter<void>` | **Deprecated** Switch to `menuClosed` instead |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `openMenu(): void` | Opens the menu |
+| `closeMenu(): void` | Closes the menu |
+| `toggleMenu(): void` | Toggles the menu between the open and closed states |
+| `updatePosition(): void` | Updates the position of the menu |
+| `triggersSubmenu(): boolean` | Whether the menu triggers a sub-menu or a top-level one |
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `menuOpen` | `boolean` | Whether the menu is open |
+| `dir` | `'ltr' \| 'rtl'` | The text direction of the containing app |
+
+### MatMenuItem
+
+Selector: `[mat-menu-item]`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `role` | `'menuitem' \| 'menuitemradio' \| 'menuitemcheckbox'` | `'menuitem'` | ARIA role for the menu item |
+| `disabled` | `boolean` | `false` | Whether the menu item is disabled |
+| `disableRipple` | `boolean` | `false` | Whether ripples are disabled on the menu item |
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `focus(origin?: FocusOrigin, options?: FocusOptions): void` | Focuses the menu item |
+| `getLabel(): string` | Gets the label to be used when determining whether the option should be focused |
+
+## Examples
+
+### Nested Menu
+
+```typescript
+@Component({
+  template: `
+    <button mat-button [matMenuTriggerFor]="animals">Animals</button>
+    <mat-menu #animals="matMenu">
+      <button mat-menu-item [matMenuTriggerFor]="vertebrates">Vertebrates</button>
+      <button mat-menu-item [matMenuTriggerFor]="invertebrates">Invertebrates</button>
+    </mat-menu>
+
+    <mat-menu #vertebrates="matMenu">
+      <button mat-menu-item>Fish</button>
+      <button mat-menu-item>Amphibians</button>
+      <button mat-menu-item>Reptiles</button>
+    </mat-menu>
+
+    <mat-menu #invertebrates="matMenu">
+      <button mat-menu-item>Insects</button>
+      <button mat-menu-item>Molluscs</button>
+    </mat-menu>
+  `
+})
+export class NestedMenuExample {}
+```
+
+### Menu Position
+
+```typescript
+@Component({
+  template: `
+    <button mat-button [matMenuTriggerFor]="aboveMenu">Above</button>
+    <mat-menu #aboveMenu="matMenu" yPosition="above">
+      <button mat-menu-item>Item 1</button>
+      <button mat-menu-item>Item 2</button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="beforeMenu">Before</button>
+    <mat-menu #beforeMenu="matMenu" xPosition="before">
+      <button mat-menu-item>Item 1</button>
+      <button mat-menu-item>Item 2</button>
+    </mat-menu>
+  `
+})
+export class MenuPositionExample {}
+```
+
+### Icons in Menu
+
+```typescript
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  imports: [MatMenuModule, MatIconModule, MatButtonModule],
+  template: `
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>dialpad</mat-icon>
+        <span>Redial</span>
+      </button>
+      <button mat-menu-item disabled>
+        <mat-icon>voicemail</mat-icon>
+        <span>Check voice mail</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>notifications_off</mat-icon>
+        <span>Disable alerts</span>
+      </button>
+    </mat-menu>
+  `
+})
+export class MenuIconsExample {}
+```
+
+## Accessibility
+
+### Keyboard Interaction
+
+- `DOWN_ARROW`: Moves focus to the next menu item
+- `UP_ARROW`: Moves focus to the previous menu item
+- `HOME`: Moves focus to the first menu item
+- `END`: Moves focus to the last menu item
+- `ENTER`: Activates the focused menu item
+- `SPACE`: Activates the focused menu item
+- `ESCAPE`: Closes the menu
+- `LEFT_ARROW`: Closes sub-menu (for LTR languages)
+- `RIGHT_ARROW`: Opens sub-menu (for LTR languages)
+
+### ARIA
+
+The menu trigger has `role="button"`, `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls` attributes. Each menu item has `role="menuitem"` by default, which can be customized via the `role` input.
+
+### Focus Management
+
+- When opened via keyboard, focus is placed on the first menu item
+- When opened via mouse, focus remains on the trigger
+- When closed, focus is restored to the trigger by default (configurable via `matMenuTriggerRestoreFocus`)
+
+## Theming
+
+The menu component uses the Material Design theming system. Include the menu theme in your application theme:
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.menu-theme($theme);
+}
+```
+
+## Types
+
+### MenuPositionX
+
+```typescript
+type MenuPositionX = 'before' | 'after';
+```
+
+### MenuPositionY
+
+```typescript
+type MenuPositionY = 'above' | 'below';
+```
+
+### MenuCloseReason
+
+```typescript
+type MenuCloseReason = void | 'click' | 'keydown' | 'tab';
+```
+
+## Injection Tokens
+
+### MAT_MENU_DEFAULT_OPTIONS
+
+```typescript
+const MAT_MENU_DEFAULT_OPTIONS: InjectionToken<MatMenuDefaultOptions>;
+
+interface MatMenuDefaultOptions {
+  xPosition: MenuPositionX;
+  yPosition: MenuPositionY;
+  overlapTrigger: boolean;
+  backdropClass: string;
+  overlayPanelClass?: string | string[];
+  hasBackdrop?: boolean;
+}
+```
+
+Use to configure default options for all menus:
+
+```typescript
+providers: [
+  {
+    provide: MAT_MENU_DEFAULT_OPTIONS,
+    useValue: {
+      overlapTrigger: true,
+      xPosition: 'before',
+      yPosition: 'below',
+      backdropClass: 'custom-backdrop'
+    }
+  }
+]
+```

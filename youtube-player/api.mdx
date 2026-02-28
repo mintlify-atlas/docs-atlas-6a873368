@@ -1,0 +1,367 @@
+---
+title: 'YouTube Player API'
+description: 'API reference for Angular YouTube Player component'
+---
+
+# YouTube Player API
+
+Complete API reference for the Angular YouTube Player component.
+
+**Source**: `/home/daytona/workspace/source/src/youtube-player/youtube-player.ts`
+
+## Component Inputs
+
+### videoId
+
+- **Type**: `string`
+- **Required**: Yes (unless using `playerVars.list`)
+- **Description**: The YouTube video ID to play
+
+```html
+<youtube-player videoId="dQw4w9WgXcQ" />
+```
+
+### width
+
+- **Type**: `number`
+- **Default**: `640`
+- **Description**: Width of the player in pixels
+
+```html
+<youtube-player videoId="..." [width]="800" />
+```
+
+### height
+
+- **Type**: `number`
+- **Default**: `390`
+- **Description**: Height of the player in pixels
+
+```html
+<youtube-player videoId="..." [height]="450" />
+```
+
+### startSeconds
+
+- **Type**: `number`
+- **Description**: Start playback at a specific time (in seconds)
+
+```html
+<youtube-player videoId="..." [startSeconds]="30" />
+```
+
+### endSeconds
+
+- **Type**: `number`
+- **Description**: End playback at a specific time (in seconds)
+
+```html
+<youtube-player videoId="..." [endSeconds]="120" />
+```
+
+### suggestedQuality
+
+- **Type**: `YT.SuggestedVideoQuality`
+- **Description**: Suggested video quality
+- **Values**: `'small'`, `'medium'`, `'large'`, `'hd720'`, `'hd1080'`, `'highres'`, `'default'`
+
+```html
+<youtube-player videoId="..." suggestedQuality="hd720" />
+```
+
+### playerVars
+
+- **Type**: `YT.PlayerVars`
+- **Description**: YouTube Player parameters
+
+```typescript
+import {Component} from '@angular/core';
+import {YouTubePlayer} from '@angular/youtube-player';
+
+@Component({
+  selector: 'app-player',
+  imports: [YouTubePlayer],
+  template: `
+    <youtube-player 
+      videoId="dQw4w9WgXcQ" 
+      [playerVars]="playerVars" />
+  `
+})
+export class PlayerComponent {
+  playerVars: YT.PlayerVars = {
+    autoplay: 1,
+    controls: 1,
+    modestbranding: 1,
+    rel: 0,
+    showinfo: 0
+  };
+}
+```
+
+### loadApi
+
+- **Type**: `boolean`
+- **Default**: `true`
+- **Description**: Whether to automatically load the YouTube iframe API
+
+```html
+<youtube-player videoId="..." [loadApi]="false" />
+```
+
+### disablePlaceholder
+
+- **Type**: `boolean`
+- **Default**: `false`
+- **Description**: Whether to disable the placeholder and load the API immediately
+
+```html
+<youtube-player videoId="..." disablePlaceholder />
+```
+
+### placeholderImageQuality
+
+- **Type**: `'low' | 'standard' | 'high'`
+- **Default**: `'standard'`
+- **Description**: Quality of the placeholder thumbnail image
+
+```html
+<youtube-player videoId="..." placeholderImageQuality="high" />
+```
+
+### placeholderButtonLabel
+
+- **Type**: `string`
+- **Default**: `'Play video'`
+- **Description**: Accessible label for the placeholder play button
+
+```html
+<youtube-player videoId="..." placeholderButtonLabel="Reproducir vídeo" />
+```
+
+### disableCookies
+
+- **Type**: `boolean`
+- **Default**: `false`
+- **Description**: Whether to use youtube-nocookie.com instead of youtube.com
+
+```html
+<youtube-player videoId="..." [disableCookies]="true" />
+```
+
+## Component Outputs (Events)
+
+### ready
+
+- **Type**: `EventEmitter<YT.PlayerEvent>`
+- **Description**: Fires when the player is ready
+
+```typescript
+onReady(event: YT.PlayerEvent) {
+  console.log('Player is ready');
+}
+```
+
+### stateChange
+
+- **Type**: `EventEmitter<YT.OnStateChangeEvent>`
+- **Description**: Fires when the player state changes
+
+```typescript
+onStateChange(event: YT.OnStateChangeEvent) {
+  console.log('Player state:', event.data);
+  // -1: unstarted
+  //  0: ended
+  //  1: playing
+  //  2: paused
+  //  3: buffering
+  //  5: video cued
+}
+```
+
+### playbackQualityChange
+
+- **Type**: `EventEmitter<YT.OnPlaybackQualityChangeEvent>`
+- **Description**: Fires when playback quality changes
+
+### playbackRateChange
+
+- **Type**: `EventEmitter<YT.OnPlaybackRateChangeEvent>`
+- **Description**: Fires when playback rate changes
+
+### error
+
+- **Type**: `EventEmitter<YT.OnErrorEvent>`
+- **Description**: Fires when an error occurs
+
+```typescript
+onError(event: YT.OnErrorEvent) {
+  console.error('Player error:', event.data);
+  // 2: Invalid video ID
+  // 5: HTML5 player error
+  // 100: Video not found
+  // 101/150: Video not embeddable
+}
+```
+
+### apiChange
+
+- **Type**: `EventEmitter<YT.PlayerEvent>`
+- **Description**: Fires when the player's API changes
+
+## Component Methods
+
+Access these methods using `ViewChild` or `viewChild`:
+
+```typescript
+import {Component, ViewChild, AfterViewInit} from '@angular/core';
+import {YouTubePlayer} from '@angular/youtube-player';
+
+@Component({
+  selector: 'app-player',
+  imports: [YouTubePlayer],
+  template: `<youtube-player #player videoId="dQw4w9WgXcQ" />`
+})
+export class PlayerComponent implements AfterViewInit {
+  @ViewChild('player') youtubePlayer!: YouTubePlayer;
+
+  ngAfterViewInit() {
+    // Now you can call methods on the player
+  }
+
+  playVideo() {
+    this.youtubePlayer.playVideo();
+  }
+
+  pauseVideo() {
+    this.youtubePlayer.pauseVideo();
+  }
+}
+```
+
+### Playback Controls
+
+- `playVideo()` - Play the video
+- `pauseVideo()` - Pause the video
+- `stopVideo()` - Stop the video
+- `seekTo(seconds: number, allowSeekAhead: boolean)` - Seek to a specific time
+- `mute()` - Mute the player
+- `unMute()` - Unmute the player
+
+### Player State
+
+- `getPlayerState()` - Get current player state
+- `getCurrentTime()` - Get current playback time in seconds
+- `getDuration()` - Get video duration in seconds
+- `getVolume()` - Get volume level (0-100)
+- `getPlaybackRate()` - Get playback speed
+- `getAvailablePlaybackRates()` - Get available playback speeds
+
+### Player Settings
+
+- `setVolume(volume: number)` - Set volume (0-100)
+- `setPlaybackRate(rate: number)` - Set playback speed
+- `setSize(width: number, height: number)` - Resize the player
+
+### Video Info
+
+- `getVideoUrl()` - Get video URL
+- `getVideoEmbedCode()` - Get embed code
+- `getPlaylist()` - Get playlist (if playing a playlist)
+- `getPlaylistIndex()` - Get current position in playlist
+
+## Common PlayerVars
+
+Here are commonly used `playerVars` options:
+
+```typescript
+playerVars: YT.PlayerVars = {
+  autoplay: 1,              // Auto-play video (0 or 1)
+  controls: 1,              // Show player controls (0, 1, or 2)
+  disablekb: 0,            // Disable keyboard controls (0 or 1)
+  enablejsapi: 1,          // Enable JS API (0 or 1)
+  fs: 1,                   // Show fullscreen button (0 or 1)
+  loop: 1,                 // Loop video (0 or 1)
+  modestbranding: 1,       // Minimize YouTube branding (0 or 1)
+  playsinline: 1,          // Play inline on iOS (0 or 1)
+  rel: 0,                  // Show related videos (0 or 1)
+  showinfo: 0,             // Show video info (deprecated)
+  start: 30,               // Start time in seconds
+  end: 120,                // End time in seconds
+  iv_load_policy: 3,       // Hide video annotations (1 or 3)
+  cc_load_policy: 1,       // Show closed captions (0 or 1)
+  cc_lang_pref: 'en',      // Caption language
+  color: 'white',          // Progress bar color ('red' or 'white')
+  hl: 'en',                // Interface language
+  list: 'PLxxxxxxxx',      // Playlist ID
+  listType: 'playlist',    // List type ('playlist', 'search', 'user_uploads')
+}
+```
+
+## Complete Example
+
+```typescript
+import {Component, ViewChild, signal} from '@angular/core';
+import {YouTubePlayer} from '@angular/youtube-player';
+
+@Component({
+  selector: 'app-player',
+  imports: [YouTubePlayer],
+  template: `
+    <youtube-player
+      #player
+      [videoId]="videoId()"
+      [width]="800"
+      [height]="450"
+      [playerVars]="playerVars"
+      (ready)="onReady($event)"
+      (stateChange)="onStateChange($event)"
+      (error)="onError($event)" />
+      
+    <div class="controls">
+      <button (click)="play()">Play</button>
+      <button (click)="pause()">Pause</button>
+      <button (click)="stop()">Stop</button>
+    </div>
+  `
+})
+export class PlayerComponent {
+  @ViewChild('player') youtubePlayer!: YouTubePlayer;
+  
+  videoId = signal('dQw4w9WgXcQ');
+  
+  playerVars: YT.PlayerVars = {
+    autoplay: 0,
+    controls: 1,
+    modestbranding: 1,
+    rel: 0
+  };
+  
+  onReady(event: YT.PlayerEvent) {
+    console.log('Player ready');
+  }
+  
+  onStateChange(event: YT.OnStateChangeEvent) {
+    console.log('State:', event.data);
+  }
+  
+  onError(event: YT.OnErrorEvent) {
+    console.error('Error:', event.data);
+  }
+  
+  play() {
+    this.youtubePlayer.playVideo();
+  }
+  
+  pause() {
+    this.youtubePlayer.pauseVideo();
+  }
+  
+  stop() {
+    this.youtubePlayer.stopVideo();
+  }
+}
+```
+
+## Source Code
+
+View the [youtube-player.ts source code](https://github.com/angular/components/tree/main/src/youtube-player/youtube-player.ts) on GitHub.

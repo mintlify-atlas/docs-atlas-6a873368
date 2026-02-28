@@ -1,80 +1,419 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Build your first Angular Material application in minutes
+icon: rocket
 ---
 
-## Get started in three steps
+## Build Your First Material App
 
-Get your documentation site running locally and make your first customization.
+This guide will walk you through building a simple Angular Material application from scratch. You'll learn how to import components, use them in your templates, and apply Material Design principles.
 
-### Step 1: Set up your local environment
+<Info>
+  Make sure you've completed the [Installation](/installation) steps before starting this guide.
+</Info>
+
+## Step 1: Import Your First Component
+
+Let's start by adding a Material slide toggle to your application.
+
+<Steps>
+  <Step title="Import the Module">
+    In your component file, import `MatSlideToggleModule`:
+    
+    ```typescript app.component.ts
+    import { Component } from '@angular/core';
+    import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+    
+    @Component({
+      selector: 'app-root',
+      imports: [MatSlideToggleModule],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.css'
+    })
+    export class AppComponent {
+      title = 'my-material-app';
+    }
+    ```
+    
+    <Note>
+      This example uses standalone components. If you're using NgModules, add `MatSlideToggleModule` to your module's `imports` array instead.
+    </Note>
+  </Step>
+  
+  <Step title="Use the Component">
+    Add the component to your template:
+    
+    ```html app.component.html
+    <mat-slide-toggle>Toggle me!</mat-slide-toggle>
+    ```
+  </Step>
+  
+  <Step title="Run Your App">
+    Start the development server:
+    
+    ```bash
+    ng serve
+    ```
+    
+    Open [http://localhost:4200](http://localhost:4200) in your browser. You should see a Material Design slide toggle!
+  </Step>
+</Steps>
+
+## Step 2: Build a Toolbar
+
+Let's create a Material toolbar for your application header.
+
+<Steps>
+  <Step title="Import Toolbar and Button Modules">
+    ```typescript app.component.ts
+    import { Component } from '@angular/core';
+    import { MatToolbarModule } from '@angular/material/toolbar';
+    import { MatButtonModule } from '@angular/material/button';
+    import { MatIconModule } from '@angular/material/icon';
+    
+    @Component({
+      selector: 'app-root',
+      imports: [
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.css'
+    })
+    export class AppComponent {
+      title = 'My Material App';
+    }
+    ```
+  </Step>
+  
+  <Step title="Create the Toolbar">
+    ```html app.component.html
+    <mat-toolbar color="primary">
+      <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>{{ title }}</span>
+      <span class="spacer"></span>
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+    ```
+  </Step>
+  
+  <Step title="Add Styles">
+    ```css app.component.css
+    .spacer {
+      flex: 1 1 auto;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Step 3: Create a Card Layout
+
+Let's add some Material cards to display content.
+
+<Steps>
+  <Step title="Import Card Module">
+    ```typescript app.component.ts
+    import { Component } from '@angular/core';
+    import { MatToolbarModule } from '@angular/material/toolbar';
+    import { MatButtonModule } from '@angular/material/button';
+    import { MatIconModule } from '@angular/material/icon';
+    import { MatCardModule } from '@angular/material/card';
+    
+    @Component({
+      selector: 'app-root',
+      imports: [
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        MatCardModule
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.css'
+    })
+    export class AppComponent {
+      title = 'My Material App';
+    }
+    ```
+  </Step>
+  
+  <Step title="Add Cards to Template">
+    ```html app.component.html
+    <mat-toolbar color="primary">
+      <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>{{ title }}</span>
+      <span class="spacer"></span>
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+    
+    <div class="content">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Welcome</mat-card-title>
+          <mat-card-subtitle>Getting started with Angular Material</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Angular Material provides high-quality UI components for your Angular applications.
+            This quick start demonstrates some of the core components.
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">LEARN MORE</button>
+          <button mat-button>SHARE</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    ```
+  </Step>
+  
+  <Step title="Style the Layout">
+    ```css app.component.css
+    .spacer {
+      flex: 1 1 auto;
+    }
+    
+    .content {
+      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    mat-card {
+      margin-bottom: 16px;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Step 4: Add a Form
+
+Let's create a simple form using Material form fields.
+
+<Steps>
+  <Step title="Import Form Modules">
+    ```typescript app.component.ts
+    import { Component } from '@angular/core';
+    import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+    import { MatToolbarModule } from '@angular/material/toolbar';
+    import { MatButtonModule } from '@angular/material/button';
+    import { MatIconModule } from '@angular/material/icon';
+    import { MatCardModule } from '@angular/material/card';
+    import { MatFormFieldModule } from '@angular/material/form-field';
+    import { MatInputModule } from '@angular/material/input';
+    
+    @Component({
+      selector: 'app-root',
+      imports: [
+        ReactiveFormsModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatIconModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.css'
+    })
+    export class AppComponent {
+      title = 'My Material App';
+      email = new FormControl('', [Validators.required, Validators.email]);
+      
+      getErrorMessage() {
+        if (this.email.hasError('required')) {
+          return 'You must enter a value';
+        }
+        return this.email.hasError('email') ? 'Not a valid email' : '';
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Add Form to Template">
+    ```html app.component.html
+    <mat-toolbar color="primary">
+      <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>{{ title }}</span>
+      <span class="spacer"></span>
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+    
+    <div class="content">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Contact Us</mat-card-title>
+          <mat-card-subtitle>Send us a message</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="pat@example.com" [formControl]="email" required>
+            <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Message</mat-label>
+            <textarea matInput rows="5" placeholder="Your message"></textarea>
+          </mat-form-field>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary">SEND</button>
+          <button mat-button>CANCEL</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    ```
+  </Step>
+  
+  <Step title="Add Form Styles">
+    ```css app.component.css
+    .spacer {
+      flex: 1 1 auto;
+    }
+    
+    .content {
+      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    mat-card {
+      margin-bottom: 16px;
+    }
+    
+    .full-width {
+      width: 100%;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Common Component Patterns
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+  <Accordion title="Using Forms" icon="input-text">
+    Material form fields work with both template-driven and reactive forms:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+    ```typescript
+    import { MatFormFieldModule } from '@angular/material/form-field';
+    import { MatInputModule } from '@angular/material/input';
+    import { ReactiveFormsModule } from '@angular/forms';
+    ```
+    
+    All Material form components support Angular forms and validation.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+  
+  <Accordion title="Theming Components" icon="palette">
+    Most components accept a `color` attribute for theming:
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+    ```html
+    <button mat-raised-button color="primary">Primary</button>
+    <button mat-raised-button color="accent">Accent</button>
+    <button mat-raised-button color="warn">Warn</button>
+    ```
+  </Accordion>
+  
+  <Accordion title="Accessibility" icon="universal-access">
+    Material components are accessible by default. Always provide:
+    
+    - Labels for form fields
+    - `aria-label` for icon buttons
+    - Proper heading hierarchy
+    - Keyboard navigation support
+  </Accordion>
+  
+  <Accordion title="Component Variants" icon="shapes">
+    Many components have multiple variants:
+    
+    ```html
+    <!-- Buttons -->
+    <button mat-button>Basic</button>
+    <button mat-raised-button>Raised</button>
+    <button mat-flat-button>Flat</button>
+    <button mat-stroked-button>Stroked</button>
+    
+    <!-- Form Fields -->
+    <mat-form-field appearance="fill">...</mat-form-field>
+    <mat-form-field appearance="outline">...</mat-form-field>
+    ```
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Using Schematics
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+Angular Material includes schematics to generate pre-built components:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<CodeGroup>
+```bash Navigation
+ng generate @angular/material:navigation my-nav
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+```bash Table
+ng generate @angular/material:table my-table
+```
 
-### Step 3: Go live
+```bash Dashboard
+ng generate @angular/material:dashboard my-dashboard
+```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+```bash Address Form
+ng generate @angular/material:address-form my-form
+```
+</CodeGroup>
 
-## Next steps
+These commands generate complete, working components with Material Design.
 
-Now that you have your docs running, explore these key features:
+See the [Schematics Guide](/essentials/schematics) for more details.
+
+## Next Steps
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Theming" icon="palette" href="/essentials/theming">
+    Customize colors, typography, and density
+  </Card>
+  
+  <Card title="Component API" icon="book" href="/api-reference/material">
+    Explore all available components
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access" href="/essentials/accessibility">
+    Learn about accessibility features
+  </Card>
+  
+  <Card title="Schematics" icon="terminal" href="/essentials/schematics">
+    Generate components with CLI
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Additional Resources
+
+<CardGroup cols={2}>
+  <Card title="Material Design Guidelines" icon="palette" href="https://m3.material.io/">
+    Official Material Design specification
+  </Card>
+  
+  <Card title="Angular Documentation" icon="angular" href="https://angular.dev">
+    Learn more about Angular framework
+  </Card>
+  
+  <Card title="Component Examples" icon="code" href="https://material.angular.dev">
+    Live examples and demos
+  </Card>
+  
+  <Card title="GitHub Repository" icon="github" href="https://github.com/angular/components">
+    Source code and issue tracker
+  </Card>
+</CardGroup>

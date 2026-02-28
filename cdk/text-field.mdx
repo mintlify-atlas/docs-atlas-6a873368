@@ -1,0 +1,426 @@
+---
+title: Text Field
+description: Auto-resizing textareas and text field utilities
+---
+
+The `@angular/cdk/text-field` package provides utilities for working with text input fields, including auto-resizing textareas.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {TextFieldModule} from '@angular/cdk/text-field';
+```
+
+## Auto-resize Textarea
+
+### Basic Usage
+
+Automatically resize a textarea based on content:
+
+```html
+<textarea cdkTextareaAutosize placeholder="Type something..."></textarea>
+```
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-autosize-textarea',
+  template: `
+    <textarea 
+      cdkTextareaAutosize
+      [(ngModel)]="text"
+      placeholder="This textarea will grow as you type...">
+    </textarea>
+  `,
+  styles: [`
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      resize: none; /* Disable manual resize */
+    }
+  `]
+})
+export class AutosizeTextarea {
+  text = '';
+}
+```
+
+### Min and Max Rows
+
+```html
+<textarea 
+  cdkTextareaAutosize
+  [cdkAutosizeMinRows]="3"
+  [cdkAutosizeMaxRows]="10"
+  [(ngModel)]="text">
+</textarea>
+```
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-bounded-textarea',
+  template: `
+    <textarea 
+      cdkTextareaAutosize
+      [cdkAutosizeMinRows]="minRows"
+      [cdkAutosizeMaxRows]="maxRows"
+      [(ngModel)]="text"
+      placeholder="Min 3 rows, max 10 rows">
+    </textarea>
+    
+    <div class="controls">
+      <label>
+        Min rows: <input type="number" [(ngModel)]="minRows" min="1" max="5">
+      </label>
+      <label>
+        Max rows: <input type="number" [(ngModel)]="maxRows" min="5" max="20">
+      </label>
+    </div>
+  `,
+})
+export class BoundedTextarea {
+  text = '';
+  minRows = 3;
+  maxRows = 10;
+}
+```
+
+### Programmatic Resize
+
+```typescript
+import {Component, ViewChild} from '@angular/core';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+
+@Component({
+  selector: 'app-manual-resize',
+  template: `
+    <textarea 
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+      [(ngModel)]="text">
+    </textarea>
+    
+    <button (click)="triggerResize()">Resize</button>
+    <button (click)="resetSize()">Reset Size</button>
+  `,
+})
+export class ManualResize {
+  @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  text = '';
+
+  triggerResize() {
+    // Trigger resize calculation
+    this.autosize.resizeToFitContent();
+  }
+
+  resetSize() {
+    this.autosize.reset();
+  }
+}
+```
+
+## Advanced Examples
+
+### With Placeholder
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-placeholder-textarea',
+  template: `
+    <div class="textarea-wrapper">
+      <textarea 
+        cdkTextareaAutosize
+        [cdkAutosizeMinRows]="2"
+        [cdkAutosizeMaxRows]="8"
+        [(ngModel)]="comment"
+        [placeholder]="placeholder">
+      </textarea>
+      <div class="char-count">{{ comment.length }} / {{ maxLength }}</div>
+    </div>
+  `,
+  styles: [`
+    .textarea-wrapper {
+      position: relative;
+    }
+    .char-count {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+  `]
+})
+export class PlaceholderTextarea {
+  comment = '';
+  maxLength = 500;
+  placeholder = 'Enter your comment (max 500 characters)...';
+}
+```
+
+### Form Integration
+
+```typescript
+import {Component} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
+@Component({
+  selector: 'app-form-textarea',
+  template: `
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Description</label>
+        <textarea 
+          cdkTextareaAutosize
+          [cdkAutosizeMinRows]="3"
+          [cdkAutosizeMaxRows]="10"
+          formControlName="description"
+          placeholder="Enter description...">
+        </textarea>
+        <div *ngIf="form.get('description')?.invalid && form.get('description')?.touched" 
+             class="error">
+          Description is required
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="form.invalid">Submit</button>
+    </form>
+  `,
+})
+export class FormTextarea {
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      description: ['', [Validators.required, Validators.minLength(10)]]
+    });
+  }
+
+  onSubmit() {
+    if (this.form.valid) {
+      console.log(this.form.value);
+    }
+  }
+}
+```
+
+### Debounced Auto-resize
+
+```typescript
+import {Component, ViewChild, AfterViewInit} from '@angular/core';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+
+@Component({
+  selector: 'app-debounced-textarea',
+  template: `
+    <textarea 
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+      (input)="onInput($event)"
+      [(ngModel)]="text">
+    </textarea>
+  `,
+})
+export class DebouncedTextarea implements AfterViewInit {
+  @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  text = '';
+  private inputSubject = new Subject<string>();
+
+  ngAfterViewInit() {
+    this.inputSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.autosize.resizeToFitContent();
+    });
+  }
+
+  onInput(event: Event) {
+    const value = (event.target as HTMLTextAreaElement).value;
+    this.inputSubject.next(value);
+  }
+}
+```
+
+### Comment Box with Autosize
+
+```typescript
+import {Component} from '@angular/core';
+
+@Component({
+  selector: 'app-comment-box',
+  template: `
+    <div class="comment-box">
+      <div class="header">
+        <img [src]="userAvatar" class="avatar" />
+        <span class="username">{{ username }}</span>
+      </div>
+      
+      <textarea 
+        cdkTextareaAutosize
+        [cdkAutosizeMinRows]="2"
+        [cdkAutosizeMaxRows]="15"
+        [(ngModel)]="comment"
+        placeholder="Write a comment..."
+        class="comment-input">
+      </textarea>
+      
+      <div class="actions">
+        <button (click)="cancel()" class="btn-cancel">Cancel</button>
+        <button (click)="post()" [disabled]="!comment.trim()" class="btn-post">
+          Post Comment
+        </button>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .comment-box {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      background: white;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .comment-input {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      resize: none;
+    }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+  `]
+})
+export class CommentBox {
+  username = 'John Doe';
+  userAvatar = 'https://via.placeholder.com/32';
+  comment = '';
+
+  post() {
+    if (this.comment.trim()) {
+      console.log('Posting comment:', this.comment);
+      this.comment = '';
+    }
+  }
+
+  cancel() {
+    this.comment = '';
+  }
+}
+```
+
+## API Reference
+
+### cdkTextareaAutosize Directive
+
+**Selector**: `textarea[cdkTextareaAutosize]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkAutosizeMinRows` | `number` | Minimum number of rows |
+| `cdkAutosizeMaxRows` | `number` | Maximum number of rows |
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `resizeToFitContent(force?)` | `void` | Trigger resize |
+| `reset()` | `void` | Reset to initial size |
+
+### AutofillMonitor
+
+Detect browser autofill:
+
+```typescript
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {AutofillMonitor} from '@angular/cdk/text-field';
+import {Subscription} from 'rxjs';
+
+@Component({
+  selector: 'app-autofill-detection',
+  template: `
+    <input #emailInput type="email" placeholder="Email" />
+    <p *ngIf="isAutofilled">This field was autofilled</p>
+  `,
+})
+export class AutofillDetection implements OnDestroy {
+  @ViewChild('emailInput') emailInput: ElementRef;
+  private monitor = inject(AutofillMonitor);
+  private subscription: Subscription;
+  isAutofilled = false;
+
+  ngAfterViewInit() {
+    this.subscription = this.monitor
+      .monitor(this.emailInput)
+      .subscribe(event => {
+        this.isAutofilled = event.isAutofilled;
+      });
+  }
+
+  ngOnDestroy() {
+    this.monitor.stopMonitoring(this.emailInput);
+    this.subscription.unsubscribe();
+  }
+}
+```
+
+## Styling
+
+```css
+/* Hide resize handle */
+textarea[cdkTextareaAutosize] {
+  resize: none;
+}
+
+/* Custom scrollbar for max height */
+textarea[cdkTextareaAutosize] {
+  overflow-y: auto;
+}
+
+textarea[cdkTextareaAutosize]::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea[cdkTextareaAutosize]::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+```
+
+## Best Practices
+
+1. **Set max rows** - Prevent infinite growth
+2. **Disable manual resize** - Use `resize: none`
+3. **Use with forms** - Works with Angular forms
+4. **Consider performance** - Debounce for large content
+5. **Accessibility** - Ensure proper labels
+
+## See Also
+
+- [Angular Forms](https://angular.dev/guide/forms)
+- [HTML textarea Element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea)

@@ -1,0 +1,224 @@
+---
+title: Datepicker
+description: The datepicker allows users to enter a date either through text input, or by choosing a date from the calendar.
+---
+
+## Overview
+
+The `<mat-datepicker>` allows users to enter a date either through text input or by choosing a date from the calendar. It is made up of several components and directives that work together.
+
+## Basic Usage
+
+```typescript
+import { Component } from '@angular/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
+@Component({
+  selector: 'app-datepicker-example',
+  standalone: true,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
+  template: `
+    <mat-form-field>
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  `
+})
+export class DatepickerExample {}
+```
+
+## API Reference
+
+### MatDatepicker
+
+Selector: `mat-datepicker`
+
+Exported as: `matDatepicker`
+
+#### Inputs
+
+<ParamField path="startAt" type="D | null" default="null">
+  The date to open the calendar to initially.
+</ParamField>
+
+<ParamField path="startView" type="'month' | 'year' | 'multi-year'" default="'month'">
+  The view that the calendar should start in.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette">
+  Theme color of the datepicker's calendar. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="touchUi" type="boolean" default="false">
+  Whether the calendar UI is in touch mode. In touch mode the calendar opens in a dialog rather than a dropdown.
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the datepicker pop-up should be disabled.
+</ParamField>
+
+<ParamField path="xPosition" type="'start' | 'end'" default="'start'">
+  Preferred position of the datepicker in the X axis.
+</ParamField>
+
+<ParamField path="yPosition" type="'above' | 'below'" default="'below'">
+  Preferred position of the datepicker in the Y axis.
+</ParamField>
+
+<ParamField path="restoreFocus" type="boolean" default="true">
+  Whether to restore focus to the previously-focused element when the calendar is closed.
+</ParamField>
+
+<ParamField path="dateClass" type="MatCalendarCellClassFunction<D>">
+  Function that can be used to add custom CSS classes to dates.
+</ParamField>
+
+<ParamField path="panelClass" type="string | string[]">
+  Classes to be passed to the date picker panel.
+</ParamField>
+
+<ParamField path="opened" type="boolean" default="false">
+  Whether the calendar is open.
+</ParamField>
+
+<ParamField path="calendarHeaderComponent" type="ComponentType<any>">
+  An input indicating the type of the custom header component for the calendar, if set.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="yearSelected" type="EventEmitter<D>">
+  Emits selected year in multiyear view. This doesn't imply a change on the selected date.
+</ParamField>
+
+<ParamField path="monthSelected" type="EventEmitter<D>">
+  Emits selected month in year view. This doesn't imply a change on the selected date.
+</ParamField>
+
+<ParamField path="viewChanged" type="EventEmitter<MatCalendarView>">
+  Emits when the current view changes.
+</ParamField>
+
+<ParamField path="opened" type="EventEmitter<void>">
+  Emits when the datepicker has been opened.
+</ParamField>
+
+<ParamField path="closed" type="EventEmitter<void>">
+  Emits when the datepicker has been closed.
+</ParamField>
+
+#### Methods
+
+<ParamField path="open()" type="void">
+  Opens the calendar.
+</ParamField>
+
+<ParamField path="close()" type="void">
+  Closes the calendar.
+</ParamField>
+
+<ParamField path="select(date: D)" type="void">
+  Selects the given date.
+</ParamField>
+
+<ParamField path="registerInput(input: C)" type="MatDateSelectionModel<S, D>">
+  Registers an input with this datepicker.
+</ParamField>
+
+## Date Range Selection
+
+```html
+<mat-form-field>
+  <mat-label>Enter a date range</mat-label>
+  <mat-date-range-input [rangePicker]="picker">
+    <input matStartDate placeholder="Start date">
+    <input matEndDate placeholder="End date">
+  </mat-date-range-input>
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-date-range-picker #picker></mat-date-range-picker>
+</mat-form-field>
+```
+
+## Accessibility
+
+- The datepicker input uses `role="combobox"` with appropriate ARIA attributes
+- The calendar dialog uses `role="dialog"` and is properly labeled
+- Full keyboard navigation support:
+  - `ALT + DOWN_ARROW`: Open the calendar
+  - `ESCAPE`: Close the calendar
+  - `ARROW KEYS`: Navigate between dates
+  - `PAGE_UP/PAGE_DOWN`: Navigate between months
+  - `ENTER`: Select the currently focused date
+- Screen readers announce the selected date and navigation actions
+- Use `aria-label` on the datepicker toggle for better accessibility
+
+## Advanced Usage
+
+### Custom Date Formats
+
+```typescript
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+@Component({
+  providers: [
+    {provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS}
+  ]
+})
+export class DatepickerFormatsExample {}
+```
+
+### Min and Max Dates
+
+```html
+<mat-form-field>
+  <input matInput [matDatepicker]="picker" [min]="minDate" [max]="maxDate">
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+```
+
+### Date Validation
+
+```html
+<mat-form-field>
+  <input matInput [matDatepicker]="picker" [matDatepickerFilter]="myFilter">
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+```
+
+```typescript
+myFilter = (d: Date | null): boolean => {
+  const day = (d || new Date()).getDay();
+  // Prevent Saturday and Sunday from being selected.
+  return day !== 0 && day !== 6;
+};
+```
+
+### Touch UI Mode
+
+For mobile devices, use touch UI mode:
+
+```html
+<mat-datepicker touchUi="true"></mat-datepicker>
+```

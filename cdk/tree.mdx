@@ -1,0 +1,129 @@
+---
+title: CdkTree
+description: Hierarchical tree structure component
+---
+
+The `CdkTree` provides behavior for hierarchical tree structures.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {CdkTreeModule} from '@angular/cdk/tree';
+```
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {FlatTreeControl} from '@angular/cdk/tree';
+import {ArrayDataSource} from '@angular/cdk/collections';
+
+interface FlatNode {
+  name: string;
+  level: number;
+  expandable: boolean;
+}
+
+@Component({
+  selector: 'app-tree-example',
+  template: `
+    <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+      <cdk-tree-node *cdkTreeNodeDef="let node" cdkTreeNodePadding>
+        {{ node.name }}
+      </cdk-tree-node>
+      
+      <cdk-tree-node *cdkTreeNodeDef="let node; when: hasChild" cdkTreeNodePadding>
+        <button (click)="treeControl.toggle(node)">
+          {{ treeControl.isExpanded(node) ? '▼' : '▶' }}
+        </button>
+        {{ node.name }}
+      </cdk-tree-node>
+    </cdk-tree>
+  `,
+})
+export class TreeExample {
+  treeControl = new FlatTreeControl<FlatNode>(
+    node => node.level,
+    node => node.expandable
+  );
+
+  dataSource = new ArrayDataSource([
+    {name: 'Fruit', level: 0, expandable: true},
+    {name: 'Apple', level: 1, expandable: false},
+    {name: 'Banana', level: 1, expandable: false},
+    {name: 'Vegetables', level: 0, expandable: true},
+    {name: 'Carrot', level: 1, expandable: false},
+  ]);
+
+  hasChild = (_: number, node: FlatNode) => node.expandable;
+}
+```
+
+## Nested Tree
+
+```typescript
+import {NestedTreeControl} from '@angular/cdk/tree';
+
+interface NestedNode {
+  name: string;
+  children?: NestedNode[];
+}
+
+@Component({
+  template: `
+    <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+      <cdk-nested-tree-node *cdkTreeNodeDef="let node">
+        {{ node.name }}
+      </cdk-nested-tree-node>
+      
+      <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild">
+        <button (click)="treeControl.toggle(node)">
+          {{ treeControl.isExpanded(node) ? '▼' : '▶' }}
+        </button>
+        {{ node.name }}
+        <div [class.hidden]="!treeControl.isExpanded(node)">
+          <ng-container cdkTreeNodeOutlet></ng-container>
+        </div>
+      </cdk-nested-tree-node>
+    </cdk-tree>
+  `,
+})
+export class NestedTreeExample {
+  treeControl = new NestedTreeControl<NestedNode>(node => node.children);
+  
+  dataSource = new ArrayDataSource([{
+    name: 'Fruit',
+    children: [
+      {name: 'Apple'},
+      {name: 'Banana'},
+    ]
+  }]);
+
+  hasChild = (_: number, node: NestedNode) => !!node.children && node.children.length > 0;
+}
+```
+
+## API Reference
+
+### cdk-tree
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `dataSource` | `DataSource` | Tree data |
+| `treeControl` | `TreeControl` | Controls tree expansion |
+
+### FlatTreeControl
+
+Controls flat tree structures.
+
+### NestedTreeControl
+
+Controls nested tree structures.
+
+## See Also
+
+- [Angular Material Tree](https://material.angular.io/components/tree/overview)

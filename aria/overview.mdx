@@ -1,0 +1,98 @@
+---
+title: '@angular/aria Overview'
+description: 'Accessible ARIA-compliant components for Angular applications'
+---
+
+# @angular/aria Overview
+
+`@angular/aria` is a package that provides a set of accessible, ARIA-compliant UI components for Angular applications. These components follow the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) to ensure proper accessibility for all users.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Package Information
+
+- **Package Name**: `@angular/aria`
+- **Description**: Angular Aria
+- **Repository**: [https://github.com/angular/components](https://github.com/angular/components)
+- **License**: MIT
+
+## Peer Dependencies
+
+- `@angular/cdk`
+- `@angular/core`
+
+## Available Components
+
+### Accordion
+- `AccordionGroup` - Container for accordion items with state management
+- `AccordionPanel` - Collapsible content panel
+- `AccordionTrigger` - Button to toggle panel visibility
+- `AccordionContent` - Lazy-loaded accordion content
+
+### Combobox
+- `Combobox` - Main combobox container
+- `ComboboxInput` - Input field for combobox
+- `ComboboxPopup` - Popup container for options
+- `ComboboxDialog` - Dialog variant of combobox
+- `ComboboxPopupContainer` - Container for popup content
+
+### Grid
+- `Grid` - Data grid container
+- `GridRow` - Grid row element
+- `GridCell` - Grid cell element
+- `GridCellWidget` - Interactive widget within a cell
+
+### Listbox
+- `Listbox` - Selectable list container
+- `Option` - Individual list option
+
+### Menu
+- `Menu` - Menu container
+- `MenuBar` - Horizontal menu bar
+- `MenuItem` - Individual menu item
+- `MenuTrigger` - Button to open menu
+- `MenuContent` - Lazy-loaded menu content
+
+### Tabs
+- `Tabs` - Tab container
+- `TabList` - List of tab headers
+- `Tab` - Individual tab header
+- `TabPanel` - Tab content panel
+- `TabContent` - Lazy-loaded tab content
+
+### Toolbar
+- `Toolbar` - Toolbar container
+- `ToolbarWidget` - Interactive toolbar element
+- `ToolbarWidgetGroup` - Group of toolbar widgets
+
+### Tree
+- `Tree` - Tree view container
+- `TreeItem` - Tree node
+- `TreeItemGroup` - Group of tree items
+
+## Features
+
+- **Full ARIA Support**: All components implement proper ARIA roles, states, and properties
+- **Keyboard Navigation**: Complete keyboard interaction support
+- **Screen Reader Compatible**: Optimized for assistive technologies
+- **Customizable**: Flexible styling and behavior options
+- **Lazy Loading**: Deferred content rendering for better performance
+- **Developer Preview**: Components are marked as `@developerPreview` as of version 21.0
+
+## Usage
+
+Import the components you need from `@angular/aria`:
+
+```typescript
+import {AccordionGroup, AccordionPanel, AccordionTrigger} from '@angular/aria';
+import {Listbox, Option} from '@angular/aria';
+import {Menu, MenuItem, MenuTrigger} from '@angular/aria';
+```
+
+## Learn More
+
+Explore the individual component documentation pages for detailed usage examples, API references, and best practices.

@@ -1,0 +1,164 @@
+---
+title: Chips
+description: Compact elements representing inputs, attributes, or actions
+---
+
+Chips are compact elements that represent an input, attribute, or action. They can be used for filtering, selecting options, or displaying information.
+
+## Import
+
+```typescript
+import { MatChip, MatChipSet } from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
+```
+
+## Basic Usage
+
+```html
+<mat-chip-set>
+  <mat-chip>Chip 1</mat-chip>
+  <mat-chip>Chip 2</mat-chip>
+  <mat-chip>Chip 3</mat-chip>
+</mat-chip-set>
+```
+
+## API Reference
+
+### MatChip
+
+Selector: `mat-chip`, `[mat-chip]`, `mat-basic-chip`, `[mat-basic-chip]`
+
+Exported as: `matChip`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() id` | `string` | Unique ID for the chip |
+| `@Input() value` | `any` | Value of the chip |
+| `@Input() color` | `string` | Theme color |
+| `@Input() removable` | `boolean` | Whether chip displays remove styling. Default: true |
+| `@Input() highlighted` | `boolean` | Colors chip for emphasis |
+| `@Input() disableRipple` | `boolean` | Whether ripples are disabled |
+| `@Input() disabled` | `boolean` | Whether the chip is disabled |
+| `@Input() role` | `string` | Role for the root element |
+| `@Input() aria-label` | `string` | ARIA label for content |
+| `@Input() aria-description` | `string` | ARIA description |
+| `@Output() removed` | `EventEmitter<MatChipEvent>` | Emitted when chip is to be removed |
+| `@Output() destroyed` | `EventEmitter<MatChipEvent>` | Emitted when chip is destroyed |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `focus(): void` | Focuses the chip |
+| `remove(): void` | Allows programmatic removal of the chip |
+
+#### Content Slots
+
+| Selector | Description |
+|----------|-------------|
+| `matChipAvatar` | Leading icon for the chip |
+| `matChipTrailingIcon` | Trailing icon |
+| `matChipRemove` | Remove button |
+
+## Examples
+
+### With Icons
+
+```html
+<mat-chip-set>
+  <mat-chip>
+    <mat-icon matChipAvatar>face</mat-icon>
+    John Doe
+  </mat-chip>
+  <mat-chip>
+    <mat-icon matChipAvatar>face</mat-icon>
+    Jane Smith
+    <button matChipRemove>
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </mat-chip>
+</mat-chip-set>
+```
+
+### Removable Chips
+
+```typescript
+export class ChipComponent {
+  fruits = ['Apple', 'Banana', 'Orange'];
+
+  remove(fruit: string) {
+    const index = this.fruits.indexOf(fruit);
+    if (index >= 0) {
+      this.fruits.splice(index, 1);
+    }
+  }
+}
+```
+
+```html
+<mat-chip-set>
+  @for (fruit of fruits; track fruit) {
+    <mat-chip (removed)="remove(fruit)">
+      {{fruit}}
+      <button matChipRemove>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip>
+  }
+</mat-chip-set>
+```
+
+### Chip List with Input
+
+```html
+<mat-form-field>
+  <mat-chip-grid #chipGrid>
+    @for (tag of tags; track tag) {
+      <mat-chip-row (removed)="remove(tag)">
+        {{tag}}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+  <input [matChipInputFor]="chipGrid"
+         (matChipInputTokenEnd)="add($event)"/>
+</mat-form-field>
+```
+
+### Disabled Chips
+
+```html
+<mat-chip-set>
+  <mat-chip [disabled]="true">Disabled Chip</mat-chip>
+</mat-chip-set>
+```
+
+### Highlighted Chips
+
+```html
+<mat-chip-set>
+  <mat-chip [highlighted]="true">Highlighted</mat-chip>
+</mat-chip-set>
+```
+
+## Accessibility
+
+- Chips have appropriate ARIA roles based on usage
+- Use `aria-label` or `aria-description` for screen readers
+- Remove button is keyboard accessible
+- Backspace/Delete keys trigger chip removal
+
+## Types
+
+```typescript
+interface MatChipEvent {
+  chip: MatChip;
+}
+```
+
+## Related Components
+

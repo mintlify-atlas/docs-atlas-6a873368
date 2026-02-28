@@ -1,0 +1,441 @@
+---
+title: Coercion
+description: Type coercion utilities for inputs and values
+---
+
+The `@angular/cdk/coercion` package provides utilities for coercing values to specific types, commonly used for component inputs.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {
+  coerceBooleanProperty,
+  coerceNumberProperty,
+  coerceArray,
+  coerceCssPixelValue,
+  coerceElement
+} from '@angular/cdk/coercion';
+```
+
+## Boolean Coercion
+
+Coerce any value to boolean (useful for attribute inputs):
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-toggle',
+  template: `<div [class.disabled]="disabled">Toggle</div>`,
+})
+export class ToggleComponent {
+  private _disabled = false;
+
+  @Input()
+  get disabled(): boolean {
+    return this._disabled;
+  }
+  set disabled(value: any) {
+    this._disabled = coerceBooleanProperty(value);
+  }
+}
+```
+
+**Modern approach with transform**:
+
+```typescript
+import {Component, Input, booleanAttribute} from '@angular/core';
+
+@Component({
+  selector: 'app-toggle',
+  template: `<div [class.disabled]="disabled">Toggle</div>`,
+})
+export class ToggleComponent {
+  @Input({transform: booleanAttribute}) disabled = false;
+}
+```
+
+**Coercion rules**:
+- `false`, `"false"`, `null`, `undefined`, `""` → `false`
+- Everything else → `true`
+
+```typescript
+coerceBooleanProperty(true);      // true
+coerceBooleanProperty(false);     // false
+coerceBooleanProperty('');        // true (empty string)
+coerceBooleanProperty('false');   // false
+coerceBooleanProperty(null);      // false
+coerceBooleanProperty(undefined); // false
+coerceBooleanProperty(0);         // true
+coerceBooleanProperty('any');     // true
+```
+
+## Number Coercion
+
+Coerce values to numbers:
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceNumberProperty} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-counter',
+  template: `<div>Count: {{ count }}</div>`,
+})
+export class CounterComponent {
+  private _count = 0;
+
+  @Input()
+  get count(): number {
+    return this._count;
+  }
+  set count(value: any) {
+    this._count = coerceNumberProperty(value);
+  }
+}
+```
+
+**Modern approach**:
+
+```typescript
+import {Component, Input, numberAttribute} from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  template: `<div>Count: {{ count }}</div>`,
+})
+export class CounterComponent {
+  @Input({transform: numberAttribute}) count = 0;
+}
+```
+
+**Coercion rules**:
+
+```typescript
+coerceNumberProperty('42');       // 42
+coerceNumberProperty(42);         // 42
+coerceNumberProperty('42.5');     // 42.5
+coerceNumberProperty('');         // 0
+coerceNumberProperty(null);       // 0
+coerceNumberProperty('invalid');  // 0
+coerceNumberProperty('5', 10);    // 5 (with fallback 10)
+coerceNumberProperty('', 10);     // 10 (fallback used)
+```
+
+## Array Coercion
+
+Ensure a value is an array:
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceArray} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-list',
+  template: `
+    <ul>
+      <li *ngFor="let item of items">{{ item }}</li>
+    </ul>
+  `,
+})
+export class ListComponent {
+  private _items: string[] = [];
+
+  @Input()
+  get items(): string[] {
+    return this._items;
+  }
+  set items(value: string | string[]) {
+    this._items = coerceArray(value);
+  }
+}
+```
+
+**Usage**:
+
+```html
+<!-- Single value becomes array -->
+<app-list [items]="'single'"></app-list>
+<!-- ['single'] -->
+
+<!-- Array stays array -->
+<app-list [items]="['a', 'b', 'c']"></app-list>
+<!-- ['a', 'b', 'c'] -->
+
+<!-- Null/undefined becomes empty array -->
+<app-list [items]="null"></app-list>
+<!-- [] -->
+```
+
+## CSS Pixel Value Coercion
+
+Coerce to CSS pixel value:
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceCssPixelValue} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-box',
+  template: `<div [style.width]="width" [style.height]="height">Box</div>`,
+})
+export class BoxComponent {
+  private _width: string;
+  private _height: string;
+
+  @Input()
+  get width(): string {
+    return this._width;
+  }
+  set width(value: any) {
+    this._width = coerceCssPixelValue(value);
+  }
+
+  @Input()
+  get height(): string {
+    return this._height;
+  }
+  set height(value: any) {
+    this._height = coerceCssPixelValue(value);
+  }
+}
+```
+
+**Coercion rules**:
+
+```typescript
+coerceCssPixelValue(100);        // '100px'
+coerceCssPixelValue('100');      // '100px'
+coerceCssPixelValue('100px');    // '100px'
+coerceCssPixelValue('50%');      // '50%'
+coerceCssPixelValue('auto');     // 'auto'
+coerceCssPixelValue(null);       // null
+```
+
+## Element Coercion
+
+Coerce `ElementRef` to `HTMLElement`:
+
+```typescript
+import {Component, ElementRef} from '@angular/core';
+import {coerceElement} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-element-wrapper',
+  template: `<div #wrapper>Content</div>`,
+})
+export class ElementWrapperComponent {
+  @ViewChild('wrapper') wrapper: ElementRef;
+
+  getElement(): HTMLElement {
+    // Works with both ElementRef and HTMLElement
+    return coerceElement(this.wrapper);
+  }
+}
+```
+
+**Usage**:
+
+```typescript
+const elementRef = new ElementRef(document.body);
+coerceElement(elementRef);          // HTMLElement (document.body)
+coerceElement(document.body);       // HTMLElement (document.body)
+```
+
+## Practical Examples
+
+### Flexible Size Input
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceNumberProperty, coerceCssPixelValue} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-resizable',
+  template: `
+    <div 
+      class="resizable"
+      [style.width]="widthPx"
+      [style.height]="heightPx">
+      Content
+    </div>
+  `,
+})
+export class ResizableComponent {
+  private _width: number;
+  private _height: number;
+
+  @Input()
+  get width(): number {
+    return this._width;
+  }
+  set width(value: any) {
+    this._width = coerceNumberProperty(value, 200);
+  }
+
+  @Input()
+  get height(): number {
+    return this._height;
+  }
+  set height(value: any) {
+    this._height = coerceNumberProperty(value, 200);
+  }
+
+  get widthPx(): string {
+    return coerceCssPixelValue(this._width);
+  }
+
+  get heightPx(): string {
+    return coerceCssPixelValue(this._height);
+  }
+}
+```
+
+**Usage**:
+
+```html
+<!-- All of these work -->
+<app-resizable [width]="300" [height]="400"></app-resizable>
+<app-resizable width="300" height="400"></app-resizable>
+<app-resizable width="300px" height="400px"></app-resizable>
+```
+
+### Multi-value Input
+
+```typescript
+import {Component, Input} from '@angular/core';
+import {coerceArray} from '@angular/cdk/coercion';
+
+@Component({
+  selector: 'app-tag-list',
+  template: `
+    <div class="tags">
+      <span *ngFor="let tag of tags" class="tag">{{ tag }}</span>
+    </div>
+  `,
+})
+export class TagListComponent {
+  private _tags: string[] = [];
+
+  @Input()
+  get tags(): string[] {
+    return this._tags;
+  }
+  set tags(value: string | string[]) {
+    this._tags = coerceArray(value);
+  }
+}
+```
+
+**Usage**:
+
+```html
+<!-- Single tag -->
+<app-tag-list [tags]="'important'"></app-tag-list>
+
+<!-- Multiple tags -->
+<app-tag-list [tags]="['important', 'urgent', 'review']"></app-tag-list>
+```
+
+## API Reference
+
+### coerceBooleanProperty
+
+```typescript
+function coerceBooleanProperty(value: any): boolean
+```
+
+Coerces a data-bound value (typically a string) to a boolean.
+
+### coerceNumberProperty
+
+```typescript
+function coerceNumberProperty(value: any, fallbackValue?: number): number
+```
+
+Coerces a data-bound value to a number.
+
+### coerceArray
+
+```typescript
+function coerceArray<T>(value: T | readonly T[]): readonly T[]
+```
+
+Wraps value in an array if it isn't one.
+
+### coerceCssPixelValue
+
+```typescript
+function coerceCssPixelValue(value: any): string | null
+```
+
+Coerces a value to a CSS pixel value (adds 'px' suffix to numbers).
+
+### coerceElement
+
+```typescript
+function coerceElement<T>(elementOrRef: ElementRef<T> | T): T
+```
+
+Coerces an `ElementRef` or `Element` to the element.
+
+## Modern Approach (Angular 16+)
+
+Angular 16+ provides built-in transform functions:
+
+```typescript
+import {Component, Input, booleanAttribute, numberAttribute} from '@angular/core';
+
+@Component({
+  selector: 'app-modern-coercion',
+  template: `
+    <div>Enabled: {{ enabled }}</div>
+    <div>Count: {{ count }}</div>
+  `,
+})
+export class ModernCoercion {
+  @Input({transform: booleanAttribute}) enabled = false;
+  @Input({transform: numberAttribute}) count = 0;
+}
+```
+
+## Best Practices
+
+1. **Use modern transforms** - Prefer `booleanAttribute` / `numberAttribute` in Angular 16+
+2. **Provide fallback values** - For `coerceNumberProperty`
+3. **Type safety** - Use TypeScript generics with `coerceArray`
+4. **Null handling** - Coercion functions handle null/undefined gracefully
+5. **Documentation** - Document expected input types in component docs
+
+## Common Patterns
+
+### Disabled State
+
+```typescript
+@Input({transform: booleanAttribute}) disabled = false;
+```
+
+### Size Properties
+
+```typescript
+@Input({transform: numberAttribute}) size = 100;
+```
+
+### Optional Arrays
+
+```typescript
+@Input()
+set selectedIds(value: number | number[] | null) {
+  this._selectedIds = value ? coerceArray(value) : [];
+}
+```
+
+## See Also
+
+- [Angular Component API](https://angular.dev/guide/components)
+- [Input Transforms](https://angular.dev/guide/components/inputs#input-transforms)

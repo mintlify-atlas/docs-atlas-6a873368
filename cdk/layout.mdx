@@ -1,0 +1,335 @@
+---
+title: Layout
+description: Responsive breakpoint detection and media queries
+---
+
+The `@angular/cdk/layout` package provides utilities for responding to viewport size changes and media queries.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {LayoutModule} from '@angular/cdk/layout';
+```
+
+## BreakpointObserver
+
+The `BreakpointObserver` allows you to observe media query changes.
+
+### Basic Usage
+
+```typescript
+import {Component, inject, OnInit} from '@angular/core';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+
+@Component({
+  selector: 'app-responsive',
+  template: `
+    <div [class.mobile]="isMobile">
+      <p *ngIf="isMobile">Mobile view</p>
+      <p *ngIf="!isMobile">Desktop view</p>
+    </div>
+  `,
+})
+export class ResponsiveComponent implements OnInit {
+  private breakpointObserver = inject(BreakpointObserver);
+  isMobile = false;
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
+  }
+}
+```
+
+### Custom Media Queries
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {BreakpointObserver} from '@angular/cdk/layout';
+
+@Component({
+  selector: 'app-custom-breakpoints',
+  template: `
+    <div [ngSwitch]="currentSize">
+      <div *ngSwitchCase="'small'">Small screen</div>
+      <div *ngSwitchCase="'medium'">Medium screen</div>
+      <div *ngSwitchCase="'large'">Large screen</div>
+    </div>
+  `,
+})
+export class CustomBreakpoints {
+  private breakpointObserver = inject(BreakpointObserver);
+  currentSize: string;
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)',
+        '(min-width: 960px)'
+      ])
+      .subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.currentSize = 'small';
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.currentSize = 'medium';
+        } else {
+          this.currentSize = 'large';
+        }
+      });
+  }
+}
+```
+
+### Multiple Breakpoints
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {BreakpointObserver, Breakpoints, BreakpointState} from '@angular/cdk/layout';
+
+@Component({
+  selector: 'app-multi-breakpoint',
+  template: `
+    <div class="grid" [class.cols-1]="cols === 1" [class.cols-2]="cols === 2" [class.cols-4]="cols === 4">
+      <!-- Grid items -->
+    </div>
+  `,
+})
+export class MultiBreakpoint {
+  private breakpointObserver = inject(BreakpointObserver);
+  cols = 4;
+
+  ngOnInit() {
+    this.breakpointObserver
+      .observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge,
+      ])
+      .subscribe((state: BreakpointState) => {
+        if (state.breakpoints[Breakpoints.XSmall]) {
+          this.cols = 1;
+        } else if (state.breakpoints[Breakpoints.Small]) {
+          this.cols = 2;
+        } else {
+          this.cols = 4;
+        }
+      });
+  }
+}
+```
+
+## Predefined Breakpoints
+
+The CDK provides predefined breakpoint constants:
+
+```typescript
+import {Breakpoints} from '@angular/cdk/layout';
+
+// Handset
+Breakpoints.Handset           // '(max-width: 599.98px) and (orientation: portrait), (max-width: 959.98px) and (orientation: landscape)'
+Breakpoints.HandsetPortrait   // '(max-width: 599.98px) and (orientation: portrait)'
+Breakpoints.HandsetLandscape  // '(max-width: 959.98px) and (orientation: landscape)'
+
+// Tablet
+Breakpoints.Tablet            // '(min-width: 600px) and (max-width: 839.98px) and (orientation: portrait), (min-width: 960px) and (max-width: 1279.98px) and (orientation: landscape)'
+Breakpoints.TabletPortrait    // '(min-width: 600px) and (max-width: 839.98px) and (orientation: portrait)'
+Breakpoints.TabletLandscape   // '(min-width: 960px) and (max-width: 1279.98px) and (orientation: landscape)'
+
+// Web
+Breakpoints.Web               // '(min-width: 840px) and (orientation: portrait), (min-width: 1280px) and (orientation: landscape)'
+Breakpoints.WebPortrait       // '(min-width: 840px) and (orientation: portrait)'
+Breakpoints.WebLandscape      // '(min-width: 1280px) and (orientation: landscape)'
+
+// Size-based
+Breakpoints.XSmall            // '(max-width: 599.98px)'
+Breakpoints.Small             // '(min-width: 600px) and (max-width: 959.98px)'
+Breakpoints.Medium            // '(min-width: 960px) and (max-width: 1279.98px)'
+Breakpoints.Large             // '(min-width: 1280px) and (max-width: 1919.98px)'
+Breakpoints.XLarge            // '(min-width: 1920px)'
+```
+
+## Synchronous Checking
+
+Check breakpoints synchronously without subscribing:
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+
+@Component({
+  selector: 'app-sync-check',
+  template: `<div>Current state: {{ isHandset ? 'Mobile' : 'Desktop' }}</div>`,
+})
+export class SyncCheck {
+  private breakpointObserver = inject(BreakpointObserver);
+
+  get isHandset(): boolean {
+    return this.breakpointObserver.isMatched(Breakpoints.Handset);
+  }
+}
+```
+
+## MediaMatcher
+
+Lower-level service for working with media queries:
+
+```typescript
+import {Component, inject, OnDestroy} from '@angular/core';
+import {MediaMatcher} from '@angular/cdk/layout';
+
+@Component({
+  selector: 'app-media-matcher',
+  template: `<div>Dark mode: {{ isDarkMode }}</div>`,
+})
+export class MediaMatcherExample implements OnDestroy {
+  private mediaMatcher = inject(MediaMatcher);
+  private darkModeQuery: MediaQueryList;
+  isDarkMode = false;
+
+  constructor() {
+    this.darkModeQuery = this.mediaMatcher.matchMedia('(prefers-color-scheme: dark)');
+    this.isDarkMode = this.darkModeQuery.matches;
+    
+    // Listen for changes
+    this.darkModeQuery.addEventListener('change', this.onDarkModeChange);
+  }
+
+  onDarkModeChange = (event: MediaQueryListEvent) => {
+    this.isDarkMode = event.matches;
+  };
+
+  ngOnDestroy() {
+    this.darkModeQuery.removeEventListener('change', this.onDarkModeChange);
+  }
+}
+```
+
+## Responsive Service Example
+
+```typescript
+import {Injectable, inject} from '@angular/core';
+import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
+import {Observable} from 'rxjs';
+import {map, shareReplay} from 'rxjs/operators';
+
+@Injectable({providedIn: 'root'})
+export class ResponsiveService {
+  private breakpointObserver = inject(BreakpointObserver);
+
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Handset])
+    .pipe(
+      map(result => result.matches),
+      shareReplay(1)
+    );
+
+  isTablet$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Tablet])
+    .pipe(
+      map(result => result.matches),
+      shareReplay(1)
+    );
+
+  isWeb$: Observable<boolean> = this.breakpointObserver
+    .observe([Breakpoints.Web])
+    .pipe(
+      map(result => result.matches),
+      shareReplay(1)
+    );
+}
+```
+
+Usage:
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {ResponsiveService} from './responsive.service';
+
+@Component({
+  selector: 'app-my-component',
+  template: `
+    <div *ngIf="responsive.isHandset$ | async">
+      Mobile layout
+    </div>
+    <div *ngIf="responsive.isWeb$ | async">
+      Desktop layout
+    </div>
+  `,
+})
+export class MyComponent {
+  responsive = inject(ResponsiveService);
+}
+```
+
+## API Reference
+
+### BreakpointObserver
+
+**Injectable**: `{providedIn: 'root'}`
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `observe(value)` | `Observable<BreakpointState>` | Observe one or more media queries |
+| `isMatched(value)` | `boolean` | Synchronously check if media query matches |
+
+### BreakpointState
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `matches` | `boolean` | Whether any query matches |
+| `breakpoints` | `{[key: string]: boolean}` | Match state for each query |
+
+### MediaMatcher
+
+**Injectable**: `{providedIn: 'root'}`
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `matchMedia(query)` | `MediaQueryList` | Creates a MediaQueryList |
+
+## Best Practices
+
+1. **Use predefined breakpoints** - Consistent with Material Design
+2. **ShareReplay observable** - Avoid multiple subscriptions
+3. **Unsubscribe or use async pipe** - Prevent memory leaks
+4. **Consider mobile-first** - Design for small screens first
+5. **Test on real devices** - Simulators may not match exactly
+
+## Testing
+
+```typescript
+import {TestBed} from '@angular/core/testing';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {of} from 'rxjs';
+
+describe('ResponsiveComponent', () => {
+  it('should handle mobile breakpoint', () => {
+    const mockBreakpointObserver = {
+      observe: jasmine.createSpy('observe').and.returnValue(
+        of({matches: true, breakpoints: {}})
+      )
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        {provide: BreakpointObserver, useValue: mockBreakpointObserver}
+      ]
+    });
+  });
+});
+```
+
+## See Also
+
+- [Material Design Responsive Layout](https://m3.material.io/foundations/layout/applying-layout/window-size-classes)
+- [CSS Media Queries (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries)

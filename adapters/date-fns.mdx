@@ -1,0 +1,294 @@
+---
+title: 'date-fns Adapter'
+description: 'Use date-fns with Angular Material date components'
+---
+
+# date-fns Adapter
+
+The date-fns adapter allows you to use the [date-fns](https://date-fns.org/) library with Angular Material date components like Datepicker and Timepicker.
+
+**Source**: `/home/daytona/workspace/source/src/material-date-fns-adapter/adapter/date-fns-adapter.ts`
+
+## Installation
+
+```bash
+npm install @angular/material-date-fns-adapter date-fns
+```
+
+## Setup
+
+### Standalone Components
+
+Provide the adapter in your component or at the application level:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideNativeDateAdapter} from '@angular/material/core';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@Component({
+  selector: 'app-datepicker',
+  imports: [MatDatepickerModule],
+  providers: [provideDateFnsAdapter()],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+  `
+})
+export class DatepickerComponent {}
+```
+
+### NgModule
+
+Provide the adapter in your module:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {DateFnsAdapter, MAT_DATE_FNS_FORMATS} from '@angular/material-date-fns-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@NgModule({
+  imports: [MatDatepickerModule],
+  providers: [
+    {provide: DateAdapter, useClass: DateFnsAdapter},
+    {provide: MAT_DATE_FORMATS, useValue: MAT_DATE_FNS_FORMATS}
+  ]
+})
+export class AppModule {}
+```
+
+## Localization
+
+Provide a locale from date-fns:
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+import {enUS, es, fr, de} from 'date-fns/locale';
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideDateFnsAdapter(),
+    {provide: MAT_DATE_LOCALE, useValue: es} // Spanish locale
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+Or provide it globally:
+
+```typescript
+import {ApplicationConfig} from '@angular/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+import {es} from 'date-fns/locale';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideDateFnsAdapter(),
+    {provide: MAT_DATE_LOCALE, useValue: es}
+  ]
+};
+```
+
+## Custom Date Formats
+
+Customize how dates are displayed and parsed:
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+
+const CUSTOM_DATE_FORMATS = {
+  parse: {
+    dateInput: 'P', // Short date format
+  },
+  display: {
+    dateInput: 'P',
+    monthYearLabel: 'MMM yyyy',
+    dateA11yLabel: 'PP',
+    monthYearA11yLabel: 'MMMM yyyy',
+  },
+};
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideDateFnsAdapter(),
+    {provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS}
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+## DateFnsAdapter API
+
+The `DateFnsAdapter` class extends Angular Material's `DateAdapter` and implements all required methods.
+
+### Key Methods
+
+Implemented from `/home/daytona/workspace/source/src/material-date-fns-adapter/adapter/date-fns-adapter.ts:58`:
+
+- `getYear(date: Date): number` - Get the year
+- `getMonth(date: Date): number` - Get the month (0-11)
+- `getDate(date: Date): number` - Get the day of month
+- `getDayOfWeek(date: Date): number` - Get day of week (0-6)
+- `getMonthNames(style)` - Get month names in given style
+- `getDateNames()` - Get array of date names
+- `getDayOfWeekNames(style)` - Get day names in given style
+- `getYearName(date: Date): string` - Get year as string
+- `getFirstDayOfWeek(): number` - Get first day of week (locale-dependent)
+- `getNumDaysInMonth(date: Date): number` - Get days in month
+- `clone(date: Date): Date` - Clone a date
+- `createDate(year, month, date): Date` - Create a new date
+- `today(): Date` - Get today's date
+- `parse(value, parseFormat)` - Parse a date string
+- `format(date, displayFormat): string` - Format a date
+- `addCalendarYears(date, years): Date` - Add years
+- `addCalendarMonths(date, months): Date` - Add months
+- `addCalendarDays(date, days): Date` - Add days
+- `toIso8601(date): string` - Convert to ISO 8601 string
+- `isDateInstance(obj): boolean` - Check if value is a Date
+- `isValid(date): boolean` - Check if date is valid
+- `invalid(): Date` - Create an invalid date
+
+### Time Support
+
+The adapter also supports time operations:
+
+- `setTime(target, hours, minutes, seconds): Date`
+- `getHours(date): number`
+- `getMinutes(date): number`
+- `getSeconds(date): number`
+- `parseTime(value, parseFormat)`
+- `addSeconds(date, amount): Date`
+
+## Date Format Tokens
+
+date-fns uses specific format tokens. Common ones:
+
+- `P` - Short date (e.g., 04/29/2023)
+- `PP` - Medium date (e.g., Apr 29, 2023)
+- `PPP` - Long date (e.g., April 29th, 2023)
+- `PPPP` - Full date (e.g., Saturday, April 29th, 2023)
+- `p` - Short time (e.g., 12:00 AM)
+- `pp` - Medium time (e.g., 12:00:00 AM)
+- `yyyy` - 4-digit year
+- `MM` - 2-digit month
+- `dd` - 2-digit day
+- `MMMM` - Full month name
+- `MMM` - Short month name
+- `EEEE` - Full day name
+- `EEE` - Short day name
+
+See the [date-fns format documentation](https://date-fns.org/docs/format) for all tokens.
+
+## Example with Datepicker
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {enUS} from 'date-fns/locale';
+
+@Component({
+  selector: 'app-date-form',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule
+  ],
+  providers: [
+    provideDateFnsAdapter(),
+    {provide: MAT_DATE_LOCALE, useValue: enUS}
+  ],
+  template: `
+    <mat-form-field>
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker" [formControl]="dateControl" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+    
+    @if (dateControl.value) {
+      <p>Selected: {{dateControl.value | date:'fullDate'}}</p>
+    }
+  `
+})
+export class DateFormComponent {
+  dateControl = new FormControl(new Date());
+}
+```
+
+## Example with Timepicker
+
+```typescript
+import {Component} from '@angular/core';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {provideDateFnsAdapter} from '@angular/material-date-fns-adapter';
+import {MatTimepickerModule} from '@angular/material/timepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+
+@Component({
+  selector: 'app-time-form',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTimepickerModule
+  ],
+  providers: [provideDateFnsAdapter()],
+  template: `
+    <mat-form-field>
+      <mat-label>Choose a time</mat-label>
+      <input matInput [matTimepicker]="picker" [formControl]="timeControl" />
+      <mat-timepicker-toggle matSuffix [for]="picker" />
+      <mat-timepicker #picker />
+    </mat-form-field>
+  `
+})
+export class TimeFormComponent {
+  timeControl = new FormControl(new Date());
+}
+```
+
+## Why Use date-fns?
+
+- **Lightweight**: Modular and tree-shakeable
+- **Immutable**: All functions return new dates
+- **Type-safe**: Full TypeScript support
+- **i18n**: Support for 100+ locales
+- **Modern**: Works with ES modules
+- **Comprehensive**: 200+ date utility functions
+
+## Comparison with Other Adapters
+
+| Feature | date-fns | Moment.js | Luxon |
+|---------|----------|-----------|-------|
+| Bundle size | Small | Large | Medium |
+| Tree-shaking | Yes | No | Yes |
+| Immutable | Yes | No* | Yes |
+| Active development | Yes | Deprecated | Yes |
+| TypeScript | Native | Via @types | Native |
+
+*Moment.js is mutable by default but has an immutable mode
+
+## Source Code
+
+View the [DateFnsAdapter source code](https://github.com/angular/components/tree/main/src/material-date-fns-adapter) on GitHub.

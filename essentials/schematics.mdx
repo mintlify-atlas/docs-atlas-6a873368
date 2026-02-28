@@ -1,0 +1,451 @@
+---
+title: Schematics
+description: Use Angular CLI schematics to generate pre-built Material Design components
+icon: terminal
+---
+
+## Overview
+
+Angular Material comes with built-in schematics that help you quickly generate pre-configured components using the Angular CLI. These schematics create production-ready components with Material Design best practices already implemented.
+
+<Info>
+  Schematics are included with both `@angular/material` and `@angular/cdk`. Once installed, they're available through the Angular CLI.
+</Info>
+
+## Installation Schematic
+
+The easiest way to add Angular Material to your project is using the `ng add` schematic:
+
+```bash
+ng add @angular/material
+```
+
+This schematic will:
+
+<Steps>
+  <Step title="Install Dependencies">
+    Adds `@angular/material`, `@angular/cdk`, and `@angular/animations` to your `package.json`
+  </Step>
+  
+  <Step title="Configure Theme">
+    Prompts you to select a prebuilt theme or set up a custom theme
+  </Step>
+  
+  <Step title="Add Typography">
+    Asks whether to apply global Material Design typography styles
+  </Step>
+  
+  <Step title="Include Fonts">
+    Adds Roboto font and Material Icons to your `index.html`
+  </Step>
+  
+  <Step title="Set Global Styles">
+    Configures global CSS for proper Material component display
+  </Step>
+</Steps>
+
+For CDK only:
+
+```bash
+ng add @angular/cdk
+```
+
+## Component Schematics
+
+Angular Material provides several component schematics to quickly generate common UI patterns:
+
+### Navigation Schematic
+
+Generates a component with a responsive Material sidenav and toolbar:
+
+```bash
+ng generate @angular/material:navigation <component-name>
+```
+
+**What it creates:**
+- Responsive side navigation using `<mat-sidenav>`
+- App toolbar with menu button using `<mat-toolbar>`
+- Breakpoint detection for mobile/desktop layouts
+- Navigation links in the sidenav
+
+<CodeGroup>
+```bash Generate
+ng generate @angular/material:navigation main-nav
+```
+
+```bash Output
+CREATE src/app/main-nav/main-nav.component.css
+CREATE src/app/main-nav/main-nav.component.html
+CREATE src/app/main-nav/main-nav.component.spec.ts
+CREATE src/app/main-nav/main-nav.component.ts
+```
+</CodeGroup>
+
+### Table Schematic
+
+Generates a component with a Material data table configured for sorting and pagination:
+
+```bash
+ng generate @angular/material:table <component-name>
+```
+
+**What it creates:**
+- `<mat-table>` with column definitions
+- `MatTableDataSource` for data management
+- `mat-sort` for sortable columns
+- `mat-paginator` for pagination
+- Sample data structure
+
+<CodeGroup>
+```bash Generate
+ng generate @angular/material:table user-table
+```
+
+```typescript Example Usage
+// Generated component includes:
+@ViewChild(MatPaginator) paginator!: MatPaginator;
+@ViewChild(MatSort) sort!: MatSort;
+
+ngAfterViewInit() {
+  this.dataSource.paginator = this.paginator;
+  this.dataSource.sort = this.sort;
+}
+```
+</CodeGroup>
+
+### Dashboard Schematic
+
+Generates a component with a responsive grid dashboard layout:
+
+```bash
+ng generate @angular/material:dashboard <component-name>
+```
+
+**What it creates:**
+- Responsive grid layout using CSS Grid
+- Multiple `<mat-card>` components
+- Card headers and content areas
+- Responsive breakpoint handling
+
+```bash
+ng generate @angular/material:dashboard analytics-dashboard
+```
+
+### Address Form Schematic
+
+Generates a component with a form using Material form controls:
+
+```bash
+ng generate @angular/material:address-form <component-name>
+```
+
+**What it creates:**
+- Reactive form with form validation
+- Material form fields (`<mat-form-field>`)
+- Material input controls
+- Material radio buttons
+- Material select dropdowns
+- Submit button with Material styling
+
+<CodeGroup>
+```bash Generate
+ng generate @angular/material:address-form shipping-form
+```
+
+```typescript Example
+// Generated component includes:
+addressForm = this.fb.group({
+  firstName: [null, Validators.required],
+  lastName: [null, Validators.required],
+  address: [null, Validators.required],
+  city: [null, Validators.required],
+  state: [null, Validators.required],
+  postalCode: [null, Validators.compose([
+    Validators.required,
+    Validators.minLength(5),
+    Validators.maxLength(5)
+  ])]
+});
+```
+</CodeGroup>
+
+### Tree Schematic
+
+Generates a component that visualizes nested data using `<mat-tree>`:
+
+```bash
+ng generate @angular/material:tree <component-name>
+```
+
+**What it creates:**
+- `<mat-tree>` component with nested nodes
+- Expandable/collapsible tree structure
+- Material icons for expand/collapse
+- Sample hierarchical data structure
+
+```bash
+ng generate @angular/material:tree file-tree
+```
+
+## CDK Schematics
+
+The Angular CDK also provides schematics:
+
+### Drag and Drop Schematic
+
+Generates a component using CDK drag-drop directives:
+
+```bash
+ng generate @angular/cdk:drag-drop <component-name>
+```
+
+**What it creates:**
+- Interactive drag-and-drop list
+- `cdkDropList` and `cdkDrag` directives
+- Drop event handling
+- Sample to-do list structure
+
+<CodeGroup>
+```bash Generate
+ng generate @angular/cdk:drag-drop todo-list
+```
+
+```html Example Output
+<div cdkDropList (cdkDropListDropped)="drop($event)">
+  <div *ngFor="let item of items" cdkDrag>
+    {{ item }}
+  </div>
+</div>
+```
+</CodeGroup>
+
+## Theme Color Schematic
+
+Generates Material 3 color palettes from custom colors:
+
+```bash
+ng generate @angular/material:theme-color
+```
+
+This schematic will:
+
+<Steps>
+  <Step title="Prompt for Colors">
+    Asks for primary, secondary, tertiary, and neutral color values
+  </Step>
+  
+  <Step title="Generate Palette File">
+    Creates a file with complete Material 3 color palettes
+  </Step>
+  
+  <Step title="Optional High Contrast">
+    Can generate high contrast override mixins
+  </Step>
+  
+  <Step title="Integration Ready">
+    Palette file can be imported and used in your theme
+  </Step>
+</Steps>
+
+<Note>
+  Learn more in the [theme-color schematic documentation](https://github.com/angular/components/blob/main/src/material/schematics/ng-generate/theme-color/README.md).
+</Note>
+
+## Using Generated Components
+
+After generating a component, you can use it in your application:
+
+<Steps>
+  <Step title="Import the Component">
+    Import the generated component in your routes or parent component:
+    
+    ```typescript app.routes.ts
+    import { Routes } from '@angular/router';
+    import { MainNavComponent } from './main-nav/main-nav.component';
+    import { UserTableComponent } from './user-table/user-table.component';
+    
+    export const routes: Routes = [
+      { path: '', component: MainNavComponent },
+      { path: 'users', component: UserTableComponent },
+    ];
+    ```
+  </Step>
+  
+  <Step title="Customize the Component">
+    Modify the generated code to fit your needs:
+    
+    - Update data sources
+    - Add your business logic
+    - Adjust styling
+    - Modify templates
+  </Step>
+  
+  <Step title="Style the Component">
+    The generated components include basic styles. Enhance them:
+    
+    ```scss component.scss
+    .dashboard-card {
+      margin: 16px;
+      
+      mat-card-header {
+        background: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Schematic Options
+
+Many schematics accept additional options:
+
+<ParamField path="--project" type="string">
+  The project to generate the component in (for multi-project workspaces)
+</ParamField>
+
+<ParamField path="--path" type="string">
+  The path to create the component in
+</ParamField>
+
+<ParamField path="--module" type="string">
+  The module to import the component into (for NgModule-based apps)
+</ParamField>
+
+<ParamField path="--export" type="boolean" default="false">
+  Whether to export the component from the module
+</ParamField>
+
+<ParamField path="--skip-import" type="boolean" default="false">
+  Whether to skip importing the component into a module
+</ParamField>
+
+### Example with Options
+
+```bash
+ng generate @angular/material:table user-table \
+  --project=admin-app \
+  --path=src/app/features/users \
+  --export
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Start with Schematics" icon="rocket">
+    Use schematics as a starting point, then customize:
+    
+    - Schematics provide best-practice patterns
+    - They include proper imports and setup
+    - Modify generated code to match your needs
+    - Learn Material patterns from the generated code
+  </Accordion>
+  
+  <Accordion title="Organize Generated Components" icon="folder-tree">
+    Keep your project organized:
+    
+    ```bash
+    # Generate in feature folders
+    ng generate @angular/material:table src/app/features/users/user-list
+    ng generate @angular/material:dashboard src/app/features/analytics/dashboard
+    ```
+  </Accordion>
+  
+  <Accordion title="Review Generated Code" icon="code">
+    Always review and understand the generated code:
+    
+    - Check imports and dependencies
+    - Understand the data flow
+    - Review accessibility features
+    - Customize for your use case
+  </Accordion>
+  
+  <Accordion title="Combine Schematics" icon="layer-group">
+    Use multiple schematics together:
+    
+    ```bash
+    # Create a full admin interface
+    ng generate @angular/material:navigation admin-shell
+    ng generate @angular/material:table admin-shell/user-table
+    ng generate @angular/material:dashboard admin-shell/dashboard
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Example: Building a Complete Feature
+
+Here's how to use schematics to build a complete user management feature:
+
+<Steps>
+  <Step title="Generate Navigation">
+    ```bash
+    ng generate @angular/material:navigation app-shell
+    ```
+  </Step>
+  
+  <Step title="Generate User Table">
+    ```bash
+    ng generate @angular/material:table users/user-list
+    ```
+  </Step>
+  
+  <Step title="Generate User Form">
+    ```bash
+    ng generate @angular/material:address-form users/user-form
+    ```
+  </Step>
+  
+  <Step title="Connect Components">
+    Update the navigation to link to your new components:
+    
+    ```html app-shell.component.html
+    <mat-sidenav-container>
+      <mat-sidenav #drawer mode="side" opened>
+        <mat-nav-list>
+          <a mat-list-item routerLink="/users">Users</a>
+          <a mat-list-item routerLink="/dashboard">Dashboard</a>
+        </mat-nav-list>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+    ```
+  </Step>
+</Steps>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Angular Schematics" icon="book" href="https://angular.dev/tools/cli/schematics">
+    Learn about Angular schematics
+  </Card>
+  
+  <Card title="Theme Color Schematic" icon="palette" href="https://github.com/angular/components/blob/main/src/material/schematics/ng-generate/theme-color/README.md">
+    Custom palette generation guide
+  </Card>
+  
+  <Card title="Component Examples" icon="code" href="https://material.angular.dev">
+    See live examples of components
+  </Card>
+  
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Build your first Material app
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="palette" href="/essentials/theming">
+    Customize your generated components
+  </Card>
+  
+  <Card title="Components" icon="grid" href="/api-reference/material">
+    Explore all Material components
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access" href="/essentials/accessibility">
+    Ensure your components are accessible
+  </Card>
+</CardGroup>

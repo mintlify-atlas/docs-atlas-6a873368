@@ -1,0 +1,252 @@
+---
+title: Input
+description: MatInput is a directive that allows native input and textarea elements to work with mat-form-field.
+---
+
+## Overview
+
+`matInput` is a directive that allows native `<input>` and `<textarea>` elements to work with `<mat-form-field>`. It adds Material Design styling and behavior to native form controls.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Input">
+    ```html
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Textarea">
+    ```html
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput rows="4"></textarea>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl, Validators } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-input-example',
+      template: `
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput [formControl]="emailControl">
+          <mat-error *ngIf="emailControl.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="emailControl.hasError('email')">
+            Please enter a valid email
+          </mat-error>
+        </mat-form-field>
+      `
+    })
+    export class InputExample {
+      emailControl = new FormControl('', [Validators.required, Validators.email]);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatInput
+
+Selector: `input[matInput], textarea[matInput], select[matNativeControl]`
+
+Exported as: `matInput`
+
+#### Inputs
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the input is disabled.
+</ParamField>
+
+<ParamField path="id" type="string">
+  Unique id of the element. Auto-generated if not provided.
+</ParamField>
+
+<ParamField path="placeholder" type="string">
+  Placeholder text for the input.
+</ParamField>
+
+<ParamField path="required" type="boolean" default="false">
+  Whether the input is required.
+</ParamField>
+
+<ParamField path="type" type="string" default="'text'">
+  Input type of the element. Supported types: text, email, password, number, tel, url, search, date, datetime-local, month, time, week.
+</ParamField>
+
+<ParamField path="errorStateMatcher" type="ErrorStateMatcher">
+  An object used to control when error messages are shown.
+</ParamField>
+
+<ParamField path="value" type="string">
+  The input element's value.
+</ParamField>
+
+<ParamField path="readonly" type="boolean" default="false">
+  Whether the element is readonly.
+</ParamField>
+
+<ParamField path="disabledInteractive" type="boolean" default="false">
+  Whether the input should remain interactive when it is disabled.
+</ParamField>
+
+<ParamField path="name" type="string">
+  Name of the input.
+</ParamField>
+
+#### Properties
+
+<ParamField path="focused" type="boolean" readonly>
+  Whether the input is focused.
+</ParamField>
+
+<ParamField path="empty" type="boolean" readonly>
+  Whether the input is empty.
+</ParamField>
+
+<ParamField path="shouldLabelFloat" type="boolean" readonly>
+  Whether the label should float.
+</ParamField>
+
+<ParamField path="errorState" type="boolean">
+  Whether the input is in an error state.
+</ParamField>
+
+#### Methods
+
+<ParamField path="focus(options?: FocusOptions)" type="void">
+  Focuses the input.
+</ParamField>
+
+<ParamField path="updateErrorState()" type="void">
+  Refreshes the error state of the input.
+</ParamField>
+
+## Input Types
+
+### Text Input
+
+```html
+<mat-form-field>
+  <mat-label>Username</mat-label>
+  <input matInput type="text">
+</mat-form-field>
+```
+
+### Number Input
+
+```html
+<mat-form-field>
+  <mat-label>Age</mat-label>
+  <input matInput type="number" min="0" max="120">
+</mat-form-field>
+```
+
+### Email Input
+
+```html
+<mat-form-field>
+  <mat-label>Email</mat-label>
+  <input matInput type="email">
+</mat-form-field>
+```
+
+### Password Input
+
+```html
+<mat-form-field>
+  <mat-label>Password</mat-label>
+  <input matInput type="password">
+</mat-form-field>
+```
+
+### Textarea
+
+```html
+<mat-form-field>
+  <mat-label>Comments</mat-label>
+  <textarea matInput rows="5"></textarea>
+</mat-form-field>
+```
+
+## Accessibility
+
+- The matInput directive ensures proper ARIA attributes are set
+- Labels are automatically associated with inputs
+- Error messages are announced to screen readers via `aria-describedby`
+- Required fields are indicated with `aria-required="true"`
+- Invalid fields are marked with `aria-invalid="true"`
+- The input inherits accessibility features from the parent `mat-form-field`
+
+## Advanced Usage
+
+### Auto-resize Textarea
+
+```html
+<mat-form-field>
+  <mat-label>Auto-resize textarea</mat-label>
+  <textarea matInput cdkTextareaAutosize></textarea>
+</mat-form-field>
+```
+
+### Character Counter
+
+```html
+<mat-form-field>
+  <mat-label>Bio</mat-label>
+  <textarea matInput maxlength="256" #bio></textarea>
+  <mat-hint align="end">{{bio.value.length}}/256</mat-hint>
+</mat-form-field>
+```
+
+### Input with Prefix/Suffix
+
+```html
+<mat-form-field>
+  <mat-label>Amount</mat-label>
+  <span matPrefix>$ &nbsp;</span>
+  <input matInput type="number">
+  <span matSuffix>.00</span>
+</mat-form-field>
+```
+
+### Custom Error State Matcher
+
+```typescript
+import { ErrorStateMatcher } from '@angular/material/core';
+import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+```
+
+```html
+<mat-form-field>
+  <input matInput [formControl]="emailControl" [errorStateMatcher]="matcher">
+</mat-form-field>
+```
+
+### Disabled Interactive
+
+Allow disabled inputs to remain interactive (e.g., for copying text):
+
+```html
+<mat-form-field>
+  <input matInput [disabled]="true" [disabledInteractive]="true" value="Read-only value">
+</mat-form-field>
+```

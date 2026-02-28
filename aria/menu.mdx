@@ -1,0 +1,228 @@
+---
+title: 'ARIA Menu'
+description: 'Accessible menu and menubar components'
+---
+
+# ARIA Menu
+
+The ARIA Menu provides accessible menu and menubar components following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Menu
+
+A list of menu items that can be nested for sub-menus.
+
+**Selector**: `[ngMenu]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/menu/menu.ts:58`
+
+#### Inputs
+
+- `disabled` (boolean) - Whether the menu is disabled
+- `preserveContent` (boolean) - Whether to preserve content when menu closes
+
+#### Properties
+
+- `visible` (signal) - Whether the menu is currently visible
+
+### MenuBar
+
+A horizontal menu bar container.
+
+**Selector**: `[ngMenuBar]`
+
+#### Inputs
+
+- `disabled` (boolean) - Whether the menu bar is disabled
+
+### MenuItem
+
+An individual menu item.
+
+**Selector**: `[ngMenuItem]`
+
+#### Inputs
+
+- `value` - The value associated with this menu item
+- `disabled` (boolean) - Whether this item is disabled
+- `submenu` - Reference to a sub-menu to open
+
+### MenuTrigger
+
+Button that opens a menu.
+
+**Selector**: `[ngMenuTrigger]`
+
+#### Inputs
+
+- `menu` - Reference to the menu to open
+
+### MenuContent
+
+Directive for lazy-loaded menu content.
+
+**Selector**: `[ngMenuContent]`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {Menu, MenuItem, MenuTrigger} from '@angular/aria';
+
+@Component({
+  selector: 'app-menu-example',
+  imports: [Menu, MenuItem, MenuTrigger],
+  template: `
+    <button ngMenuTrigger [menu]="fileMenu">File</button>
+
+    <div ngMenu #fileMenu="ngMenu">
+      <div ngMenuItem value="new" (click)="onNew()">New</div>
+      <div ngMenuItem value="open" (click)="onOpen()">Open</div>
+      <div ngMenuItem value="save" (click)="onSave()">Save</div>
+      <div ngMenuItem value="save-as" (click)="onSaveAs()">Save As...</div>
+    </div>
+  `
+})
+export class MenuExample {
+  onNew() { console.log('New'); }
+  onOpen() { console.log('Open'); }
+  onSave() { console.log('Save'); }
+  onSaveAs() { console.log('Save As'); }
+}
+```
+
+## Nested Sub-Menus
+
+```html
+<button ngMenuTrigger [menu]="mainMenu">Options</button>
+
+<div ngMenu #mainMenu="ngMenu">
+  <div ngMenuItem value="star">Star</div>
+  <div ngMenuItem value="edit">Edit</div>
+  <div ngMenuItem value="more" [submenu]="subMenu">More</div>
+</div>
+
+<div ngMenu #subMenu="ngMenu">
+  <div ngMenuItem value="sub-item-1">Sub Item 1</div>
+  <div ngMenuItem value="sub-item-2">Sub Item 2</div>
+  <div ngMenuItem value="sub-item-3">Sub Item 3</div>
+</div>
+```
+
+## Menu Bar
+
+```typescript
+import {Component} from '@angular/core';
+import {MenuBar, Menu, MenuItem, MenuTrigger} from '@angular/aria';
+
+@Component({
+  selector: 'app-menubar-example',
+  imports: [MenuBar, Menu, MenuItem, MenuTrigger],
+  template: `
+    <div ngMenuBar>
+      <button ngMenuTrigger [menu]="fileMenu">File</button>
+      <button ngMenuTrigger [menu]="editMenu">Edit</button>
+      <button ngMenuTrigger [menu]="viewMenu">View</button>
+    </div>
+
+    <div ngMenu #fileMenu="ngMenu">
+      <div ngMenuItem value="new">New</div>
+      <div ngMenuItem value="open">Open</div>
+      <div ngMenuItem value="save">Save</div>
+    </div>
+
+    <div ngMenu #editMenu="ngMenu">
+      <div ngMenuItem value="undo">Undo</div>
+      <div ngMenuItem value="redo">Redo</div>
+      <div ngMenuItem value="cut">Cut</div>
+      <div ngMenuItem value="copy">Copy</div>
+    </div>
+
+    <div ngMenu #viewMenu="ngMenu">
+      <div ngMenuItem value="zoom-in">Zoom In</div>
+      <div ngMenuItem value="zoom-out">Zoom Out</div>
+    </div>
+  `
+})
+export class MenuBarExample {}
+```
+
+## Context Menu
+
+```html
+<div (contextmenu)="openContextMenu($event)">
+  Right-click here
+</div>
+
+<div ngMenu #contextMenu="ngMenu">
+  <div ngMenuItem value="copy">Copy</div>
+  <div ngMenuItem value="paste">Paste</div>
+  <div ngMenuItem value="delete">Delete</div>
+</div>
+```
+
+## Disabled Menu Items
+
+```html
+<div ngMenu>
+  <div ngMenuItem value="available">Available Action</div>
+  <div ngMenuItem value="unavailable" [disabled]="true">Unavailable Action</div>
+</div>
+```
+
+## Keyboard Navigation
+
+### Menu
+- **Arrow Up/Down** - Navigate between menu items
+- **Enter/Space** - Activate focused menu item
+- **Arrow Right** - Open sub-menu or move to next menu
+- **Arrow Left** - Close sub-menu or move to previous menu
+- **Escape** - Close menu
+- **Home** - Focus first menu item
+- **End** - Focus last menu item
+- **Type characters** - Jump to matching item
+
+### MenuBar
+- **Arrow Left/Right** - Navigate between menu triggers
+- **Arrow Down** - Open menu and focus first item
+- **Enter/Space** - Open menu
+- **Escape** - Close menu and return to trigger
+
+## Accessibility Features
+
+- Implements ARIA menu and menubar patterns
+- Proper roles: `menubar`, `menu`, `menuitem`
+- `aria-haspopup` for items with sub-menus
+- `aria-expanded` state management
+- `aria-disabled` for disabled items
+- Focus management and restoration
+- Full keyboard navigation
+- Screen reader support
+- Mouse hover interactions
+
+## Use Cases
+
+- Application menu bars
+- Context menus
+- Dropdown menus
+- Navigation menus
+- Action menus
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [menu.ts](https://github.com/angular/components/tree/main/src/aria/menu/menu.ts)
+- [menu-bar.ts](https://github.com/angular/components/tree/main/src/aria/menu/menu-bar.ts)
+- [menu-item.ts](https://github.com/angular/components/tree/main/src/aria/menu/menu-item.ts)
+- [menu-trigger.ts](https://github.com/angular/components/tree/main/src/aria/menu/menu-trigger.ts)

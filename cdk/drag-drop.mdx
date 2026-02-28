@@ -1,0 +1,360 @@
+---
+title: Drag and Drop
+description: Create sortable lists and draggable elements
+---
+
+The `@angular/cdk/drag-drop` package provides directives and utilities for creating drag-and-drop interfaces, including sortable lists and free-form dragging.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {DragDropModule} from '@angular/cdk/drag-drop';
+```
+
+## Basic Dragging
+
+### Free Drag
+
+Make any element draggable:
+
+```html
+<div class="box" cdkDrag>
+  I can be dragged anywhere!
+</div>
+```
+
+```css
+.box {
+  width: 200px;
+  height: 200px;
+  border: solid 1px #ccc;
+  cursor: move;
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  opacity: 0.8;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+```
+
+### Sortable List
+
+Create a sortable list:
+
+```typescript
+import {Component} from '@angular/core';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+
+@Component({
+  selector: 'app-sortable-list',
+  template: `
+    <div cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let item of items" cdkDrag>
+        {{ item }}
+      </div>
+    </div>
+  `,
+})
+export class SortableList {
+  items = ['Item 1', 'Item 2', 'Item 3', 'Item 4'];
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+  }
+}
+```
+
+## Multiple Lists
+
+Move items between lists:
+
+```typescript
+import {Component} from '@angular/core';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
+
+@Component({
+  selector: 'app-multi-list',
+  template: `
+    <div class="container">
+      <div class="list">
+        <h2>To Do</h2>
+        <div 
+          cdkDropList
+          #todoList="cdkDropList"
+          [cdkDropListData]="todo"
+          [cdkDropListConnectedTo]="[doneList]"
+          (cdkDropListDropped)="drop($event)">
+          <div *ngFor="let item of todo" cdkDrag>{{ item }}</div>
+        </div>
+      </div>
+
+      <div class="list">
+        <h2>Done</h2>
+        <div 
+          cdkDropList
+          #doneList="cdkDropList"
+          [cdkDropListData]="done"
+          [cdkDropListConnectedTo]="[todoList]"
+          (cdkDropListDropped)="drop($event)">
+          <div *ngFor="let item of done" cdkDrag>{{ item }}</div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .container { display: flex; gap: 20px; }
+    .list { flex: 1; border: 1px solid #ccc; padding: 10px; }
+  `]
+})
+export class MultiList {
+  todo = ['Task 1', 'Task 2', 'Task 3'];
+  done = ['Completed task'];
+
+  drop(event: CdkDragDrop<string[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
+  }
+}
+```
+
+## Advanced Features
+
+### Custom Drag Handle
+
+```html
+<div cdkDrag>
+  <div cdkDragHandle>
+    <svg width="24" height="24" viewBox="0 0 24 24">
+      <path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/>
+    </svg>
+  </div>
+  
+  <div>Item content (only handle is draggable)</div>
+</div>
+```
+
+### Custom Preview
+
+```html
+<div cdkDrag>
+  Item content
+  
+  <div *cdkDragPreview class="custom-preview">
+    Custom drag preview
+  </div>
+</div>
+```
+
+### Custom Placeholder
+
+```html
+<div cdkDrag>
+  Item content
+  
+  <div *cdkDragPlaceholder class="custom-placeholder">
+    Drop here
+  </div>
+</div>
+```
+
+### Constrain Dragging
+
+```html
+<!-- Lock to horizontal axis -->
+<div cdkDrag cdkDragLockAxis="x">
+  Horizontal only
+</div>
+
+<!-- Lock to vertical axis -->
+<div cdkDrag cdkDragLockAxis="y">
+  Vertical only
+</div>
+
+<!-- Constrain to boundary -->
+<div class="boundary">
+  <div cdkDrag [cdkDragBoundary]="'.boundary'">
+    Can't leave boundary
+  </div>
+</div>
+```
+
+### Drag Delay
+
+```html
+<!-- Delay before drag starts (ms) -->
+<div cdkDrag [cdkDragStartDelay]="200">
+  Drag after 200ms
+</div>
+
+<!-- Different delays for touch -->
+<div cdkDrag [cdkDragStartDelay]="{touch: 500, mouse: 0}">
+  Touch requires 500ms hold
+</div>
+```
+
+### Disabled Dragging
+
+```html
+<div cdkDrag [cdkDragDisabled]="isDisabled">
+  Conditionally draggable
+</div>
+
+<div cdkDropList [cdkDropListDisabled]="isLocked">
+  <div *ngFor="let item of items" cdkDrag>{{ item }}</div>
+</div>
+```
+
+## Events
+
+```typescript
+@Component({
+  template: `
+    <div 
+      cdkDrag
+      (cdkDragStarted)="onDragStarted($event)"
+      (cdkDragMoved)="onDragMoved($event)"
+      (cdkDragEnded)="onDragEnded($event)"
+      (cdkDragReleased)="onDragReleased($event)">
+      Draggable with events
+    </div>
+  `,
+})
+export class DragEvents {
+  onDragStarted(event: CdkDragStart) {
+    console.log('Drag started', event);
+  }
+
+  onDragMoved(event: CdkDragMove) {
+    console.log('Drag moved', event.pointerPosition);
+  }
+
+  onDragEnded(event: CdkDragEnd) {
+    console.log('Drag ended at', event.dropPoint);
+  }
+
+  onDragReleased(event: CdkDragRelease) {
+    console.log('Drag released');
+  }
+}
+```
+
+## API Reference
+
+### cdkDrag Directive
+
+**Selector**: `[cdkDrag]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkDragData` | `T` | Arbitrary data attached to drag instance |
+| `cdkDragLockAxis` | `'x' \| 'y'` | Lock dragging to axis |
+| `cdkDragBoundary` | `string \| ElementRef \| HTMLElement` | Element that limits dragging |
+| `cdkDragDisabled` | `boolean` | Whether dragging is disabled |
+| `cdkDragStartDelay` | `number \| {touch, mouse}` | Delay before drag starts |
+| `cdkDragConstrainPosition` | `(point, ref, dimensions) => point` | Constrain position function |
+| `cdkDragFreeDragPosition` | `{x, y}` | Position for free drag items |
+| `cdkDragPreviewClass` | `string \| string[]` | Classes for preview element |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cdkDragStarted` | `CdkDragStart` | Emitted when drag starts |
+| `cdkDragMoved` | `CdkDragMove` | Emitted as drag moves |
+| `cdkDragEnded` | `CdkDragEnd` | Emitted when drag ends |
+| `cdkDragReleased` | `CdkDragRelease` | Emitted when user releases drag |
+| `cdkDragEntered` | `CdkDragEnter` | Emitted when enters drop list |
+| `cdkDragExited` | `CdkDragExit` | Emitted when exits drop list |
+
+### cdkDropList Directive
+
+**Selector**: `[cdkDropList]`
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkDropListData` | `T[]` | Data array for the list |
+| `cdkDropListConnectedTo` | `CdkDropList[]` | Other lists to connect to |
+| `cdkDropListOrientation` | `'horizontal' \| 'vertical'` | Layout orientation |
+| `cdkDropListDisabled` | `boolean` | Whether dropping is disabled |
+| `cdkDropListSortingDisabled` | `boolean` | Disable internal sorting |
+| `cdkDropListEnterPredicate` | `(drag, drop) => boolean` | Predicate for accepting items |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cdkDropListDropped` | `CdkDragDrop` | Emitted when item is dropped |
+| `cdkDropListEntered` | `CdkDragEnter` | Emitted when drag enters |
+| `cdkDropListExited` | `CdkDragExit` | Emitted when drag exits |
+| `cdkDropListSorted` | `CdkDragSortEvent` | Emitted when list is sorted |
+
+## Utility Functions
+
+### moveItemInArray
+
+Move an item within an array:
+
+```typescript
+moveItemInArray(array, fromIndex, toIndex);
+```
+
+### transferArrayItem
+
+Transfer item between arrays:
+
+```typescript
+transferArrayItem(fromArray, toArray, fromIndex, toIndex);
+```
+
+### copyArrayItem
+
+Copy item between arrays:
+
+```typescript
+copyArrayItem(fromArray, toArray, fromIndex, toIndex);
+```
+
+## Accessibility
+
+```html
+<div 
+  cdkDrag
+  role="button"
+  [attr.aria-grabbed]="isDragging"
+  tabindex="0">
+  Accessible draggable item
+</div>
+```
+
+## Best Practices
+
+1. **Provide visual feedback** - Use preview and placeholder templates
+2. **Handle both touch and mouse** - Test on mobile devices
+3. **Add ARIA attributes** - Make drag-drop accessible
+4. **Optimize performance** - Limit DOM updates during drag
+5. **Preserve data** - Use moveItemInArray to maintain array references
+
+## See Also
+
+- [Angular Material Drag and Drop](https://material.angular.io/cdk/drag-drop/overview)
+- [ARIA: Drag and Drop](https://www.w3.org/WAI/ARIA/apg/patterns/)

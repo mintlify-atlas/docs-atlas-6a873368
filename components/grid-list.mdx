@@ -1,0 +1,476 @@
+---
+title: MatGridList
+description: Grid list component for Angular Material - displays content in a grid layout with dynamic tile sizing.
+---
+
+# MatGridList
+
+The `mat-grid-list` is a two-dimensional list view that arranges cells into grid-based layout. It supports dynamic tile sizing and automatic layout.
+
+## Basic Usage
+
+```typescript
+import { MatGridListModule } from '@angular/material/grid-list';
+
+@Component({
+  selector: 'grid-list-example',
+  imports: [MatGridListModule],
+  template: `
+    <mat-grid-list cols="3" rowHeight="100px">
+      <mat-grid-tile>Tile 1</mat-grid-tile>
+      <mat-grid-tile>Tile 2</mat-grid-tile>
+      <mat-grid-tile>Tile 3</mat-grid-tile>
+      <mat-grid-tile>Tile 4</mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class GridListExample {}
+```
+
+## API Reference
+
+### MatGridList
+
+Selector: `mat-grid-list`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `cols` | `number` | - | **Required** Number of columns in the grid list |
+| `rowHeight` | `string \| number` | `'1:1'` | Row height. Can be a number (px), ratio (e.g., '4:3'), or 'fit' |
+| `gutterSize` | `string` | `'1px'` | Size of the grid list's gutter in pixels |
+
+### MatGridTile
+
+Selector: `mat-grid-tile`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `colspan` | `number` | `1` | Number of columns the tile spans |
+| `rowspan` | `number` | `1` | Number of rows the tile spans |
+
+### MatGridTileHeader
+
+Selector: `mat-grid-tile-header`
+
+Header section for a grid tile.
+
+### MatGridTileFooter
+
+Selector: `mat-grid-tile-footer`
+
+Footer section for a grid tile.
+
+## Examples
+
+### Fixed Row Height
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="4" rowHeight="200px" gutterSize="10px">
+      <mat-grid-tile *ngFor="let tile of tiles">
+        {{ tile.text }}
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class FixedHeightExample {
+  tiles = [
+    {text: 'One'},
+    {text: 'Two'},
+    {text: 'Three'},
+    {text: 'Four'},
+  ];
+}
+```
+
+### Ratio Row Height
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="3" rowHeight="4:3">
+      <mat-grid-tile>4:3 Ratio</mat-grid-tile>
+      <mat-grid-tile>4:3 Ratio</mat-grid-tile>
+      <mat-grid-tile>4:3 Ratio</mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class RatioHeightExample {}
+```
+
+### Fit Mode
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="2" rowHeight="fit" style="height: 400px;">
+      <mat-grid-tile>Fit 1</mat-grid-tile>
+      <mat-grid-tile>Fit 2</mat-grid-tile>
+      <mat-grid-tile>Fit 3</mat-grid-tile>
+      <mat-grid-tile>Fit 4</mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class FitModeExample {}
+```
+
+### Spanning Tiles
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="4" rowHeight="100px">
+      <mat-grid-tile [colspan]="2" [rowspan]="1">
+        Span 2 columns
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="2">
+        Span 2 rows
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        1x1
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="2">
+        2x2
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class SpanningTilesExample {}
+```
+
+### With Headers and Footers
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="3" rowHeight="200px">
+      <mat-grid-tile *ngFor="let tile of tiles">
+        <mat-grid-tile-header>
+          {{ tile.header }}
+        </mat-grid-tile-header>
+        
+        <div>{{ tile.content }}</div>
+        
+        <mat-grid-tile-footer>
+          {{ tile.footer }}
+        </mat-grid-tile-footer>
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class HeaderFooterExample {
+  tiles = [
+    {header: 'Header 1', content: 'Content 1', footer: 'Footer 1'},
+    {header: 'Header 2', content: 'Content 2', footer: 'Footer 2'},
+    {header: 'Header 3', content: 'Content 3', footer: 'Footer 3'},
+  ];
+}
+```
+
+### Image Gallery
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="3" rowHeight="1:1" gutterSize="8px">
+      <mat-grid-tile *ngFor="let image of images">
+        <img [src]="image.url" [alt]="image.alt" class="tile-image">
+        <mat-grid-tile-footer>
+          <h3>{{ image.title }}</h3>
+        </mat-grid-tile-footer>
+      </mat-grid-tile>
+    </mat-grid-list>
+  `,
+  styles: [`
+    .tile-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  `]
+})
+export class ImageGalleryExample {
+  images = [
+    {url: 'image1.jpg', alt: 'Image 1', title: 'Photo 1'},
+    {url: 'image2.jpg', alt: 'Image 2', title: 'Photo 2'},
+    {url: 'image3.jpg', alt: 'Image 3', title: 'Photo 3'},
+  ];
+}
+```
+
+### Dynamic Grid
+
+```typescript
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+@Component({
+  template: `
+    <mat-grid-list [cols]="cols" rowHeight="2:1">
+      <mat-grid-tile *ngFor="let tile of tiles">
+        {{ tile }}
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class DynamicGridExample {
+  cols = 4;
+  tiles = Array.from({length: 12}, (_, i) => `Tile ${i + 1}`);
+
+  constructor(private breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver
+      .observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge,
+      ])
+      .subscribe(result => {
+        if (result.breakpoints[Breakpoints.XSmall]) {
+          this.cols = 1;
+        } else if (result.breakpoints[Breakpoints.Small]) {
+          this.cols = 2;
+        } else if (result.breakpoints[Breakpoints.Medium]) {
+          this.cols = 3;
+        } else {
+          this.cols = 4;
+        }
+      });
+  }
+}
+```
+
+### Complex Layout
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="4" rowHeight="100px" gutterSize="5px">
+      <mat-grid-tile [colspan]="2" [rowspan]="2" [style.background]="'lightblue'">
+        Main Content
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" [style.background]="'lightgreen'">
+        Header
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightcoral'">
+        1
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" [style.background]="'lightcoral'">
+        2
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1" [style.background]="'lightyellow'">
+        Footer
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class ComplexLayoutExample {}
+```
+
+## Row Height Modes
+
+### Fixed Height
+
+Set an explicit pixel value:
+
+```html
+<mat-grid-list cols="3" rowHeight="200px">
+```
+
+### Ratio
+
+Set a width:height ratio:
+
+```html
+<mat-grid-list cols="3" rowHeight="4:3">
+<mat-grid-list cols="3" rowHeight="16:9">
+<mat-grid-list cols="3" rowHeight="1:1">
+```
+
+### Fit
+
+Divide available height by number of rows:
+
+```html
+<mat-grid-list cols="3" rowHeight="fit" style="height: 600px;">
+```
+
+## Accessibility
+
+The grid list has proper ARIA roles applied. Add appropriate labels:
+
+```html
+<mat-grid-list cols="3" aria-label="Photo gallery">
+  <mat-grid-tile>
+    <img src="photo.jpg" alt="Descriptive text">
+  </mat-grid-tile>
+</mat-grid-list>
+```
+
+For interactive tiles:
+
+```html
+<mat-grid-tile>
+  <button aria-label="View details">Click me</button>
+</mat-grid-tile>
+```
+
+## Styling
+
+### Tile Styling
+
+```scss
+mat-grid-tile {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+// Tile content
+mat-grid-tile .mat-grid-tile-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+### Header and Footer Styling
+
+```scss
+mat-grid-tile-header,
+mat-grid-tile-footer {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px;
+}
+
+mat-grid-tile-header h3,
+mat-grid-tile-footer h3 {
+  margin: 0;
+  font-size: 14px;
+}
+```
+
+### Gutter Styling
+
+The `gutterSize` input controls spacing:
+
+```html
+<mat-grid-list cols="3" gutterSize="10px">
+```
+
+## Performance Considerations
+
+1. **Virtual scrolling**: For large lists, consider using CDK virtual scrolling
+2. **Image optimization**: Use appropriate image sizes and lazy loading
+3. **Change detection**: Use `OnPush` strategy when possible
+
+```typescript
+import { ChangeDetectionStrategy } from '@angular/core';
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  // ...
+})
+export class OptimizedGridExample {}
+```
+
+## Best Practices
+
+1. **Consistent sizing**: Keep tiles consistently sized for better visual appeal
+2. **Responsive design**: Adjust column count based on screen size
+3. **Gutter spacing**: Use appropriate gutter size for visual separation
+4. **Content overflow**: Handle content that doesn't fit within tiles
+5. **Loading states**: Show placeholders while content loads
+
+## Common Patterns
+
+### Product Grid
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="4" rowHeight="300px" gutterSize="16px">
+      <mat-grid-tile *ngFor="let product of products">
+        <mat-card class="product-card">
+          <img mat-card-image [src]="product.image" [alt]="product.name">
+          <mat-card-content>
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.price | currency }}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button>Add to Cart</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list>
+  `,
+  styles: [`
+    .product-card {
+      width: 100%;
+      height: 100%;
+    }
+  `]
+})
+export class ProductGridExample {
+  products = [
+    {name: 'Product 1', price: 29.99, image: 'product1.jpg'},
+    // ... more products
+  ];
+}
+```
+
+### Dashboard Layout
+
+```typescript
+@Component({
+  template: `
+    <mat-grid-list cols="4" rowHeight="150px">
+      <mat-grid-tile [colspan]="3" [rowspan]="2">
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>Main Chart</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- Chart component -->
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+      
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-card class="dashboard-card">
+          <mat-card-content>Metric 1</mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+      
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-card class="dashboard-card">
+          <mat-card-content>Metric 2</mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list>
+  `
+})
+export class DashboardExample {}
+```
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.grid-list-theme($theme);
+}
+```

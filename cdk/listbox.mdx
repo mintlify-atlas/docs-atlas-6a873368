@@ -1,0 +1,61 @@
+---
+title: CdkListbox
+description: Accessible listbox implementation
+---
+
+The `CdkListbox` provides behavior for accessible listbox patterns.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {CdkListboxModule} from '@angular/cdk/listbox';
+```
+
+## Basic Usage
+
+```html
+<div cdkListbox [(cdkListboxValue)]="selectedValue">
+  <div cdkOption="1">Option 1</div>
+  <div cdkOption="2">Option 2</div>
+  <div cdkOption="3">Option 3</div>
+</div>
+```
+
+### Multi-Selection
+
+```html
+<div cdkListbox [cdkListboxMultiple]="true" [(cdkListboxValue)]="selectedValues">
+  <div cdkOption="apple">Apple</div>
+  <div cdkOption="banana">Banana</div>
+  <div cdkOption="orange">Orange</div>
+</div>
+```
+
+## API Reference
+
+### cdkListbox
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkListboxValue` | `any` | Selected value(s) |
+| `cdkListboxMultiple` | `boolean` | Allow multiple selection |
+| `cdkListboxDisabled` | `boolean` | Disable listbox |
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cdkListboxValueChange` | `any` | Value change event |
+
+### cdkOption
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `cdkOption` | `any` | Option value |
+| `cdkOptionDisabled` | `boolean` | Disable option |
+
+## See Also
+
+- [ARIA Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)

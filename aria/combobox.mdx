@@ -1,0 +1,207 @@
+---
+title: 'ARIA Combobox'
+description: 'Accessible combobox component with input and popup functionality'
+---
+
+# ARIA Combobox
+
+The ARIA Combobox provides an accessible input field with a popup containing selectable options, following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### Combobox
+
+The main container that orchestrates combobox behavior.
+
+**Selector**: `[ngCombobox]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/combobox/combobox.ts:60`
+
+#### Inputs
+
+- `filterMode` ('manual' | 'auto-select' | 'highlight') - How filtering behaves:
+  - `manual` - Consumer is responsible for filtering options
+  - `auto-select` - Automatically selects the first matching option
+  - `highlight` - Highlights matching text without changing selection
+  - Default: `'manual'`
+- `disabled` (boolean) - Whether the combobox is disabled. Default: `false`
+- `readonly` (boolean) - Whether the combobox is read-only. Default: `false`
+- `alwaysExpanded` (boolean) - Whether the popup should always be visible. Default: `false`
+- `firstMatch` (V | undefined) - The value of the first matching item
+- `preserveContent` (boolean) - Whether to preserve popup content when closed
+
+#### Properties
+
+- `expanded` (signal) - Whether the combobox popup is expanded
+- `inputElement` (signal) - The connected input element, if any
+
+#### Methods
+
+- `open()` - Opens the combobox to the selected item
+- `close()` - Closes the combobox
+
+### ComboboxInput
+
+The input field for the combobox.
+
+**Selector**: `[ngComboboxInput]`
+
+#### Inputs
+
+- `value` (string) - The current input value
+- `placeholder` (string) - Placeholder text
+
+### ComboboxPopup
+
+The popup container that displays options.
+
+**Selector**: `[ngComboboxPopup]`
+
+### ComboboxPopupContainer
+
+Template directive for popup content.
+
+**Selector**: `[ngComboboxPopupContainer]`
+
+### ComboboxDialog
+
+Dialog variant of the combobox.
+
+**Selector**: `[ngComboboxDialog]`
+
+## Basic Usage
+
+```typescript
+import {Component, signal, computed} from '@angular/core';
+import {Combobox, ComboboxInput, ComboboxPopupContainer} from '@angular/aria';
+import {Listbox, Option} from '@angular/aria';
+
+@Component({
+  selector: 'app-combobox-example',
+  imports: [Combobox, ComboboxInput, ComboboxPopupContainer, Listbox, Option],
+  template: `
+    <div ngCombobox filterMode="highlight">
+      <input
+        ngComboboxInput
+        placeholder="Search for a state..."
+        [(value)]="searchString"
+      />
+
+      <ng-template ngComboboxPopupContainer>
+        <div ngListbox [(value)]="selectedValue">
+          @for (option of filteredOptions(); track option) {
+            <div ngOption [value]="option" [label]="option">
+              <span>{{option}}</span>
+            </div>
+          }
+        </div>
+      </ng-template>
+    </div>
+  `
+})
+export class ComboboxExample {
+  searchString = signal('');
+  selectedValue = signal('');
+  
+  allOptions = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'];
+  
+  filteredOptions = computed(() => {
+    const search = this.searchString().toLowerCase();
+    return this.allOptions.filter(opt => 
+      opt.toLowerCase().includes(search)
+    );
+  });
+}
+```
+
+## Auto-Select Mode
+
+```html
+<div ngCombobox filterMode="auto-select">
+  <input ngComboboxInput placeholder="Type to search..." />
+  
+  <ng-template ngComboboxPopupContainer>
+    <div ngListbox>
+      <!-- First matching option is automatically selected -->
+      @for (option of options; track option) {
+        <div ngOption [value]="option">{{option}}</div>
+      }
+    </div>
+  </ng-template>
+</div>
+```
+
+## Always Expanded
+
+```html
+<div ngCombobox [alwaysExpanded]="true">
+  <input ngComboboxInput />
+  
+  <ng-template ngComboboxPopupContainer>
+    <div ngListbox>
+      <!-- Popup is always visible -->
+    </div>
+  </ng-template>
+</div>
+```
+
+## With CDK Overlay
+
+```html
+<div ngCombobox>
+  <input ngComboboxInput />
+  
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="isOpen">
+    <div ngListbox>
+      <!-- Options -->
+    </div>
+  </ng-template>
+</div>
+```
+
+## Keyboard Navigation
+
+- **Arrow Down** - Open popup and move to next option
+- **Arrow Up** - Move to previous option
+- **Enter** - Select focused option and close
+- **Escape** - Close popup
+- **Tab** - Close popup and move focus
+- **Type characters** - Filter/search options
+
+## Accessibility Features
+
+- Implements ARIA combobox pattern (ARIA 1.2)
+- `role="combobox"` on input
+- `aria-expanded` state management
+- `aria-controls` linking to popup
+- `aria-activedescendant` for virtual focus
+- Full keyboard navigation
+- Screen reader announcements
+
+## Use Cases
+
+The combobox component can be used for:
+- **Autocomplete** - Search with suggestions
+- **Select** - Dropdown selection
+- **Multiselect** - Multiple option selection
+- **Typeahead** - Search-as-you-type
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [combobox.ts](https://github.com/angular/components/tree/main/src/aria/combobox/combobox.ts)
+- [combobox-input.ts](https://github.com/angular/components/tree/main/src/aria/combobox/combobox-input.ts)
+- [combobox-popup.ts](https://github.com/angular/components/tree/main/src/aria/combobox/combobox-popup.ts)

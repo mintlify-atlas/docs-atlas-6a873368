@@ -1,0 +1,214 @@
+---
+title: Autocomplete
+description: The autocomplete is a normal text input enhanced by a panel of suggested options.
+---
+
+## Overview
+
+The `<mat-autocomplete>` component provides a panel of suggested options that appears below a text input field. It enhances user experience by offering real-time suggestions based on user input.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Template-driven">
+    ```html
+    <mat-form-field>
+      <mat-label>Choose an option</mat-label>
+      <input type="text" matInput [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let option of options" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-autocomplete-example',
+      template: `
+        <mat-form-field>
+          <mat-label>Search</mat-label>
+          <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      `
+    })
+    export class AutocompleteExample {
+      myControl = new FormControl('');
+      options: string[] = ['One', 'Two', 'Three'];
+      filteredOptions: Observable<string[]>;
+      
+      ngOnInit() {
+        this.filteredOptions = this.myControl.valueChanges.pipe(
+          startWith(''),
+          map(value => this._filter(value))
+        );
+      }
+      
+      private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.options.filter(option => 
+          option.toLowerCase().includes(filterValue)
+        );
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatAutocomplete
+
+Selector: `mat-autocomplete`
+
+Exported as: `matAutocomplete`
+
+#### Inputs
+
+<ParamField path="displayWith" type="((value: any) => string) | null" default="null">
+  Function that maps an option's control value to its display value in the trigger.
+</ParamField>
+
+<ParamField path="autoActiveFirstOption" type="boolean" default="false">
+  Whether the first option should be highlighted when the autocomplete panel is opened.
+</ParamField>
+
+<ParamField path="autoSelectActiveOption" type="boolean" default="false">
+  Whether the active option should be selected as the user is navigating.
+</ParamField>
+
+<ParamField path="requireSelection" type="boolean" default="false">
+  Whether the user is required to make a selection when interacting with the autocomplete. If enabled, the value will be reset if the user moves away without selecting.
+</ParamField>
+
+<ParamField path="panelWidth" type="string | number">
+  Specify the width of the autocomplete panel. Can be any CSS sizing value, otherwise it will match the width of its host.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether ripples are disabled within the autocomplete panel.
+</ParamField>
+
+<ParamField path="class" type="string | string[]">
+  CSS classes to apply to the autocomplete panel inside the overlay container.
+</ParamField>
+
+<ParamField path="hideSingleSelectionIndicator" type="boolean">
+  Whether checkmark indicator for single-selection options is hidden.
+</ParamField>
+
+<ParamField path="aria-label" type="string">
+  Aria label of the autocomplete.
+</ParamField>
+
+<ParamField path="aria-labelledby" type="string">
+  Input that can be used to specify the `aria-labelledby` attribute.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="optionSelected" type="EventEmitter<MatAutocompleteSelectedEvent>">
+  Event that is emitted whenever an option from the list is selected.
+</ParamField>
+
+<ParamField path="opened" type="EventEmitter<void>">
+  Event that is emitted when the autocomplete panel is opened.
+</ParamField>
+
+<ParamField path="closed" type="EventEmitter<void>">
+  Event that is emitted when the autocomplete panel is closed.
+</ParamField>
+
+<ParamField path="optionActivated" type="EventEmitter<MatAutocompleteActivatedEvent>">
+  Emits whenever an option is activated using keyboard navigation.
+</ParamField>
+
+#### Properties
+
+<ParamField path="id" type="string">
+  Unique ID to be used by autocomplete trigger's "aria-owns" property. Auto-generated with prefix `mat-autocomplete-`.
+</ParamField>
+
+<ParamField path="isOpen" type="boolean" readonly>
+  Whether the autocomplete panel is open.
+</ParamField>
+
+<ParamField path="showPanel" type="boolean" readonly>
+  Whether the autocomplete panel should be visible, depending on option length.
+</ParamField>
+
+## Events
+
+### MatAutocompleteSelectedEvent
+
+<ParamField path="source" type="MatAutocomplete">
+  Reference to the autocomplete panel that emitted the event.
+</ParamField>
+
+<ParamField path="option" type="MatOption">
+  Option that was selected.
+</ParamField>
+
+## Accessibility
+
+- The autocomplete trigger uses `role="combobox"` and manages `aria-expanded`, `aria-owns`, and `aria-activedescendant` attributes
+- Use `aria-label` or `aria-labelledby` to provide an accessible label for the autocomplete
+- The autocomplete panel uses `role="listbox"` and each option has `role="option"`
+- Keyboard navigation is fully supported (Arrow keys, Enter, Escape)
+- Screen readers announce the active option and selection changes
+
+## Advanced Usage
+
+### Display Value Formatting
+
+```typescript
+export class AutocompleteDisplayExample {
+  options: User[] = [
+    {name: 'Mary', id: 1},
+    {name: 'Shelley', id: 2}
+  ];
+  
+  displayFn(user: User): string {
+    return user && user.name ? user.name : '';
+  }
+}
+```
+
+```html
+<mat-autocomplete [displayWith]="displayFn">
+  <mat-option *ngFor="let option of options" [value]="option">
+    {{ option.name }}
+  </mat-option>
+</mat-autocomplete>
+```
+
+### Auto-selection
+
+Use `autoActiveFirstOption` to automatically highlight the first option when the panel opens:
+
+```html
+<mat-autocomplete [autoActiveFirstOption]="true">
+  <!-- options -->
+</mat-autocomplete>
+```
+
+### Require Selection
+
+Ensure users select from the available options:
+
+```html
+<mat-autocomplete [requireSelection]="true">
+  <!-- options -->
+</mat-autocomplete>
+```

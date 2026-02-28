@@ -1,0 +1,521 @@
+---
+title: "Migration Guides"
+description: "Step-by-step guides for migrating between major Angular Material versions"
+---
+
+This guide provides detailed migration instructions for upgrading Angular Material across major versions.
+
+<Info>
+  Always migrate one major version at a time for the smoothest upgrade experience.
+</Info>
+
+## Migrating to v21
+
+<Steps>
+  <Step title="Prerequisites">
+    Ensure you're on the latest v20 release:
+
+    ```bash
+    ng update @angular/core@20 @angular/cli@20
+    ng update @angular/material@20
+    ```
+
+    Verify your application works correctly before proceeding.
+  </Step>
+
+  <Step title="Update Angular and Material">
+    Run the Angular update command:
+
+    ```bash
+    ng update @angular/core@21 @angular/cli@21 @angular/material@21
+    ```
+
+    This command will:
+    - Update package versions
+    - Run automated migrations
+    - Update import statements
+    - Fix deprecated API usage
+  </Step>
+
+  <Step title="Update Portal Directives">
+    Replace old portal directive names:
+
+    **TypeScript:**
+    ```ts
+    // Before
+    import { TemplatePortalDirective, PortalHostDirective } from '@angular/cdk/portal';
+
+    // After
+    import { CdkPortal, CdkPortalOutlet } from '@angular/cdk/portal';
+    ```
+
+    **Templates:**
+    ```html
+    <!-- Before -->
+    <ng-template portal>Content</ng-template>
+    <ng-template portalHost></ng-template>
+
+    <!-- After -->
+    <ng-template cdkPortal>Content</ng-template>
+    <ng-template cdkPortalOutlet></ng-template>
+    ```
+  </Step>
+
+  <Step title="Update SCSS Variables">
+    Update z-index and overlay variables:
+
+    ```scss
+    // Before
+    @use '@angular/material' as mat;
+
+    .custom-overlay {
+      z-index: mat.$z-index-overlay;
+    }
+
+    .backdrop {
+      background: mat.$dark-backdrop-background;
+    }
+
+    // After
+    .custom-overlay {
+      z-index: mat.$overlay-z-index;
+    }
+
+    .backdrop {
+      background: mat.$overlay-backdrop-color;
+    }
+    ```
+  </Step>
+
+  <Step title="Remove Animation Imports">
+    Remove imports of animation constants:
+
+    ```ts
+    // Remove these imports
+    import { matDialogAnimations } from '@angular/material/dialog';
+    import { matMenuAnimations } from '@angular/material/menu';
+    // etc.
+
+    // Use CSS/SCSS for animation customization instead
+    ```
+
+    If you were using these for custom animations:
+
+    ```scss
+    .mat-mdc-dialog-container {
+      animation-duration: 300ms;
+      animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    ```
+  </Step>
+
+  <Step title="Remove MatCommonModule">
+    Remove `MatCommonModule` from imports:
+
+    ```ts
+    // Before
+    import { MatCommonModule } from '@angular/material/core';
+
+    @NgModule({
+      imports: [MatCommonModule, MatButtonModule]
+    })
+
+    // After - just import specific modules
+    @NgModule({
+      imports: [MatButtonModule]
+    })
+    ```
+  </Step>
+
+  <Step title="Test your application">
+    Run your test suite and manually test critical paths:
+
+    ```bash
+    ng test
+    ng e2e
+    ng serve
+    ```
+  </Step>
+</Steps>
+
+## Migrating to v20
+
+<Steps>
+  <Step title="Update from v19">
+    ```bash
+    ng update @angular/core@20 @angular/cli@20
+    ng update @angular/material@20
+    ```
+  </Step>
+
+  <Step title="Update TypeScript">
+    Ensure you're using TypeScript 5.4 or later:
+
+    ```json
+    // package.json
+    {
+      "devDependencies": {
+        "typescript": "~5.4.0"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Standalone Components">
+    Consider migrating to standalone components:
+
+    ```ts
+    // Before
+    @NgModule({
+      declarations: [MyComponent],
+      imports: [MatButtonModule]
+    })
+    export class MyModule {}
+
+    // After
+    @Component({
+      standalone: true,
+      imports: [MatButtonModule],
+      // ...
+    })
+    export class MyComponent {}
+    ```
+  </Step>
+</Steps>
+
+## Migrating to v19 (Material Design 3)
+
+<Warning>
+  Version 19 introduced Material Design 3, which includes visual changes to all components.
+</Warning>
+
+<Tabs>
+  <Tab title="Option 1: Adopt M3">
+    <Steps>
+      <Step title="Update packages">
+        ```bash
+        ng update @angular/core@19 @angular/cli@19
+        ng update @angular/material@19
+        ```
+      </Step>
+
+      <Step title="Update theme configuration">
+        Replace M2 theme API with M3:
+
+        ```scss
+        @use '@angular/material' as mat;
+
+        // Before (M2)
+        $theme: mat.m2-define-light-theme((
+          color: (
+            primary: mat.m2-define-palette(mat.$indigo-palette),
+            accent: mat.m2-define-palette(mat.$pink-palette),
+          )
+        ));
+
+        // After (M3)
+        $theme: mat.define-theme((
+          color: (
+            theme-type: light,
+            primary: mat.$violet-palette,
+          ),
+        ));
+
+        html {
+          @include mat.all-component-themes($theme);
+        }
+        ```
+      </Step>
+
+      <Step title="Update density">
+        M3 uses a simpler density API:
+
+        ```scss
+        $theme: mat.define-theme((
+          density: (
+            scale: -1  // More compact
+          )
+        ));
+        ```
+      </Step>
+
+      <Step title="Test visual changes">
+        All components will look different. Test thoroughly:
+        - Component spacing and sizing
+        - Colors in light and dark modes
+        - Custom overrides
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Option 2: Use M2 Compatibility">
+    <Steps>
+      <Step title="Update packages">
+        ```bash
+        ng update @angular/material@19
+        ```
+      </Step>
+
+      <Step title="Keep M2 theme API">
+        Use the M2 compatibility mode:
+
+        ```scss
+        @use '@angular/material' as mat;
+
+        $theme: mat.m2-define-light-theme((
+          color: (
+            primary: mat.m2-define-palette(mat.$indigo-palette),
+            accent: mat.m2-define-palette(mat.$pink-palette),
+          )
+        ));
+
+        html {
+          // Use M2 mixins
+          @include mat.m2-all-component-themes($theme);
+        }
+        ```
+      </Step>
+
+      <Step title="Enable system tokens (optional)">
+        Use M3 tokens with M2 themes:
+
+        ```scss
+        html {
+          @include mat.m2-all-component-themes($theme);
+          @include mat.m2-theme($theme);  // Generates M3-style tokens
+          @include mat.system-classes();   // Utility classes
+        }
+        ```
+      </Step>
+
+      <Step title="Plan M3 migration">
+        M2 compatibility will be maintained but plan to migrate to M3 eventually.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Migrating from AngularJS Material
+
+<Warning>
+  Migrating from AngularJS Material to Angular Material requires a complete rewrite.
+</Warning>
+
+<Steps>
+  <Step title="Set up Angular">
+    Create a new Angular application:
+
+    ```bash
+    ng new my-app
+    cd my-app
+    ng add @angular/material
+    ```
+  </Step>
+
+  <Step title="Map components">
+    Most AngularJS Material components have Angular equivalents:
+
+    | AngularJS | Angular |
+    |-----------|--------|
+    | `<md-button>` | `<button mat-button>` |
+    | `<md-input-container>` | `<mat-form-field>` |
+    | `<md-select>` | `<mat-select>` |
+    | `<md-dialog>` | `MatDialog` service |
+    | `<md-sidenav>` | `<mat-sidenav>` |
+  </Step>
+
+  <Step title="Update directive syntax">
+    ```html
+    <!-- AngularJS -->
+    <md-button ng-click="ctrl.submit()">
+      Submit
+    </md-button>
+
+    <!-- Angular -->
+    <button mat-button (click)="submit()">
+      Submit
+    </button>
+    ```
+  </Step>
+
+  <Step title="Migrate services">
+    Services work differently in Angular:
+
+    ```ts
+    // AngularJS
+    angular.module('app').controller('MyCtrl', function($mdDialog) {
+      $mdDialog.show({
+        template: '<div>Hello</div>'
+      });
+    });
+
+    // Angular
+    import { MatDialog } from '@angular/material/dialog';
+
+    @Component({...})
+    export class MyComponent {
+      constructor(private dialog: MatDialog) {}
+
+      openDialog() {
+        this.dialog.open(MyDialogComponent);
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Migrate incrementally">
+    Consider using [ngUpgrade](https://angular.io/guide/upgrade) to run both frameworks side-by-side during migration.
+  </Step>
+</Steps>
+
+## Common Migration Patterns
+
+### Updating Module Imports
+
+<CodeGroup>
+```ts Before
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+
+@NgModule({
+  imports: [MatLegacyButtonModule]
+})
+```
+
+```ts After
+import { MatButtonModule } from '@angular/material/button';
+
+@NgModule({
+  imports: [MatButtonModule]
+})
+```
+</CodeGroup>
+
+### Updating Component Selectors
+
+<CodeGroup>
+```html Before
+<mat-form-field appearance="legacy">
+  <input matInput>
+</mat-form-field>
+```
+
+```html After
+<mat-form-field appearance="fill">
+  <input matInput>
+</mat-form-field>
+```
+</CodeGroup>
+
+### Updating Theme Mixins
+
+<CodeGroup>
+```scss Before
+@import '~@angular/material/theming';
+
+@include mat-core();
+$primary: mat-palette($mat-indigo);
+```
+
+```scss After
+@use '@angular/material' as mat;
+
+@include mat.core();
+$primary: mat.$indigo-palette;
+```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Build errors after update">
+    **Clear cache and reinstall:**
+    ```bash
+    rm -rf node_modules package-lock.json
+    npm install
+    ```
+
+    **Clear Angular cache:**
+    ```bash
+    ng cache clean
+    ```
+  </Accordion>
+
+  <Accordion title="Theme not applying">
+    **Check @use syntax:**
+    ```scss
+    // Correct
+    @use '@angular/material' as mat;
+
+    // Incorrect
+    @import '@angular/material/theming';
+    ```
+  </Accordion>
+
+  <Accordion title="Tests failing">
+    **Update test imports:**
+    ```ts
+    import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+    import { MatButtonHarness } from '@angular/material/button/testing';
+    ```
+
+    **Use harnesses instead of internals:**
+    ```ts
+    // Instead of
+    const button = fixture.nativeElement.querySelector('.mat-button');
+
+    // Use
+    const button = await loader.getHarness(MatButtonHarness);
+    ```
+  </Accordion>
+
+  <Accordion title="Type errors">
+    **Update TypeScript version:**
+    ```bash
+    npm install -D typescript@latest
+    ```
+
+    **Enable strict mode gradually:**
+    ```json
+    // tsconfig.json
+    {
+      "compilerOptions": {
+        "strict": false,  // Enable gradually
+        "strictNullChecks": true
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Automated Migrations
+
+Angular CLI provides automated migrations:
+
+```bash
+# See available migrations
+ng update @angular/material --migrate-only
+
+# Run specific migration
+ng update @angular/material --migrate-only --from=19 --to=20
+```
+
+<Note>
+  Automated migrations handle most common cases but always review changes.
+</Note>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Breaking Changes" icon="triangle-exclamation" href="/guides/breaking-changes">
+    Complete list of breaking changes
+  </Card>
+  <Card title="Angular Update Guide" icon="arrow-up" href="https://update.angular.io">
+    Interactive update guide
+  </Card>
+  <Card title="GitHub Releases" icon="tag" href="https://github.com/angular/components/releases">
+    Release notes and changelogs
+  </Card>
+  <Card title="Community Forum" icon="comments" href="https://github.com/angular/components/discussions">
+    Ask migration questions
+  </Card>
+</CardGroup>

@@ -1,0 +1,389 @@
+---
+title: 'Luxon Adapter'
+description: 'Use Luxon with Angular Material date components'
+---
+
+# Luxon Adapter
+
+The Luxon adapter allows you to use the [Luxon](https://moment.github.io/luxon/) library with Angular Material date components like Datepicker and Timepicker.
+
+**Source**: `/home/daytona/workspace/source/src/material-luxon-adapter/adapter/luxon-date-adapter.ts`
+
+## Installation
+
+```bash
+npm install @angular/material-luxon-adapter luxon
+```
+
+## Setup
+
+### Standalone Components
+
+Provide the adapter in your component or at the application level:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@Component({
+  selector: 'app-datepicker',
+  imports: [MatDatepickerModule],
+  providers: [provideLuxonDateAdapter()],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+  `
+})
+export class DatepickerComponent {}
+```
+
+### NgModule
+
+Provide the adapter in your module:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {LuxonDateAdapter, MAT_LUXON_DATE_ADAPTER_OPTIONS} from '@angular/material-luxon-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+
+@NgModule({
+  imports: [MatDatepickerModule],
+  providers: [
+    {provide: DateAdapter, useClass: LuxonDateAdapter},
+    {provide: MAT_DATE_LOCALE, useValue: 'en-US'}
+  ]
+})
+export class AppModule {}
+```
+
+## Adapter Options
+
+Configure the adapter using `MAT_LUXON_DATE_ADAPTER_OPTIONS`:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideLuxonDateAdapter, MAT_LUXON_DATE_ADAPTER_OPTIONS} from '@angular/material-luxon-adapter';
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideLuxonDateAdapter(),
+    {
+      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
+      useValue: {
+        useUtc: false,
+        firstDayOfWeek: 1, // Monday
+        defaultOutputCalendar: 'gregory'
+      }
+    }
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+### Option Properties
+
+**Source**: `/home/daytona/workspace/source/src/material-luxon-adapter/adapter/luxon-date-adapter.ts:18`
+
+- `useUtc` (boolean) - Use UTC dates instead of local time. Default: `false`
+- `firstDayOfWeek` (number) - First day of week (0-6, Sunday=0). If not set, uses locale default
+- `defaultOutputCalendar` (string) - Output calendar system. Default: `'gregory'`
+
+## Localization
+
+Set the locale using `MAT_DATE_LOCALE`:
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_LOCALE} from '@angular/material/core';
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideLuxonDateAdapter(),
+    {provide: MAT_DATE_LOCALE, useValue: 'fr'} // French
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+Luxon supports many locale codes:
+- `en-US` - English (US)
+- `en-GB` - English (UK)
+- `es` - Spanish
+- `fr` - French
+- `de` - German
+- `ja` - Japanese
+- `zh-CN` - Chinese (Simplified)
+- And many more...
+
+## UTC Mode
+
+When working with UTC dates:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideLuxonDateAdapter, MAT_LUXON_DATE_ADAPTER_OPTIONS} from '@angular/material-luxon-adapter';
+import {DateTime} from 'luxon';
+
+@Component({
+  selector: 'app-utc-datepicker',
+  providers: [
+    provideLuxonDateAdapter(),
+    {
+      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
+      useValue: {useUtc: true}
+    }
+  ],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="utcDate" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+  `
+})
+export class UtcDatepickerComponent {
+  utcDate = DateTime.utc();
+}
+```
+
+## Custom Date Formats
+
+Customize how dates are displayed and parsed:
+
+```typescript
+import {Component} from '@angular/core';
+import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+
+const CUSTOM_DATE_FORMATS = {
+  parse: {
+    dateInput: 'D', // Luxon format
+  },
+  display: {
+    dateInput: 'DDD', // e.g., April 29, 2023
+    monthYearLabel: 'MMM yyyy',
+    dateA11yLabel: 'DDD',
+    monthYearA11yLabel: 'MMMM yyyy',
+  },
+};
+
+@Component({
+  selector: 'app-datepicker',
+  providers: [
+    provideLuxonDateAdapter(),
+    {provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS}
+  ],
+  // ...
+})
+export class DatepickerComponent {}
+```
+
+## LuxonDateAdapter API
+
+The `LuxonDateAdapter` class extends Angular Material's `DateAdapter`.
+
+### Key Methods
+
+Implemented from `/home/daytona/workspace/source/src/material-luxon-adapter/adapter/luxon-date-adapter.ts:62`:
+
+- `getYear(date: DateTime): number` - Get the year
+- `getMonth(date: DateTime): number` - Get the month (0-11, Luxon uses 1-12 internally)
+- `getDate(date: DateTime): number` - Get the day of month
+- `getDayOfWeek(date: DateTime): number` - Get day of week
+- `getMonthNames(style)` - Get month names
+- `getDateNames()` - Get array of date names
+- `getDayOfWeekNames(style)` - Get day names
+- `getYearName(date: DateTime): string` - Get year as string
+- `getFirstDayOfWeek(): number` - Get first day of week
+- `getNumDaysInMonth(date: DateTime): number` - Get days in month
+- `clone(date: DateTime): DateTime` - Clone a date
+- `createDate(year, month, date): DateTime` - Create a new date
+- `today(): DateTime` - Get today's date
+- `parse(value, parseFormat)` - Parse a date string
+- `format(date, displayFormat): string` - Format a date
+- `addCalendarYears(date, years): DateTime` - Add years
+- `addCalendarMonths(date, months): DateTime` - Add months
+- `addCalendarDays(date, days): DateTime` - Add days
+- `toIso8601(date): string` - Convert to ISO 8601 string
+- `isDateInstance(obj): boolean` - Check if value is a DateTime
+- `isValid(date): boolean` - Check if date is valid
+- `invalid(): DateTime` - Create an invalid date
+
+### Time Support
+
+- `setTime(target, hours, minutes, seconds): DateTime`
+- `getHours(date): number`
+- `getMinutes(date): number`
+- `getSeconds(date): number`
+- `parseTime(value, parseFormat)`
+- `addSeconds(date, amount): DateTime`
+
+## Luxon Format Tokens
+
+Luxon uses specific format tokens:
+
+- `D` - Short date (e.g., 4/29/2023)
+- `DD` - Medium date (e.g., Apr 29, 2023)
+- `DDD` - Long date (e.g., April 29, 2023)
+- `DDDD` - Full date (e.g., Saturday, April 29, 2023)
+- `t` - Short time (e.g., 9:30 AM)
+- `tt` - Medium time (e.g., 9:30:00 AM)
+- `yyyy` - 4-digit year
+- `yy` - 2-digit year
+- `MM` - 2-digit month
+- `M` - Month number
+- `MMMM` - Full month name
+- `MMM` - Short month name
+- `dd` - 2-digit day
+- `d` - Day number
+- `EEEE` - Full day name
+- `EEE` - Short day name
+
+See the [Luxon formatting documentation](https://moment.github.io/luxon/#/formatting) for all tokens.
+
+## Example with Datepicker
+
+```typescript
+import {Component} from '@angular/core';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {DateTime} from 'luxon';
+
+@Component({
+  selector: 'app-date-form',
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule
+  ],
+  providers: [provideLuxonDateAdapter()],
+  template: `
+    <mat-form-field>
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker" [formControl]="dateControl" />
+      <mat-datepicker-toggle matSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+    
+    @if (dateControl.value) {
+      <p>Selected: {{dateControl.value.toLocaleString(DateTime.DATE_FULL)}}</p>
+    }
+  `
+})
+export class DateFormComponent {
+  DateTime = DateTime;
+  dateControl = new FormControl(DateTime.now());
+}
+```
+
+## Calendar Systems
+
+Luxon supports different calendar systems:
+
+```typescript
+import {Component} from '@angular/core';
+import {provideLuxonDateAdapter, MAT_LUXON_DATE_ADAPTER_OPTIONS} from '@angular/material-luxon-adapter';
+
+@Component({
+  selector: 'app-islamic-calendar',
+  providers: [
+    provideLuxonDateAdapter(),
+    {
+      provide: MAT_LUXON_DATE_ADAPTER_OPTIONS,
+      useValue: {
+        defaultOutputCalendar: 'islamic' // Islamic calendar
+      }
+    }
+  ],
+  // ...
+})
+export class IslamicCalendarComponent {}
+```
+
+Supported calendar systems:
+- `gregory` - Gregorian (default)
+- `islamic` - Islamic
+- `hebrew` - Hebrew
+- `buddhist` - Buddhist
+- `chinese` - Chinese
+- `coptic` - Coptic
+- `ethiopic` - Ethiopic
+- `indian` - Indian
+- `japanese` - Japanese
+- `persian` - Persian
+
+## Working with Luxon DateTime
+
+```typescript
+import {Component, signal} from '@angular/core';
+import {DateTime, Interval} from 'luxon';
+import {provideLuxonDateAdapter} from '@angular/material-luxon-adapter';
+
+@Component({
+  selector: 'app-luxon-example',
+  providers: [provideLuxonDateAdapter()],
+  template: `
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+    
+    @if (selectedDate()) {
+      <div>
+        <p>ISO: {{selectedDate()!.toISO()}}</p>
+        <p>Relative: {{selectedDate()!.toRelative()}}</p>
+        <p>Days from now: {{daysFromNow()}}</p>
+      </div>
+    }
+  `
+})
+export class LuxonExampleComponent {
+  selectedDate = signal<DateTime | null>(DateTime.now());
+  
+  daysFromNow() {
+    if (!this.selectedDate()) return 0;
+    const interval = Interval.fromDateTimes(DateTime.now(), this.selectedDate()!);
+    return Math.ceil(interval.length('days'));
+  }
+}
+```
+
+## Why Use Luxon?
+
+- **Modern**: Built for modern JavaScript (ES6+)
+- **Immutable**: All operations return new objects
+- **Chainable**: Fluent API for easy composition
+- **Time zones**: First-class time zone support
+- **i18n**: Built-in internationalization
+- **Type-safe**: Written in TypeScript
+- **Successor to Moment**: Created by a Moment.js maintainer
+
+## Comparison with Other Adapters
+
+| Feature | Luxon | Moment.js | date-fns |
+|---------|-------|-----------|----------|
+| Bundle size | Medium | Large | Small |
+| Tree-shaking | Yes | No | Yes |
+| Immutable | Yes | No* | Yes |
+| Time zones | Excellent | Good | Limited |
+| i18n | Built-in | Built-in | Separate |
+| Active | Yes | Deprecated | Yes |
+
+*Moment.js has an immutable mode
+
+## Source Code
+
+View the [LuxonDateAdapter source code](https://github.com/angular/components/tree/main/src/material-luxon-adapter) on GitHub.

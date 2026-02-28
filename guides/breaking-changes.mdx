@@ -1,0 +1,370 @@
+---
+title: "Breaking Changes"
+description: "Major breaking changes across Angular Material versions"
+---
+
+This guide documents breaking changes introduced in major versions of Angular Material and CDK to help you upgrade your applications.
+
+<Warning>
+  Always review breaking changes before upgrading to a new major version.
+</Warning>
+
+## Version 21.0.0 (November 2025)
+
+Version 21.0.0 introduces several breaking changes to improve API consistency and remove deprecated code.
+
+### CDK Breaking Changes
+
+<AccordionGroup>
+  <Accordion title="Removed Factory Functions">
+    Several internal factory functions have been removed:
+
+    - `LIVE_ANNOUNCER_ELEMENT_TOKEN_FACTORY`
+    - `TREE_KEY_MANAGER_FACTORY`
+    - `TREE_KEY_MANAGER_FACTORY_PROVIDER`
+
+    <Note>
+      These were internal APIs that should not have been used directly. No migration needed for most users.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Overlay Z-Index Variables">
+    SCSS variable names have been updated:
+
+    ```scss
+    // ❌ Removed
+    $z-index-overlay-container
+    $z-index-overlay
+    $dark-backdrop-background
+    $z-index-overlay-backdrop
+
+    // ✅ Use instead
+    $overlay-container-z-index
+    $overlay-z-index
+    $overlay-backdrop-color
+    $overlay-backdrop-z-index
+    ```
+  </Accordion>
+
+  <Accordion title="Portal Directive Names">
+    Portal directives have been renamed:
+
+    ```ts
+    // ❌ Removed
+    import { TemplatePortalDirective, PortalHostDirective } from '@angular/cdk/portal';
+
+    // ✅ Use instead
+    import { CdkPortal, CdkPortalOutlet } from '@angular/cdk/portal';
+    ```
+
+    Update your templates:
+
+    ```html
+    <!-- ❌ Old -->
+    <ng-template portalHost></ng-template>
+    <ng-template portal></ng-template>
+
+    <!-- ✅ New -->
+    <ng-template cdkPortalOutlet></ng-template>
+    <ng-template cdkPortal></ng-template>
+    ```
+  </Accordion>
+
+  <Accordion title="TestElement Interface">
+    Custom `TestElement` implementations must now provide `setContenteditableValue` method:
+
+    ```ts
+    class CustomTestElement implements TestElement {
+      // New required method
+      async setContenteditableValue(value: string): Promise<void> {
+        // Implementation
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Material Breaking Changes
+
+<AccordionGroup>
+  <Accordion title="Removed Factory Functions">
+    Many component factory functions have been removed:
+
+    **Autocomplete:**
+    - `MAT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY`
+    - `MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY`
+    - `MAT_AUTOCOMPLETE_SCROLL_STRATEGY_FACTORY_PROVIDER`
+
+    **Button:**
+    - `MAT_BUTTON_TOGGLE_GROUP_DEFAULT_OPTIONS_FACTORY`
+    - `MAT_FAB_DEFAULT_OPTIONS_FACTORY`
+
+    **Checkbox:**
+    - `MAT_CHECKBOX_DEFAULT_OPTIONS_FACTORY`
+
+    **Datepicker:**
+    - `MAT_DATEPICKER_SCROLL_STRATEGY_FACTORY`
+    - `MAT_DATEPICKER_SCROLL_STRATEGY_FACTORY_PROVIDER`
+    - `MAT_DATE_LOCAL_FACTORY`
+
+    <Info>
+      These were internal implementation details. Most applications won't need changes.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Animation Symbol Removals">
+    Animation constants have been removed:
+
+    ```ts
+    // ❌ Removed
+    import { matBottomSheetAnimations } from '@angular/material/bottom-sheet';
+    import { matDialogAnimations } from '@angular/material/dialog';
+    import { matDatepickerAnimations } from '@angular/material/datepicker';
+    import { matExpansionAnimations } from '@angular/material/expansion';
+    import { matFormFieldAnimations } from '@angular/material/form-field';
+    import { matMenuAnimations } from '@angular/material/menu';
+    import { matSelectAnimations } from '@angular/material/select';
+    import { matSnackBarAnimations } from '@angular/material/snack-bar';
+    import { matStepperAnimations } from '@angular/material/stepper';
+    import { matTabsAnimations } from '@angular/material/tabs';
+    import { matTooltipAnimations } from '@angular/material/tooltip';
+    ```
+
+    <Note>
+      If you were customizing animations, you'll need to use CSS/SCSS instead.
+    </Note>
+  </Accordion>
+
+  <Accordion title="MatCommonModule Removed">
+    `MatCommonModule` has been removed along with related types:
+
+    ```ts
+    // ❌ Removed
+    import { MatCommonModule, SanityChecks, MATERIAL_SANITY_CHECKS } from '@angular/material/core';
+
+    // ✅ No replacement needed
+    // Import specific component modules directly
+    import { MatButtonModule } from '@angular/material/button';
+    ```
+  </Accordion>
+
+  <Accordion title="Core Utility Removals">
+    Several core utilities have been removed:
+
+    ```ts
+    // ❌ Removed
+    import { AnimationCurves, AnimationDurations } from '@angular/material/core';
+
+    // ✅ Use CSS variables or define your own
+    :root {
+      --animation-duration: 200ms;
+      --animation-curve: cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    ```
+
+    Also removed:
+    - `NativeDateAdapter.useUtcForDisplay`
+  </Accordion>
+</AccordionGroup>
+
+### Material Date Adapters
+
+<Accordion title="Date Adapter Factory Removals">
+  Factory functions removed from date adapters:
+
+  ```ts
+  // ❌ Removed
+  import { MAT_MOMENT_DATE_ADAPTER_OPTIONS_FACTORY } from '@angular/material-moment-adapter';
+  import { MAT_LUXON_DATE_ADAPTER_OPTIONS_FACTORY } from '@angular/material-luxon-adapter';
+
+  // ✅ Provide options directly
+  providers: [
+    {
+      provide: MAT_DATE_LOCALE,
+      useValue: 'en-US'
+    },
+    {
+      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+      useValue: { useUtc: true }
+    }
+  ]
+  ```
+</Accordion>
+
+## Version 20.0.0
+
+<Info>
+  Version 20 focused on Angular 20 compatibility with minimal breaking changes.
+</Info>
+
+### Key Changes
+
+- Updated peer dependencies to Angular 20
+- Improved standalone component support
+- Enhanced TypeScript 5.x support
+
+## Version 19.0.0
+
+### Material Design 3
+
+Version 19 introduced Material Design 3 (M3) theming:
+
+<Tabs>
+  <Tab title="M3 Themes">
+    ```scss
+    @use '@angular/material' as mat;
+
+    $theme: mat.define-theme((
+      color: (
+        theme-type: light,
+        primary: mat.$violet-palette,
+      ),
+    ));
+
+    html {
+      @include mat.all-component-themes($theme);
+    }
+    ```
+  </Tab>
+
+  <Tab title="M2 Compatibility">
+    ```scss
+    @use '@angular/material' as mat;
+
+    $theme: mat.m2-define-light-theme((
+      color: (
+        primary: mat.m2-define-palette(mat.$indigo-palette),
+        accent: mat.m2-define-palette(mat.$pink-palette),
+      )
+    ));
+
+    html {
+      @include mat.all-component-themes($theme);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Migration Strategies
+
+<Steps>
+  <Step title="Review the changelog">
+    Always read the full [CHANGELOG](https://github.com/angular/components/blob/main/CHANGELOG.md) before upgrading.
+  </Step>
+
+  <Step title="Update incrementally">
+    Update one major version at a time. Don't skip versions.
+
+    ```bash
+    # Update to v20 first
+    ng update @angular/material@20
+
+    # Then update to v21
+    ng update @angular/material@21
+    ```
+  </Step>
+
+  <Step title="Run ng update">
+    Angular's update command handles many migrations automatically:
+
+    ```bash
+    ng update @angular/material@latest
+    ```
+  </Step>
+
+  <Step title="Test thoroughly">
+    Run your full test suite after updating:
+
+    ```bash
+    ng test
+    ng e2e
+    ng build --configuration production
+    ```
+  </Step>
+
+  <Step title="Update custom themes">
+    If you have custom themes, test them in both light and dark modes.
+  </Step>
+</Steps>
+
+## Common Migration Issues
+
+<AccordionGroup>
+  <Accordion title="Import paths changed">
+    **Problem:** Import errors after upgrade
+
+    **Solution:** Update import paths
+    ```ts
+    // Old path
+    import { CdkPortal } from '@angular/cdk/portal/portal-directives';
+
+    // New path
+    import { CdkPortal } from '@angular/cdk/portal';
+    ```
+  </Accordion>
+
+  <Accordion title="Theming API changed">
+    **Problem:** Theme mixin errors
+
+    **Solution:** Update to new M3 API or use M2 compatibility mode
+    ```scss
+    // Use M2 compatibility
+    @include mat.m2-all-component-themes($theme);
+
+    // Or migrate to M3
+    @include mat.all-component-themes($theme);
+    ```
+  </Accordion>
+
+  <Accordion title="Animation imports fail">
+    **Problem:** Cannot import animation constants
+
+    **Solution:** Remove animation imports and use CSS/SCSS for customization
+    ```scss
+    .mat-mdc-dialog-container {
+      animation-duration: 300ms !important;
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Factory providers missing">
+    **Problem:** DI errors for factory functions
+
+    **Solution:** These were internal - usually no action needed. If you were using them, provide dependencies directly.
+  </Accordion>
+</AccordionGroup>
+
+## Deprecation Policy
+
+<Warning>
+  APIs are deprecated for at least 2 major versions before removal.
+</Warning>
+
+1. **Deprecation Announced** - API marked with `@deprecated` JSDoc
+2. **Console Warnings** - Runtime warnings in development mode
+3. **Two Versions** - API remains functional for 2+ versions
+4. **Removal** - API removed in a major version
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="Migration Guides" icon="map" href="/guides/migration-guides">
+    Detailed migration guides for major versions
+  </Card>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/angular/components/issues">
+    Report problems or ask questions
+  </Card>
+  <Card title="Stack Overflow" icon="stack-overflow" href="https://stackoverflow.com/questions/tagged/angular-material2">
+    Community support and answers
+  </Card>
+  <Card title="Angular Blog" icon="newspaper" href="https://blog.angular.io">
+    Release announcements and guides
+  </Card>
+</CardGroup>
+
+## Stay Updated
+
+<Check>Follow [@angular](https://twitter.com/angular) on Twitter</Check>
+<Check>Subscribe to the [Angular blog](https://blog.angular.io)</Check>
+<Check>Watch the [components repository](https://github.com/angular/components)</Check>
+<Check>Join the [Angular Discord](https://discord.gg/angular)</Check>

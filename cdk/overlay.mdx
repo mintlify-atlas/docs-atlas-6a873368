@@ -1,0 +1,333 @@
+---
+title: Overlay
+description: Create floating panels, tooltips, and popovers
+---
+
+The `@angular/cdk/overlay` package provides a flexible system for displaying floating panels on top of your app's content.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {OverlayModule} from '@angular/cdk/overlay';
+```
+
+## Basic Usage
+
+### Creating an Overlay
+
+```typescript
+import {Component, inject} from '@angular/core';
+import {Overlay, OverlayRef} from '@angular/cdk/overlay';
+import {ComponentPortal} from '@angular/cdk/portal';
+import {MyPopupComponent} from './my-popup.component';
+
+@Component({
+  selector: 'app-overlay-example',
+  template: `<button (click)="openOverlay()">Open Overlay</button>`,
+})
+export class OverlayExample {
+  private overlay = inject(Overlay);
+  private overlayRef: OverlayRef;
+
+  openOverlay() {
+    // Create overlay
+    this.overlayRef = this.overlay.create({
+      hasBackdrop: true,
+      backdropClass: 'cdk-overlay-dark-backdrop',
+      positionStrategy: this.overlay.position().global()
+        .centerHorizontally()
+        .centerVertically(),
+    });
+
+    // Attach component
+    const portal = new ComponentPortal(MyPopupComponent);
+    this.overlayRef.attach(portal);
+
+    // Close on backdrop click
+    this.overlayRef.backdropClick().subscribe(() => {
+      this.overlayRef.dispose();
+    });
+  }
+}
+```
+
+### Position Strategies
+
+#### Global Positioning
+
+```typescript
+const positionStrategy = this.overlay.position()
+  .global()
+  .centerHorizontally()
+  .centerVertically();
+```
+
+#### Connected Positioning
+
+```typescript
+import {Component, ElementRef, ViewChild} from '@angular/core';
+
+@Component({
+  template: `
+    <button #trigger (click)="openConnected()">Open</button>
+  `,
+})
+export class ConnectedExample {
+  @ViewChild('trigger') trigger: ElementRef;
+  private overlay = inject(Overlay);
+
+  openConnected() {
+    const positionStrategy = this.overlay.position()
+      .flexibleConnectedTo(this.trigger)
+      .withPositions([{
+        originX: 'start',
+        originY: 'bottom',
+        overlayX: 'start',
+        overlayY: 'top',
+      }]);
+
+    const overlayRef = this.overlay.create({
+      positionStrategy,
+      hasBackdrop: true,
+    });
+
+    // Attach content...
+  }
+}
+```
+
+### Scroll Strategies
+
+```typescript
+const overlayRef = this.overlay.create({
+  scrollStrategy: this.overlay.scrollStrategies.close(),
+  // or: .noop(), .block(), .reposition()
+});
+```
+
+- **close()** - Close overlay on scroll
+- **noop()** - Do nothing
+- **block()** - Block scrolling
+- **reposition()** - Reposition overlay
+
+## Advanced Examples
+
+### Dropdown Menu
+
+```typescript
+import {Component, ElementRef, ViewChild, TemplateRef} from '@angular/core';
+import {Overlay, OverlayRef} from '@angular/cdk/overlay';
+import {TemplatePortal} from '@angular/cdk/portal';
+
+@Component({
+  selector: 'app-dropdown',
+  template: `
+    <button #trigger (click)="toggle()">Menu</button>
+    
+    <ng-template #menu>
+      <div class="menu-panel">
+        <button (click)="selectItem('Item 1')">Item 1</button>
+        <button (click)="selectItem('Item 2')">Item 2</button>
+        <button (click)="selectItem('Item 3')">Item 3</button>
+      </div>
+    </ng-template>
+  `,
+  styles: [`
+    .menu-panel {
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+  `]
+})
+export class DropdownExample {
+  @ViewChild('trigger') trigger: ElementRef;
+  @ViewChild('menu') menu: TemplateRef<any>;
+  private overlay = inject(Overlay);
+  private overlayRef: OverlayRef;
+
+  toggle() {
+    if (this.overlayRef?.hasAttached()) {
+      this.overlayRef.detach();
+    } else {
+      this.open();
+    }
+  }
+
+  open() {
+    const positionStrategy = this.overlay.position()
+      .flexibleConnectedTo(this.trigger)
+      .withPositions([{
+        originX: 'start',
+        originY: 'bottom',
+        overlayX: 'start',
+        overlayY: 'top',
+        offsetY: 8,
+      }]);
+
+    this.overlayRef = this.overlay.create({
+      positionStrategy,
+      hasBackdrop: true,
+      backdropClass: 'cdk-overlay-transparent-backdrop',
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+    });
+
+    const portal = new TemplatePortal(this.menu, this.viewContainerRef);
+    this.overlayRef.attach(portal);
+
+    this.overlayRef.backdropClick().subscribe(() => this.overlayRef.detach());
+  }
+
+  selectItem(item: string) {
+    console.log('Selected:', item);
+    this.overlayRef.detach();
+  }
+}
+```
+
+### Tooltip
+
+```typescript
+import {Directive, ElementRef, HostListener, Input, inject} from '@angular/core';
+import {Overlay, OverlayRef} from '@angular/cdk/overlay';
+import {ComponentPortal} from '@angular/cdk/portal';
+
+@Component({
+  selector: 'app-tooltip-content',
+  template: `<div class="tooltip">{{ text }}</div>`,
+  styles: [`
+    .tooltip {
+      background: #616161;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  `]
+})
+export class TooltipContent {
+  text: string;
+}
+
+@Directive({
+  selector: '[appTooltip]',
+})
+export class TooltipDirective {
+  @Input('appTooltip') text: string;
+  private overlay = inject(Overlay);
+  private elementRef = inject(ElementRef);
+  private overlayRef: OverlayRef;
+
+  @HostListener('mouseenter')
+  show() {
+    const positionStrategy = this.overlay.position()
+      .flexibleConnectedTo(this.elementRef)
+      .withPositions([{
+        originX: 'center',
+        originY: 'bottom',
+        overlayX: 'center',
+        overlayY: 'top',
+        offsetY: 8,
+      }]);
+
+    this.overlayRef = this.overlay.create({positionStrategy});
+    const portal = new ComponentPortal(TooltipContent);
+    const componentRef = this.overlayRef.attach(portal);
+    componentRef.instance.text = this.text;
+  }
+
+  @HostListener('mouseleave')
+  hide() {
+    this.overlayRef?.dispose();
+  }
+}
+```
+
+## API Reference
+
+### Overlay Service
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `create(config?)` | `OverlayRef` | Create an overlay |
+| `position()` | `OverlayPositionBuilder` | Get position builder |
+| `scrollStrategies` | Object | Access scroll strategies |
+
+### OverlayConfig
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `hasBackdrop` | `boolean` | Whether to show backdrop |
+| `backdropClass` | `string \| string[]` | CSS classes for backdrop |
+| `panelClass` | `string \| string[]` | CSS classes for pane |
+| `positionStrategy` | `PositionStrategy` | How to position overlay |
+| `scrollStrategy` | `ScrollStrategy` | Handle scroll behavior |
+| `width` | `number \| string` | Overlay width |
+| `height` | `number \| string` | Overlay height |
+| `minWidth` | `number \| string` | Minimum width |
+| `minHeight` | `number \| string` | Minimum height |
+| `maxWidth` | `number \| string` | Maximum width |
+| `maxHeight` | `number \| string` | Maximum height |
+
+### OverlayRef
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `attach(portal)` | `ComponentRef \| EmbeddedViewRef` | Attach content |
+| `detach()` | `void` | Detach content |
+| `dispose()` | `void` | Destroy overlay |
+| `hasAttached()` | `boolean` | Check if attached |
+| `backdropClick()` | `Observable<MouseEvent>` | Backdrop click events |
+| `keydownEvents()` | `Observable<KeyboardEvent>` | Keyboard events |
+| `outsidePointerEvents()` | `Observable<MouseEvent>` | Outside click events |
+
+## Position Strategies
+
+### FlexibleConnectedPositionStrategy
+
+```typescript
+overlay.position()
+  .flexibleConnectedTo(elementRef)
+  .withPositions([{
+    originX: 'start' | 'center' | 'end',
+    originY: 'top' | 'center' | 'bottom',
+    overlayX: 'start' | 'center' | 'end',
+    overlayY: 'top' | 'center' | 'bottom',
+    offsetX: number,
+    offsetY: number,
+  }])
+  .withPush(true)  // Push overlay into viewport
+  .withGrowAfterOpen(true)
+  .withViewportMargin(8);
+```
+
+### GlobalPositionStrategy
+
+```typescript
+overlay.position().global()
+  .top('100px')
+  .left('50px')
+  .right('50px')
+  .bottom('100px')
+  .centerHorizontally()
+  .centerVertically();
+```
+
+## Best Practices
+
+1. **Dispose overlays** - Always clean up when done
+2. **Use appropriate scroll strategy** - Match UX expectations
+3. **Handle keyboard** - Close on Escape key
+4. **Accessibility** - Manage focus and ARIA
+5. **Portal reuse** - Detach instead of dispose when possible
+
+## See Also
+
+- [Portal](/cdk/portal)
+- [Angular Material Dialog](https://material.angular.io/components/dialog/overview)

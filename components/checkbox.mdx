@@ -1,0 +1,205 @@
+---
+title: Checkbox
+description: Checkbox component that provides the same functionality as a native enhanced with Material Design styling and animations.
+---
+
+## Overview
+
+`<mat-checkbox>` provides the same functionality as a native `<input type="checkbox">` enhanced with Material Design styling and animations.
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Template">
+    ```html
+    <mat-checkbox>Check me!</mat-checkbox>
+    ```
+  </Tab>
+  
+  <Tab title="Reactive Forms">
+    ```typescript
+    import { Component } from '@angular/core';
+    import { FormControl } from '@angular/forms';
+    
+    @Component({
+      selector: 'app-checkbox-example',
+      template: `
+        <mat-checkbox [formControl]="checkboxControl">
+          Accept terms and conditions
+        </mat-checkbox>
+      `
+    })
+    export class CheckboxExample {
+      checkboxControl = new FormControl(false);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## API Reference
+
+### MatCheckbox
+
+Selector: `mat-checkbox`
+
+Exported as: `matCheckbox`
+
+#### Inputs
+
+<ParamField path="checked" type="boolean" default="false">
+  Whether the checkbox is checked.
+</ParamField>
+
+<ParamField path="disabled" type="boolean" default="false">
+  Whether the checkbox is disabled.
+</ParamField>
+
+<ParamField path="indeterminate" type="boolean" default="false">
+  Whether the checkbox is indeterminate. This is also known as "mixed" mode and can be used to represent a checkbox with three states.
+</ParamField>
+
+<ParamField path="labelPosition" type="'before' | 'after'" default="'after'">
+  Whether the label should appear after or before the checkbox. Defaults to 'after'.
+</ParamField>
+
+<ParamField path="required" type="boolean" default="false">
+  Whether the checkbox is required.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette">
+  Theme color of the checkbox. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="disableRipple" type="boolean" default="false">
+  Whether the checkbox has a ripple.
+</ParamField>
+
+<ParamField path="disabledInteractive" type="boolean" default="false">
+  Whether the checkbox should remain interactive when it is disabled.
+</ParamField>
+
+<ParamField path="value" type="string">
+  The value attribute of the native input element.
+</ParamField>
+
+<ParamField path="id" type="string">
+  A unique id for the checkbox input. If none is supplied, it will be auto-generated.
+</ParamField>
+
+<ParamField path="name" type="string | null" default="null">
+  Name value will be applied to the input element if present.
+</ParamField>
+
+<ParamField path="tabIndex" type="number" default="0">
+  Tabindex for the checkbox.
+</ParamField>
+
+<ParamField path="aria-label" type="string" default="''">
+  Attached to the aria-label attribute of the host element.
+</ParamField>
+
+<ParamField path="aria-labelledby" type="string | null" default="null">
+  Users can specify the `aria-labelledby` attribute which will be forwarded to the input element.
+</ParamField>
+
+<ParamField path="aria-describedby" type="string">
+  The 'aria-describedby' attribute is read after the element's label and field type.
+</ParamField>
+
+#### Outputs
+
+<ParamField path="change" type="EventEmitter<MatCheckboxChange>">
+  Event emitted when the checkbox's `checked` value changes.
+</ParamField>
+
+<ParamField path="indeterminateChange" type="EventEmitter<boolean>">
+  Event emitted when the checkbox's `indeterminate` value changes.
+</ParamField>
+
+#### Methods
+
+<ParamField path="focus()" type="void">
+  Focuses the checkbox.
+</ParamField>
+
+<ParamField path="toggle()" type="void">
+  Toggles the `checked` state of the checkbox.
+</ParamField>
+
+### MatCheckboxChange
+
+<ParamField path="source" type="MatCheckbox">
+  The source checkbox of the event.
+</ParamField>
+
+<ParamField path="checked" type="boolean">
+  The new `checked` value of the checkbox.
+</ParamField>
+
+## Accessibility
+
+- The checkbox uses a native `<input type="checkbox">` element
+- The checkbox label is associated with the input using a `<label>` element
+- Use `aria-label` or `aria-labelledby` when the checkbox doesn't have a visible label
+- The component supports keyboard interaction (Space to toggle)
+- Disabled checkboxes are not focusable and are announced as disabled to screen readers
+
+## Advanced Usage
+
+### Indeterminate State
+
+The indeterminate state is useful when dealing with nested checkboxes:
+
+```typescript
+export class CheckboxIndeterminateExample {
+  allComplete: boolean = false;
+  
+  task = {
+    name: 'Indeterminate',
+    completed: false,
+    subtasks: [
+      {name: 'Primary', completed: false},
+      {name: 'Accent', completed: false},
+    ]
+  };
+  
+  updateAllComplete() {
+    this.allComplete = this.task.subtasks != null && 
+      this.task.subtasks.every(t => t.completed);
+  }
+  
+  someComplete(): boolean {
+    return this.task.subtasks.filter(t => t.completed).length > 0 && !this.allComplete;
+  }
+  
+  setAll(completed: boolean) {
+    this.allComplete = completed;
+    this.task.subtasks.forEach(t => t.completed = completed);
+  }
+}
+```
+
+```html
+<mat-checkbox
+  [checked]="allComplete"
+  [indeterminate]="someComplete()"
+  (change)="setAll($event.checked)">
+  Complete all
+</mat-checkbox>
+```
+
+### Label Position
+
+```html
+<mat-checkbox labelPosition="before">Before label</mat-checkbox>
+```
+
+### Disabled Interactive
+
+Allow disabled checkboxes to remain interactive:
+
+```html
+<mat-checkbox [disabled]="true" [disabledInteractive]="true">
+  Disabled but interactive
+</mat-checkbox>
+```

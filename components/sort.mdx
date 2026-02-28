@@ -1,0 +1,316 @@
+---
+title: Sort
+description: Add sorting behavior to tables
+---
+
+Directive to add sorting behavior and UI to table headers.
+
+## Import
+
+```typescript
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { MatSortModule } from '@angular/material/sort';
+```
+
+## Basic Usage
+
+```typescript
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+
+export class TableComponent implements AfterViewInit {
+  @ViewChild(MatSort) sort!: MatSort;
+  
+  displayedColumns = ['name', 'age', 'email'];
+  dataSource = new MatTableDataSource([
+    { name: 'John', age: 30, email: 'john@example.com' },
+    { name: 'Jane', age: 25, email: 'jane@example.com' }
+  ]);
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+}
+```
+
+```html
+<table mat-table [dataSource]="dataSource" matSort>
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="age">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Age</th>
+    <td mat-cell *matCellDef="let element">{{element.age}}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="email">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+    <td mat-cell *matCellDef="let element">{{element.email}}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+```
+
+## API Reference
+
+### MatSort
+
+Selector: `[matSort]`
+
+Exported as: `matSort`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() matSortActive` | `string` | ID of the currently sorted column |
+| `@Input() matSortStart` | `SortDirection` | Starting sort direction. Options: 'asc', 'desc'. Default: 'asc' |
+| `@Input() matSortDirection` | `SortDirection` | Current sort direction |
+| `@Input() matSortDisableClear` | `boolean` | Disable clearing sort |
+| `@Input() matSortDisabled` | `boolean` | Disable sorting |
+| `@Output() matSortChange` | `EventEmitter<Sort>` | Event when sort state changes |
+| `initialized` | `Observable<void>` | Emits when initialized |
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `register(sortable: MatSortable): void` | Registers a sortable |
+| `deregister(sortable: MatSortable): void` | Unregisters a sortable |
+| `sort(sortable: MatSortable): void` | Triggers sort |
+| `getNextSortDirection(sortable: MatSortable): SortDirection` | Gets next direction |
+
+### MatSortHeader
+
+Selector: `[mat-sort-header]`
+
+Exported as: `matSortHeader`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() id` | `string` | ID for this sort header |
+| `@Input() arrowPosition` | `'before' \| 'after'` | Arrow position. Default: 'after' |
+| `@Input() start` | `SortDirection` | Override default start direction |
+| `@Input() disabled` | `boolean` | Disable this header |
+| `@Input() disableClear` | `boolean` | Disable clearing for this header |
+
+## Sort Direction
+
+Sorting cycles through three states:
+1. Ascending (`'asc'`)
+2. Descending (`'desc'`)
+3. No sort (`''`) - unless `disableClear` is true
+
+## Examples
+
+### Custom Sort Direction
+
+```html
+<!-- Start with descending -->
+<table mat-table [dataSource]="dataSource" matSort matSortStart="desc">
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+  </ng-container>
+</table>
+```
+
+### Disable Clear
+
+```html
+<table mat-table [dataSource]="dataSource" matSort matSortDisableClear>
+  <!-- Only cycles between asc and desc -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+  </ng-container>
+</table>
+```
+
+### Disable Specific Column
+
+```html
+<ng-container matColumnDef="email">
+  <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="true">
+    Email (not sortable)
+  </th>
+  <td mat-cell *matCellDef="let element">{{element.email}}</td>
+</ng-container>
+```
+
+### Sort Change Event
+
+```typescript
+export class TableComponent {
+  onSortChange(sort: Sort) {
+    console.log('Active column:', sort.active);
+    console.log('Direction:', sort.direction);
+  }
+}
+```
+
+```html
+<table mat-table [dataSource]="dataSource" 
+       matSort 
+       (matSortChange)="onSortChange($event)">
+  <!-- columns -->
+</table>
+```
+
+### Programmatic Sorting
+
+```typescript
+export class TableComponent {
+  @ViewChild(MatSort) sort!: MatSort;
+
+  sortByName() {
+    this.sort.active = 'name';
+    this.sort.direction = 'asc';
+    this.sort.sortChange.emit({
+      active: 'name',
+      direction: 'asc'
+    });
+  }
+}
+```
+
+### Custom Sort Logic
+
+```typescript
+export class TableComponent {
+  dataSource = new MatTableDataSource(data);
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    
+    // Custom sort accessor
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'name': return item.name.toLowerCase();
+        case 'date': return new Date(item.date).getTime();
+        default: return item[property];
+      }
+    };
+  }
+}
+```
+
+### Arrow Position
+
+```html
+<ng-container matColumnDef="name">
+  <th mat-header-cell *matHeaderCellDef 
+      mat-sort-header 
+      arrowPosition="before">
+    Name
+  </th>
+  <td mat-cell *matCellDef="let element">{{element.name}}</td>
+</ng-container>
+```
+
+### With Sticky Header
+
+```html
+<div class="table-container">
+  <table mat-table [dataSource]="dataSource" matSort>
+    <!-- columns -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+```
+
+## Custom Data Source
+
+For custom data sources, handle sort manually:
+
+```typescript
+export class TableComponent implements AfterViewInit {
+  @ViewChild(MatSort) sort!: MatSort;
+  dataSource = new CustomDataSource();
+
+  ngAfterViewInit() {
+    this.sort.sortChange.subscribe(() => {
+      this.dataSource.sort(this.sort.active, this.sort.direction);
+    });
+  }
+}
+
+class CustomDataSource extends DataSource<any> {
+  private data = [...]; // your data
+  private dataSubject = new BehaviorSubject(this.data);
+
+  connect(): Observable<any[]> {
+    return this.dataSubject;
+  }
+
+  disconnect(): void {
+    this.dataSubject.complete();
+  }
+
+  sort(column: string, direction: SortDirection) {
+    const sorted = this.data.sort((a, b) => {
+      const valueA = a[column];
+      const valueB = b[column];
+      return direction === 'asc' 
+        ? (valueA < valueB ? -1 : 1)
+        : (valueA > valueB ? -1 : 1);
+    });
+    this.dataSubject.next(sorted);
+  }
+}
+```
+
+## Accessibility
+
+- Sortable headers have `role="button"`
+- Clicking or pressing Enter/Space triggers sort
+- Current sort state announced to screen readers
+- Sort arrows provide visual indication
+
+## Configuration
+
+```typescript
+import { MAT_SORT_DEFAULT_OPTIONS } from '@angular/material/sort';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_SORT_DEFAULT_OPTIONS,
+      useValue: {
+        disableClear: true,
+        arrowPosition: 'before'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Types
+
+```typescript
+type SortDirection = 'asc' | 'desc' | '';
+
+interface Sort {
+  active: string;
+  direction: SortDirection;
+}
+
+interface MatSortable {
+  id: string;
+  start: SortDirection;
+  disableClear: boolean;
+}
+```
+
+## Related Components
+
+- [Table](/components/table) - Data table
+- [Paginator](/components/paginator) - Pagination

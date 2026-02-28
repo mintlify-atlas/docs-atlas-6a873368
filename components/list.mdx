@@ -1,0 +1,456 @@
+---
+title: MatList
+description: List component for Angular Material - displays a collection of items in a structured list format.
+---
+
+# MatList
+
+The `mat-list` is a container component that displays items in a vertical list format with Material Design styling.
+
+## Basic Usage
+
+```typescript
+import { MatListModule } from '@angular/material/list';
+
+@Component({
+  selector: 'list-example',
+  imports: [MatListModule],
+  template: `
+    <mat-list>
+      <mat-list-item>Item 1</mat-list-item>
+      <mat-list-item>Item 2</mat-list-item>
+      <mat-list-item>Item 3</mat-list-item>
+    </mat-list>
+  `
+})
+export class ListExample {}
+```
+
+## API Reference
+
+### MatList
+
+Selector: `mat-list`
+
+Basic list container.
+
+### MatNavList
+
+Selector: `mat-nav-list`
+
+List optimized for navigation with anchor or link items.
+
+### MatActionList
+
+Selector: `mat-action-list`
+
+List where each item is a clickable action.
+
+### MatListItem
+
+Selector: `mat-list-item`, `a[mat-list-item]`, `button[mat-list-item]`
+
+#### Inputs
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `activated` | `boolean` | `false` | Whether an item in a nav-list is the currently active page |
+
+### MatListItemTitle
+
+Selector: `[matListItemTitle]`
+
+Title text within a list item.
+
+### MatListItemLine
+
+Selector: `[matListItemLine]`
+
+Additional line of text within a list item.
+
+### MatListItemMeta
+
+Selector: `[matListItemMeta]`
+
+Trailing metadata content (e.g., icons, text).
+
+### MatListItemIcon
+
+Selector: `[matListItemIcon]`
+
+Icon within a list item.
+
+### MatListItemAvatar
+
+Selector: `[matListItemAvatar]`
+
+Avatar image within a list item.
+
+## Examples
+
+### Basic List
+
+```typescript
+@Component({
+  template: `
+    <mat-list>
+      <mat-list-item>Item 1</mat-list-item>
+      <mat-list-item>Item 2</mat-list-item>
+      <mat-list-item>Item 3</mat-list-item>
+    </mat-list>
+  `
+})
+export class BasicListExample {}
+```
+
+### List with Icons
+
+```typescript
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  imports: [MatListModule, MatIconModule],
+  template: `
+    <mat-list>
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Photos</div>
+      </mat-list-item>
+      
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Documents</div>
+      </mat-list-item>
+      
+      <mat-list-item>
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>Downloads</div>
+      </mat-list-item>
+    </mat-list>
+  `
+})
+export class ListIconsExample {}
+```
+
+### List with Avatars
+
+```typescript
+@Component({
+  template: `
+    <mat-list>
+      <mat-list-item *ngFor="let contact of contacts">
+        <img matListItemAvatar [src]="contact.avatar" [alt]="contact.name">
+        <div matListItemTitle>{{ contact.name }}</div>
+        <div matListItemLine>{{ contact.email }}</div>
+      </mat-list-item>
+    </mat-list>
+  `
+})
+export class ListAvatarsExample {
+  contacts = [
+    {name: 'John Doe', email: 'john@example.com', avatar: 'avatar1.jpg'},
+    {name: 'Jane Smith', email: 'jane@example.com', avatar: 'avatar2.jpg'},
+  ];
+}
+```
+
+### Multi-Line List
+
+```typescript
+@Component({
+  template: `
+    <mat-list>
+      <mat-list-item *ngFor="let message of messages">
+        <div matListItemTitle>{{ message.subject }}</div>
+        <div matListItemLine>{{ message.from }}</div>
+        <div matListItemLine>{{ message.preview }}</div>
+        <mat-icon matListItemMeta>arrow_forward</mat-icon>
+      </mat-list-item>
+    </mat-list>
+  `
+})
+export class MultiLineListExample {
+  messages = [
+    {
+      subject: 'Meeting Tomorrow',
+      from: 'John Doe',
+      preview: 'Don\'t forget about our meeting...'
+    },
+    // ... more messages
+  ];
+}
+```
+
+### Navigation List
+
+```typescript
+@Component({
+  template: `
+    <mat-nav-list>
+      <a mat-list-item href="#/home" [activated]="currentRoute === 'home'">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <div matListItemTitle>Home</div>
+      </a>
+      
+      <a mat-list-item href="#/profile" [activated]="currentRoute === 'profile'">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <div matListItemTitle>Profile</div>
+      </a>
+      
+      <a mat-list-item href="#/settings" [activated]="currentRoute === 'settings'">
+        <mat-icon matListItemIcon>settings</mat-icon>
+        <div matListItemTitle>Settings</div>
+      </a>
+    </mat-nav-list>
+  `
+})
+export class NavListExample {
+  currentRoute = 'home';
+}
+```
+
+### Action List
+
+```typescript
+@Component({
+  template: `
+    <mat-action-list>
+      <button mat-list-item (click)="onEdit()">
+        <mat-icon matListItemIcon>edit</mat-icon>
+        <div matListItemTitle>Edit</div>
+      </button>
+      
+      <button mat-list-item (click)="onShare()">
+        <mat-icon matListItemIcon>share</mat-icon>
+        <div matListItemTitle>Share</div>
+      </button>
+      
+      <button mat-list-item (click)="onDelete()">
+        <mat-icon matListItemIcon>delete</mat-icon>
+        <div matListItemTitle>Delete</div>
+      </button>
+    </mat-action-list>
+  `
+})
+export class ActionListExample {
+  onEdit() { console.log('Edit clicked'); }
+  onShare() { console.log('Share clicked'); }
+  onDelete() { console.log('Delete clicked'); }
+}
+```
+
+### List with Dividers
+
+```typescript
+import { MatDividerModule } from '@angular/material/divider';
+
+@Component({
+  imports: [MatListModule, MatDividerModule],
+  template: `
+    <mat-list>
+      <mat-list-item>Item 1</mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>Item 2</mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>Item 3</mat-list-item>
+    </mat-list>
+  `
+})
+export class ListDividersExample {}
+```
+
+### Selection List
+
+```typescript
+import { MatListModule, MatSelectionList } from '@angular/material/list';
+import { ViewChild } from '@angular/core';
+
+@Component({
+  template: `
+    <mat-selection-list #selection>
+      <mat-list-option *ngFor="let item of items" [value]="item">
+        {{ item.name }}
+      </mat-list-option>
+    </mat-selection-list>
+    
+    <button mat-button (click)="logSelection()">Show Selection</button>
+  `
+})
+export class SelectionListExample {
+  @ViewChild('selection') selection!: MatSelectionList;
+  
+  items = [
+    {name: 'Option 1', value: 1},
+    {name: 'Option 2', value: 2},
+    {name: 'Option 3', value: 3},
+  ];
+  
+  logSelection() {
+    console.log(this.selection.selectedOptions.selected.map(o => o.value));
+  }
+}
+```
+
+## Accessibility
+
+### Navigation Lists
+
+Nav lists have `role="navigation"` applied automatically:
+
+```html
+<mat-nav-list aria-label="Main navigation">
+  <a mat-list-item href="#/home">Home</a>
+  <a mat-list-item href="#/about">About</a>
+</mat-nav-list>
+```
+
+### Action Lists
+
+Action lists have `role="group"` applied:
+
+```html
+<mat-action-list aria-label="Actions">
+  <button mat-list-item>Action 1</button>
+  <button mat-list-item>Action 2</button>
+</mat-action-list>
+```
+
+### Selection Lists
+
+Selection lists have `role="listbox"` with proper aria attributes:
+
+```html
+<mat-selection-list aria-label="Select options">
+  <mat-list-option>Option 1</mat-list-option>
+  <mat-list-option>Option 2</mat-list-option>
+</mat-selection-list>
+```
+
+## Styling
+
+```scss
+// List spacing
+mat-list {
+  padding: 8px 0;
+}
+
+// List item height
+mat-list-item {
+  height: 48px;
+}
+
+// Multi-line items
+mat-list-item.mat-2-line {
+  height: 72px;
+}
+
+mat-list-item.mat-3-line {
+  height: 88px;
+}
+
+// Custom list item styling
+mat-list-item {
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+// Avatar sizing
+[matListItemAvatar] {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+```
+
+## Best Practices
+
+1. **Appropriate list type**: Use nav-list for navigation, action-list for actions
+2. **Consistent structure**: Maintain consistent item structure throughout the list
+3. **Clear labels**: Use descriptive text for list items
+4. **Visual hierarchy**: Use icons, avatars, and metadata appropriately
+5. **Performance**: Use `trackBy` with `*ngFor` for large lists
+
+## Common Patterns
+
+### Inbox List
+
+```typescript
+@Component({
+  template: `
+    <mat-list>
+      <mat-list-item *ngFor="let email of emails" class="email-item">
+        <img matListItemAvatar [src]="email.avatar" [alt]="email.from">
+        <div matListItemTitle>{{ email.from }}</div>
+        <div matListItemLine>{{ email.subject }}</div>
+        <div matListItemLine class="email-preview">{{ email.body }}</div>
+        <span matListItemMeta class="email-time">{{ email.time }}</span>
+      </mat-list-item>
+    </mat-list>
+  `,
+  styles: [`
+    .email-preview {
+      color: rgba(0, 0, 0, 0.54);
+    }
+    .email-time {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.54);
+    }
+  `]
+})
+export class InboxListExample {
+  emails = [
+    {
+      from: 'John Doe',
+      subject: 'Meeting',
+      body: 'Let\'s meet tomorrow...',
+      time: '10:30 AM',
+      avatar: 'avatar1.jpg'
+    },
+    // ... more emails
+  ];
+}
+```
+
+### Settings List
+
+```typescript
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
+@Component({
+  imports: [MatListModule, MatSlideToggleModule, MatIconModule],
+  template: `
+    <mat-list>
+      <mat-list-item>
+        <mat-icon matListItemIcon>notifications</mat-icon>
+        <div matListItemTitle>Notifications</div>
+        <mat-slide-toggle matListItemMeta></mat-slide-toggle>
+      </mat-list-item>
+      
+      <mat-list-item>
+        <mat-icon matListItemIcon>wifi</mat-icon>
+        <div matListItemTitle>Wi-Fi</div>
+        <mat-slide-toggle matListItemMeta></mat-slide-toggle>
+      </mat-list-item>
+    </mat-list>
+  `
+})
+export class SettingsListExample {}
+```
+
+## Theming
+
+```scss
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+  ),
+));
+
+html {
+  @include mat.list-theme($theme);
+}
+```

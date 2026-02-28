@@ -1,0 +1,201 @@
+---
+title: Progress Bar
+description: Horizontal progress indicator
+---
+
+Progress bar component that displays linear progress indicators.
+
+## Import
+
+```typescript
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+```
+
+## Basic Usage
+
+```html
+<mat-progress-bar mode="determinate" [value]="50"></mat-progress-bar>
+```
+
+## API Reference
+
+### MatProgressBar
+
+Selector: `mat-progress-bar`
+
+Exported as: `matProgressBar`
+
+#### Properties
+
+| Name | Type | Description |
+|------|------|-------------|
+| `@Input() color` | `ThemePalette` | Theme color. Options: 'primary', 'accent', 'warn' |
+| `@Input() value` | `number` | Progress value (0-100). Default: 0 |
+| `@Input() bufferValue` | `number` | Buffer value (0-100). Default: 0 |
+| `@Input() mode` | `ProgressBarMode` | Mode of progress bar. Options: 'determinate', 'indeterminate', 'buffer', 'query'. Default: 'determinate' |
+| `@Output() animationEnd` | `EventEmitter<ProgressAnimationEnd>` | Event when animation completes |
+
+## Modes
+
+### Determinate
+
+Shows specific progress value:
+
+```html
+<mat-progress-bar mode="determinate" [value]="progressValue"></mat-progress-bar>
+```
+
+```typescript
+export class ProgressComponent {
+  progressValue = 40;
+}
+```
+
+### Indeterminate
+
+Shows continuous animation when progress is unknown:
+
+```html
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+```
+
+### Buffer
+
+Shows buffer value behind progress:
+
+```html
+<mat-progress-bar 
+  mode="buffer" 
+  [value]="loadedValue"
+  [bufferValue]="bufferedValue">
+</mat-progress-bar>
+```
+
+```typescript
+export class BufferComponent {
+  loadedValue = 30;
+  bufferedValue = 60;
+}
+```
+
+### Query
+
+Reverse indeterminate animation:
+
+```html
+<mat-progress-bar mode="query"></mat-progress-bar>
+```
+
+## Examples
+
+### With Color
+
+```html
+<mat-progress-bar mode="determinate" [value]="75" color="accent"></mat-progress-bar>
+<mat-progress-bar mode="determinate" [value]="50" color="warn"></mat-progress-bar>
+```
+
+### Loading Indicator
+
+```typescript
+export class LoadingComponent {
+  isLoading = true;
+  progress = 0;
+
+  startLoading() {
+    this.isLoading = true;
+    this.progress = 0;
+    
+    const interval = setInterval(() => {
+      this.progress += 10;
+      if (this.progress >= 100) {
+        clearInterval(interval);
+        this.isLoading = false;
+      }
+    }, 500);
+  }
+}
+```
+
+```html
+@if (isLoading) {
+  <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+}
+```
+
+### Animation End Event
+
+```typescript
+export class AnimationComponent {
+  onAnimationEnd(event: ProgressAnimationEnd) {
+    console.log('Animation completed at value:', event.value);
+  }
+}
+```
+
+```html
+<mat-progress-bar 
+  mode="determinate" 
+  [value]="value"
+  (animationEnd)="onAnimationEnd($event)">
+</mat-progress-bar>
+```
+
+## Styling
+
+### Custom Height
+
+```css
+mat-progress-bar {
+  height: 8px;
+}
+```
+
+### Custom Colors
+
+```css
+mat-progress-bar::part(bar) {
+  background-color: #4caf50;
+}
+```
+
+## Accessibility
+
+- Has `role="progressbar"`
+- Uses `aria-valuemin`, `aria-valuemax`, `aria-valuenow`
+- `aria-valuenow` is omitted for indeterminate mode
+- Tab index set to -1 for screen reader compatibility
+
+## Configuration
+
+```typescript
+import { MAT_PROGRESS_BAR_DEFAULT_OPTIONS } from '@angular/material/progress-bar';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_PROGRESS_BAR_DEFAULT_OPTIONS,
+      useValue: {
+        color: 'accent',
+        mode: 'determinate'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Types
+
+```typescript
+type ProgressBarMode = 'determinate' | 'indeterminate' | 'buffer' | 'query';
+
+interface ProgressAnimationEnd {
+  value: number;
+}
+```
+
+## Related Components
+
+- [Progress Spinner](/components/progress-spinner)

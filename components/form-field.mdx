@@ -1,0 +1,216 @@
+---
+title: Form Field
+description: MatFormField is a wrapper for native form controls that applies Material Design styling and behavior.
+---
+
+## Overview
+
+`<mat-form-field>` is a component used to wrap several Angular Material components and apply common text field styles such as the underline, floating label, and hint messages.
+
+## Basic Usage
+
+```html
+<mat-form-field>
+  <mat-label>Enter your name</mat-label>
+  <input matInput>
+</mat-form-field>
+```
+
+## API Reference
+
+### MatFormField
+
+Selector: `mat-form-field`
+
+Exported as: `matFormField`
+
+#### Inputs
+
+<ParamField path="appearance" type="'fill' | 'outline'" default="'fill'">
+  The form field appearance style.
+</ParamField>
+
+<ParamField path="color" type="ThemePalette" default="'primary'">
+  Theme color of the form field. This API is supported in M2 themes only.
+</ParamField>
+
+<ParamField path="floatLabel" type="'always' | 'auto'" default="'auto'">
+  Whether the label should always float or float as the user types.
+</ParamField>
+
+<ParamField path="hideRequiredMarker" type="boolean" default="false">
+  Whether the required marker should be hidden.
+</ParamField>
+
+<ParamField path="subscriptSizing" type="'fixed' | 'dynamic'" default="'fixed'">
+  Whether the form field should reserve space for one line of hint/error text (fixed) or have the spacing grow from 0px as needed (dynamic).
+</ParamField>
+
+## Supported Controls
+
+The following Angular Material components can be used within a `<mat-form-field>`:
+
+- `<input matInput>`
+- `<textarea matInput>`
+- `<select matNativeControl>`
+- `<mat-select>`
+- `<mat-chip-grid>`
+
+## Form Field Features
+
+### Label
+
+Use `<mat-label>` to provide a label for the form control:
+
+```html
+<mat-form-field>
+  <mat-label>Email</mat-label>
+  <input matInput type="email">
+</mat-form-field>
+```
+
+### Hint
+
+Hint labels can show additional information:
+
+```html
+<mat-form-field>
+  <mat-label>Enter your password</mat-label>
+  <input matInput type="password">
+  <mat-hint>At least 8 characters</mat-hint>
+</mat-form-field>
+```
+
+### Error Messages
+
+Display error messages using `<mat-error>`:
+
+```html
+<mat-form-field>
+  <mat-label>Email</mat-label>
+  <input matInput [formControl]="emailControl">
+  <mat-error *ngIf="emailControl.hasError('required')">
+    Email is required
+  </mat-error>
+  <mat-error *ngIf="emailControl.hasError('email')">
+    Please enter a valid email
+  </mat-error>
+</mat-form-field>
+```
+
+### Prefix and Suffix
+
+Add content before or after the form control:
+
+<Tabs>
+  <Tab title="Icon Prefix">
+    ```html
+    <mat-form-field>
+      <mat-label>Phone</mat-label>
+      <mat-icon matPrefix>phone</mat-icon>
+      <input matInput>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Text Suffix">
+    ```html
+    <mat-form-field>
+      <mat-label>Amount</mat-label>
+      <input matInput type="number">
+      <span matSuffix>.00</span>
+    </mat-form-field>
+    ```
+  </Tab>
+</Tabs>
+
+## Appearance Variants
+
+<Tabs>
+  <Tab title="Fill (Default)">
+    ```html
+    <mat-form-field appearance="fill">
+      <mat-label>Fill appearance</mat-label>
+      <input matInput>
+    </mat-form-field>
+    ```
+  </Tab>
+  
+  <Tab title="Outline">
+    ```html
+    <mat-form-field appearance="outline">
+      <mat-label>Outline appearance</mat-label>
+      <input matInput>
+    </mat-form-field>
+    ```
+  </Tab>
+</Tabs>
+
+## Accessibility
+
+- The form field automatically manages ARIA attributes for the form control
+- Labels are properly associated with their controls
+- Error messages are announced to screen readers
+- Hint text is associated with the control via `aria-describedby`
+- Required fields are indicated with `aria-required`
+- Invalid fields are marked with `aria-invalid`
+
+## Advanced Usage
+
+### Float Label Behavior
+
+Control when the label floats:
+
+```html
+<!-- Label always floats -->
+<mat-form-field floatLabel="always">
+  <mat-label>Always floating</mat-label>
+  <input matInput>
+</mat-form-field>
+
+<!-- Label floats only when focused or has value -->
+<mat-form-field floatLabel="auto">
+  <mat-label>Auto floating</mat-label>
+  <input matInput>
+</mat-form-field>
+```
+
+### Subscript Sizing
+
+Control the space reserved for hints and errors:
+
+```html
+<!-- Fixed: Always reserves space for one line -->
+<mat-form-field subscriptSizing="fixed">
+  <mat-label>Fixed subscript</mat-label>
+  <input matInput>
+  <mat-hint>Hint text</mat-hint>
+</mat-form-field>
+
+<!-- Dynamic: Space grows as needed -->
+<mat-form-field subscriptSizing="dynamic">
+  <mat-label>Dynamic subscript</mat-label>
+  <input matInput>
+  <mat-hint>Hint text</mat-hint>
+</mat-form-field>
+```
+
+### Global Default Options
+
+```typescript
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: {
+        appearance: 'outline',
+        floatLabel: 'always',
+        subscriptSizing: 'dynamic'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```

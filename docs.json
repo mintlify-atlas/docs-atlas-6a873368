@@ -1,122 +1,245 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Angular Components",
+  "theme": "linden",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#3f51b5",
+    "light": "#7986cb",
+    "dark": "#303f9f"
   },
-  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/angular/components"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/angular/components"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Getting Started",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Overview",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "introduction",
+              "installation",
+              "quickstart"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Essentials",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "essentials/theming",
+              "essentials/typography",
+              "essentials/accessibility",
+              "essentials/schematics"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Material Components",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Form Controls",
             "pages": [
-              "api-reference/introduction"
+              "components/autocomplete",
+              "components/checkbox",
+              "components/datepicker",
+              "components/form-field",
+              "components/input",
+              "components/radio",
+              "components/select",
+              "components/slider",
+              "components/slide-toggle",
+              "components/timepicker"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Navigation",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "components/menu",
+              "components/sidenav",
+              "components/toolbar",
+              "components/tabs"
+            ]
+          },
+          {
+            "group": "Layout",
+            "pages": [
+              "components/card",
+              "components/divider",
+              "components/expansion",
+              "components/grid-list",
+              "components/list",
+              "components/stepper",
+              "components/tree"
+            ]
+          },
+          {
+            "group": "Buttons & Indicators",
+            "pages": [
+              "components/button",
+              "components/button-toggle",
+              "components/badge",
+              "components/chips",
+              "components/icon",
+              "components/progress-bar",
+              "components/progress-spinner"
+            ]
+          },
+          {
+            "group": "Popups & Modals",
+            "pages": [
+              "components/bottom-sheet",
+              "components/dialog",
+              "components/snack-bar",
+              "components/tooltip"
+            ]
+          },
+          {
+            "group": "Data Table",
+            "pages": [
+              "components/table",
+              "components/sort",
+              "components/paginator"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CDK",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "cdk/overview"
+            ]
+          },
+          {
+            "group": "Common Behaviors",
+            "pages": [
+              "cdk/a11y",
+              "cdk/bidi",
+              "cdk/clipboard",
+              "cdk/drag-drop",
+              "cdk/layout",
+              "cdk/observers",
+              "cdk/overlay",
+              "cdk/platform",
+              "cdk/portal",
+              "cdk/scrolling",
+              "cdk/text-field"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "cdk/accordion",
+              "cdk/dialog",
+              "cdk/listbox",
+              "cdk/menu",
+              "cdk/stepper",
+              "cdk/table",
+              "cdk/tree"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "cdk/coercion",
+              "cdk/collections",
+              "cdk/keycodes",
+              "cdk/testing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Additional Packages",
+        "groups": [
+          {
+            "group": "ARIA",
+            "pages": [
+              "aria/overview",
+              "aria/accordion",
+              "aria/combobox",
+              "aria/grid",
+              "aria/listbox",
+              "aria/menu",
+              "aria/tabs",
+              "aria/toolbar",
+              "aria/tree"
+            ]
+          },
+          {
+            "group": "Google Maps",
+            "pages": [
+              "google-maps/overview",
+              "google-maps/installation",
+              "google-maps/map",
+              "google-maps/markers",
+              "google-maps/overlays"
+            ]
+          },
+          {
+            "group": "YouTube Player",
+            "pages": [
+              "youtube-player/overview",
+              "youtube-player/installation",
+              "youtube-player/api"
+            ]
+          },
+          {
+            "group": "Date Adapters",
+            "pages": [
+              "adapters/date-fns",
+              "adapters/luxon",
+              "adapters/moment"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Customization",
+            "pages": [
+              "guides/custom-form-field",
+              "guides/custom-stepper",
+              "guides/theming-components"
+            ]
+          },
+          {
+            "group": "Testing",
+            "pages": [
+              "guides/component-harnesses",
+              "guides/testing-strategies"
+            ]
+          },
+          {
+            "group": "Migration",
+            "pages": [
+              "guides/breaking-changes",
+              "guides/migration-guides"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "guides/contributing",
+              "guides/coding-standards",
+              "guides/dev-environment"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

@@ -1,0 +1,463 @@
+---
+title: "Contributing to Angular Material"
+description: "Guidelines for contributing to Angular Material and CDK"
+---
+
+We would love for you to contribute to Angular Material and help make it ever better! As a contributor, here are the guidelines we would like you to follow.
+
+<Info>
+  Before contributing, please read and follow our [Code of Conduct](https://github.com/angular/code-of-conduct/blob/main/CODE_OF_CONDUCT.md).
+</Info>
+
+## Ways to Contribute
+
+<CardGroup cols={3}>
+  <Card title="Report Bugs" icon="bug">
+    Found an issue? Report it on GitHub
+  </Card>
+  <Card title="Request Features" icon="lightbulb">
+    Have an idea? Share your proposal
+  </Card>
+  <Card title="Submit Code" icon="code">
+    Fix bugs or implement features
+  </Card>
+  <Card title="Improve Docs" icon="book">
+    Help make documentation better
+  </Card>
+  <Card title="Answer Questions" icon="comments">
+    Help others on Stack Overflow
+  </Card>
+  <Card title="Review PRs" icon="code-review">
+    Review and test pull requests
+  </Card>
+</CardGroup>
+
+## Got a Question?
+
+<Warning>
+  Please do not open GitHub issues for general support questions.
+</Warning>
+
+For questions, use these channels:
+
+- **Stack Overflow**: Tag questions with [`angular-material2`](https://stackoverflow.com/questions/tagged/angular-material2)
+- **Gitter Chat**: Join our [gitter channel](https://gitter.im/angular/material2)
+- **GitHub Discussions**: For [design discussions](https://github.com/angular/components/discussions)
+
+### Why Stack Overflow?
+
+<Check>Thousands of people willing to help</Check>
+<Check>Questions and answers stay available publicly</Check>
+<Check>Voting system surfaces the best answers</Check>
+<Check>Searchable for others with similar issues</Check>
+
+## Found a Bug?
+
+If you find a bug in the source code or a mistake in the documentation, you can help by submitting an issue to our [GitHub Repository](https://github.com/angular/components).
+
+### Issue Requirements
+
+<Warning>
+  Issues without a reproduction will be closed.
+</Warning>
+
+<Steps>
+  <Step title="Search for existing issues">
+    Before creating a new issue, search the [issue tracker](https://github.com/angular/components/issues) to see if it's already been reported.
+  </Step>
+
+  <Step title="Create a reproduction">
+    Provide a live reproduction using:
+    - [StackBlitz](https://stackblitz.com/)
+    - [CodePen](https://codepen.io/)
+    - [JsBin](https://jsbin.com/)
+
+    <Note>
+      Our team has limited resources. Reproductions allow us to quickly diagnose issues.
+    </Note>
+  </Step>
+
+  <Step title="Provide details">
+    Include in your issue:
+
+    <ParamField path="Overview" type="required">
+      Clear description of the issue and expected behavior
+    </ParamField>
+
+    <ParamField path="Versions" type="required">
+      Angular and Material versions affected (e.g., 21.0.0)
+    </ParamField>
+
+    <ParamField path="Browsers" type="required">
+      Which browsers are affected? All or specific ones?
+    </ParamField>
+
+    <ParamField path="Steps to Reproduce" type="required">
+      Unambiguous steps to reproduce the error
+    </ParamField>
+
+    <ParamField path="Screenshots" type="recommended">
+      Visual issues benefit greatly from screenshots
+    </ParamField>
+
+    <ParamField path="Related Issues" type="optional">
+      Link to similar issues if any exist
+    </ParamField>
+  </Step>
+
+  <Step title="Submit the issue">
+    [Create a new issue](https://github.com/angular/components/issues/new) with all the information.
+  </Step>
+</Steps>
+
+## Want a Feature?
+
+You can request a new feature by submitting an issue to our GitHub Repository.
+
+<Tabs>
+  <Tab title="Major Features">
+    For significant features:
+
+    1. **Open an issue** with your proposal
+    2. **Outline your approach** and discuss with the team
+    3. **Wait for approval** before starting implementation
+    4. **Submit a PR** once approved
+
+    <Info>
+      This helps coordinate efforts and ensures your work can be accepted.
+    </Info>
+  </Tab>
+
+  <Tab title="Small Features">
+    For small, targeted features:
+
+    1. **Create the feature** in your fork
+    2. **Write tests** for the functionality
+    3. **Submit a PR** directly
+
+    <Note>
+      Even small features benefit from an issue for discussion.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Submitting a Pull Request
+
+<Steps>
+  <Step title="Sign the CLA">
+    Before we can accept your PR, you must sign the [Contributor License Agreement](https://cla.developers.google.com/):
+
+    - **Individuals**: [Simple click-through form](https://cla.developers.google.com/about/google-individual)
+    - **Corporations**: [Print, sign, and submit](https://cla.developers.google.com/about/google-corporate)
+  </Step>
+
+  <Step title="Search for existing PRs">
+    Check if someone else is already working on the same thing:
+
+    ```bash
+    # Search GitHub PRs
+    https://github.com/angular/components/pulls
+    ```
+  </Step>
+
+  <Step title="Create a branch">
+    ```bash
+    git checkout -b my-fix-branch main
+    ```
+
+    <Note>
+      Branch names should be descriptive: `fix/button-ripple`, `feat/tree-virtual-scroll`
+    </Note>
+  </Step>
+
+  <Step title="Make your changes">
+    <Check>Create your patch</Check>
+    <Check>Include appropriate test cases</Check>
+    <Check>Follow our [Coding Rules](/guides/coding-standards)</Check>
+    <Check>Test with supported browsers and screen readers</Check>
+    <Check>Run the full test suite</Check>
+  </Step>
+
+  <Step title="Commit your changes">
+    Use our [commit message conventions](/guides/contributing#commit-message-format):
+
+    ```bash
+    git commit -a
+    ```
+
+    Example commit message:
+    ```
+    fix(button): unable to disable button through binding
+
+    Fixes a bug where buttons cannot be disabled through a binding.
+    This is because the `disabled` input did not set the
+    `.mat-button-disabled` class on the host element.
+
+    Fixes #1234
+    ```
+  </Step>
+
+  <Step title="Push to GitHub">
+    ```bash
+    git push origin my-fix-branch
+    ```
+  </Step>
+
+  <Step title="Create the PR">
+    1. Go to GitHub and create a pull request to `components:main`
+    2. Fill out the PR template completely
+    3. Link related issues using "Fixes #123" syntax
+  </Step>
+
+  <Step title="Address review feedback">
+    If we suggest changes:
+
+    ```bash
+    # Make updates
+    git add .
+    git commit --fixup HEAD
+    
+    # Rebase and force push
+    git rebase main -i --autosquash
+    git push -f
+    ```
+  </Step>
+</Steps>
+
+## Commit Message Format
+
+<Warning>
+  We use commit messages to automatically generate the changelog. Follow the format strictly.
+</Warning>
+
+Each commit message consists of a **header**, **body**, and **footer**:
+
+```
+<type>(<package>/<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+### Header
+
+The header is **mandatory** and must follow this format:
+
+<ParamField path="type" type="required">
+  **Type of change:**
+  - `feat` - New feature
+  - `fix` - Bug fix
+  - `docs` - Documentation only
+  - `refactor` - Code refactoring
+  - `perf` - Performance improvement
+  - `test` - Test improvements
+  - `build` - Build system changes
+  - `ci` - CI changes
+</ParamField>
+
+<ParamField path="package" type="required for changelog">
+  Which package is affected:
+  - `material` - Material components
+  - `cdk` - Component Dev Kit
+  - `material-experimental` - Experimental features
+</ParamField>
+
+<ParamField path="scope" type="required for changelog">
+  What component/area:
+  - `button`, `dialog`, `table`, etc.
+  - See [full list](https://github.com/angular/components/blob/main/.ng-dev/commit-message.mts#L10)
+</ParamField>
+
+<ParamField path="subject" type="required">
+  Brief description:
+  - Use imperative, present tense: "change" not "changed"
+  - Don't capitalize first letter
+  - No period at the end
+  - Max 100 characters
+</ParamField>
+
+### Body
+
+The body should include:
+- Motivation for the change
+- Contrast with previous behavior
+- Use imperative, present tense
+
+### Footer
+
+The footer should contain:
+- **Breaking Changes**: Start with `BREAKING CHANGE:`
+- **Deprecations**: Start with `DEPRECATED:`
+- **Issue references**: `Fixes #123`, `Closes #456`
+
+<CodeGroup>
+```text Good Commit
+fix(material/button): unable to disable button through binding
+
+Fixes a bug in the Angular Material `button` component where buttons
+cannot be disabled through a binding. This is because the `disabled`
+input did not set the `.mat-button-disabled` class on the host element.
+
+Fixes #1234
+```
+
+```text Breaking Change
+feat(cdk/overlay): remove deprecated scroll strategy
+
+BREAKING CHANGE: RepositionScrollStrategy has been removed.
+Use CloseScrollStrategy instead.
+
+Before:
+const strategy = new RepositionScrollStrategy();
+
+After:
+const strategy = new CloseScrollStrategy();
+```
+</CodeGroup>
+
+## Coding Rules
+
+To ensure consistency throughout the source code, keep these rules in mind:
+
+<CardGroup cols={2}>
+  <Card title="Write Tests" icon="flask">
+    All features or bug fixes **must be tested**
+  </Card>
+  <Card title="Document APIs" icon="book">
+    All public API methods **must be documented**
+  </Card>
+  <Card title="Follow Style Guide" icon="code">
+    Follow [Google's TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
+  </Card>
+  <Card title="100 Column Limit" icon="ruler">
+    Wrap all code at **100 characters**
+  </Card>
+</CardGroup>
+
+See the complete [Coding Standards guide](/guides/coding-standards) for details.
+
+## After Your PR is Merged
+
+<Steps>
+  <Step title="Delete your branch">
+    ```bash
+    # Delete remote branch
+    git push origin --delete my-fix-branch
+    
+    # Delete local branch
+    git branch -D my-fix-branch
+    ```
+  </Step>
+
+  <Step title="Update your main branch">
+    ```bash
+    git checkout main
+    git pull --ff upstream main
+    ```
+  </Step>
+
+  <Step title="Celebrate!">
+    🎉 Thank you for contributing to Angular Material!
+  </Step>
+</Steps>
+
+## Development Setup
+
+See the [Developer Environment guide](/guides/dev-environment) for detailed setup instructions.
+
+Quick start:
+
+```bash
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/components.git
+cd components
+
+# Install dependencies
+pnpm install
+
+# Start dev server
+pnpm dev-app
+
+# Run tests
+pnpm test button
+```
+
+## Review Process
+
+<Steps>
+  <Step title="Automated checks">
+    CI runs automatically:
+    - Linting
+    - Unit tests
+    - Integration tests
+    - Build verification
+  </Step>
+
+  <Step title="Code review">
+    Team members review:
+    - Code quality
+    - Test coverage
+    - Documentation
+    - Breaking changes
+  </Step>
+
+  <Step title="Approval">
+    PRs need approval from:
+    - One team member (small changes)
+    - Two team members (significant changes)
+  </Step>
+
+  <Step title="Merge">
+    Once approved and passing:
+    - PR is squashed and merged
+    - Commit follows format conventions
+    - Appears in next release
+  </Step>
+</Steps>
+
+## Recognition
+
+<Info>
+  All contributors are recognized in release notes and the [contributors list](https://github.com/angular/components/graphs/contributors).
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="First Contribution" icon="star">
+    Get a special "first contribution" badge
+  </Card>
+  <Card title="Frequent Contributors" icon="award">
+    Become a recognized community member
+  </Card>
+  <Card title="Major Features" icon="trophy">
+    Featured in release announcements
+  </Card>
+  <Card title="Maintainer" icon="crown">
+    Outstanding contributors may be invited as maintainers
+  </Card>
+</CardGroup>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Coding Standards" icon="book-open" href="/guides/coding-standards">
+    Detailed coding guidelines
+  </Card>
+  <Card title="Dev Environment" icon="terminal" href="/guides/dev-environment">
+    Setup your development environment
+  </Card>
+  <Card title="GitHub Repo" icon="github" href="https://github.com/angular/components">
+    Angular Components repository
+  </Card>
+  <Card title="Issue Tracker" icon="bug" href="https://github.com/angular/components/issues">
+    Report and track issues
+  </Card>
+</CardGroup>
+
+## Code of Conduct
+
+Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct](https://github.com/angular/code-of-conduct/blob/main/CODE_OF_CONDUCT.md).
+
+<Warning>
+  Violations of the Code of Conduct will not be tolerated.
+</Warning>

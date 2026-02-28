@@ -1,0 +1,281 @@
+---
+title: Snack Bar
+description: Service to display brief messages at the bottom of the screen
+---
+
+Service to dispatch Material Design snack bar messages - brief notifications that appear temporarily.
+
+## Import
+
+```typescript
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+```
+
+## Basic Usage
+
+```typescript
+import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Component({
+  selector: 'app-root',
+  template: '<button (click)="openSnackBar()">Show message</button>'
+})
+export class AppComponent {
+  constructor(private snackBar: MatSnackBar) {}
+
+  openSnackBar() {
+    this.snackBar.open('Message sent!', 'Close');
+  }
+}
+```
+
+## API Reference
+
+### MatSnackBar (Service)
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `open(message: string, action?: string, config?: MatSnackBarConfig): MatSnackBarRef` | Opens a snack bar with message and optional action |
+| `openFromComponent<T>(component: ComponentType<T>, config?: MatSnackBarConfig): MatSnackBarRef<T>` | Opens snack bar with custom component |
+| `openFromTemplate(template: TemplateRef, config?: MatSnackBarConfig): MatSnackBarRef` | Opens snack bar with template |
+| `dismiss(): void` | Dismisses the currently visible snack bar |
+
+### MatSnackBarRef
+
+Reference to the opened snack bar.
+
+#### Methods
+
+| Name | Description |
+|------|-------------|
+| `dismiss(): void` | Dismisses the snack bar |
+| `dismissWithAction(): void` | Dismisses with action |
+| `afterDismissed(): Observable<MatSnackBarDismiss>` | Observable that emits after dismissed |
+| `afterOpened(): Observable<void>` | Observable that emits after opened |
+| `onAction(): Observable<void>` | Observable for action button clicks |
+
+### MatSnackBarConfig
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `duration` | `number` | Auto-dismiss duration in ms. Default: 0 (no auto-dismiss) |
+| `horizontalPosition` | `'start' \| 'center' \| 'end' \| 'left' \| 'right'` | Horizontal position. Default: 'center' |
+| `verticalPosition` | `'top' \| 'bottom'` | Vertical position. Default: 'bottom' |
+| `panelClass` | `string \| string[]` | Custom CSS classes |
+| `announcementMessage` | `string` | Message for screen readers |
+| `politeness` | `'assertive' \| 'polite' \| 'off'` | ARIA politeness level. Default: 'polite' |
+| `data` | `any` | Data for custom component |
+| `direction` | `Direction` | Layout direction |
+
+## Examples
+
+### Simple Message
+
+```typescript
+this.snackBar.open('Message archived');
+```
+
+### With Action
+
+```typescript
+const snackBarRef = this.snackBar.open('Email sent', 'Undo');
+
+snackBarRef.onAction().subscribe(() => {
+  console.log('Undo clicked');
+});
+```
+
+### With Duration
+
+```typescript
+this.snackBar.open('Auto-dismiss after 3 seconds', 'Close', {
+  duration: 3000
+});
+```
+
+### Different Positions
+
+```typescript
+// Top center
+this.snackBar.open('Top message', 'Close', {
+  verticalPosition: 'top',
+  horizontalPosition: 'center'
+});
+
+// Bottom right
+this.snackBar.open('Bottom right', 'Close', {
+  verticalPosition: 'bottom',
+  horizontalPosition: 'end'
+});
+```
+
+### Custom Component
+
+```typescript
+@Component({
+  selector: 'custom-snack-bar',
+  template: `
+    <div class="custom-snack-bar">
+      <mat-icon>{{data.icon}}</mat-icon>
+      <span>{{data.message}}</span>
+      <button mat-icon-button (click)="snackBarRef.dismiss()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  `
+})
+export class CustomSnackBarComponent {
+  constructor(
+    public snackBarRef: MatSnackBarRef<CustomSnackBarComponent>,
+    @Inject(MAT_SNACK_BAR_DATA) public data: any
+  ) {}
+}
+
+// Open custom snack bar
+this.snackBar.openFromComponent(CustomSnackBarComponent, {
+  data: {
+    message: 'Custom notification',
+    icon: 'check_circle'
+  },
+  duration: 3000
+});
+```
+
+### Success/Error Messages
+
+```typescript
+export class NotificationService {
+  constructor(private snackBar: MatSnackBar) {}
+
+  showSuccess(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  showError(message: string) {
+    this.snackBar.open(message, 'Dismiss', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+  }
+}
+```
+
+```css
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+
+.error-snackbar {
+  background-color: #f44336;
+  color: white;
+}
+```
+
+### Dismissing Programmatically
+
+```typescript
+const snackBarRef = this.snackBar.open('Processing...', '', {
+  duration: 0 // Don't auto-dismiss
+});
+
+// Later, dismiss it
+setTimeout(() => {
+  snackBarRef.dismiss();
+}, 5000);
+```
+
+### Sequential Messages
+
+```typescript
+showMessages() {
+  const messages = ['First', 'Second', 'Third'];
+  let index = 0;
+
+  const showNext = () => {
+    if (index < messages.length) {
+      const ref = this.snackBar.open(messages[index], 'OK', {
+        duration: 2000
+      });
+      
+      ref.afterDismissed().subscribe(() => {
+        index++;
+        showNext();
+      });
+    }
+  };
+
+  showNext();
+}
+```
+
+## Accessibility
+
+- Snack bar has `role="alert"`
+- Announced to screen readers via `aria-live`
+- Use `politeness` level to control urgency:
+
+```typescript
+this.snackBar.open('Important!', 'OK', {
+  politeness: 'assertive' // Interrupts screen reader
+});
+```
+
+- Provide announcement message for complex content:
+
+```typescript
+this.snackBar.open('Item deleted', 'Undo', {
+  announcementMessage: 'Item has been deleted, press Undo to restore'
+});
+```
+
+## Configuration
+
+```typescript
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+
+@NgModule({
+  providers: [
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom'
+      }
+    }
+  ]
+})
+export class AppModule {}
+```
+
+## Best Practices
+
+- Keep messages brief (1-2 lines)
+- Use for confirmations, not errors requiring action
+- Provide action button when relevant
+- Don't stack multiple snack bars
+- Use appropriate duration (2-4 seconds for reading)
+
+## Injection Tokens
+
+```typescript
+import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+
+@Component({...})
+export class CustomSnackBarComponent {
+  constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any) {}
+}
+```
+
+## Related Components
+
+- [Dialog](/components/dialog)
+- [Bottom Sheet](/components/bottom-sheet)

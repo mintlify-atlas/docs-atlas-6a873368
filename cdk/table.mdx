@@ -1,0 +1,139 @@
+---
+title: CdkTable
+description: Data table with sorting and pagination
+---
+
+The `CdkTable` provides behavior for data tables without styling.
+
+## Installation
+
+```bash
+npm install @angular/cdk
+```
+
+```typescript
+import {CdkTableModule} from '@angular/cdk/table';
+```
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+@Component({
+  selector: 'app-table-example',
+  template: `
+    <table cdk-table [dataSource]="users">
+      <!-- ID Column -->
+      <ng-container cdkColumnDef="id">
+        <th cdk-header-cell *cdkHeaderCellDef>ID</th>
+        <td cdk-cell *cdkCellDef="let user">{{ user.id }}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container cdkColumnDef="name">
+        <th cdk-header-cell *cdkHeaderCellDef>Name</th>
+        <td cdk-cell *cdkCellDef="let user">{{ user.name }}</td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container cdkColumnDef="email">
+        <th cdk-header-cell *cdkHeaderCellDef>Email</th>
+        <td cdk-cell *cdkCellDef="let user">{{ user.email }}</td>
+      </ng-container>
+
+      <!-- Header Row -->
+      <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+      
+      <!-- Data Rows -->
+      <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  `,
+})
+export class TableExample {
+  users: User[] = [
+    {id: 1, name: 'John', email: 'john@example.com'},
+    {id: 2, name: 'Jane', email: 'jane@example.com'},
+  ];
+  
+  displayedColumns = ['id', 'name', 'email'];
+}
+```
+
+## With DataSource
+
+```typescript
+import {DataSource} from '@angular/cdk/collections';
+import {Observable, of} from 'rxjs';
+
+export class UserDataSource extends DataSource<User> {
+  constructor(private users: User[]) {
+    super();
+  }
+
+  connect(): Observable<User[]> {
+    return of(this.users);
+  }
+
+  disconnect() {}
+}
+
+@Component({
+  template: `<table cdk-table [dataSource]="dataSource">...</table>`,
+})
+export class DataSourceExample {
+  dataSource = new UserDataSource([
+    {id: 1, name: 'John', email: 'john@example.com'},
+  ]);
+}
+```
+
+## Sticky Headers
+
+```html
+<table cdk-table [dataSource]="users">
+  <ng-container cdkColumnDef="name">
+    <th cdk-header-cell *cdkHeaderCellDef [sticky]="true">Name</th>
+    <td cdk-cell *cdkCellDef="let user">{{ user.name }}</td>
+  </ng-container>
+  
+  <tr cdk-header-row *cdkHeaderRowDef="columns; sticky: true"></tr>
+  <tr cdk-row *cdkRowDef="let row; columns: columns"></tr>
+</table>
+```
+
+## API Reference
+
+### cdk-table
+
+| Input | Type | Description |
+|-------|------|-------------|
+| `dataSource` | `DataSource \| Array` | Data to display |
+| `trackBy` | `TrackByFunction` | Track items by identity |
+
+### cdkColumnDef
+
+Defines a column.
+
+### cdk-header-cell
+
+Header cell template.
+
+### cdk-cell
+
+Data cell template.
+
+### cdk-header-row / cdk-row
+
+Row templates.
+
+## See Also
+
+- [Angular Material Table](https://material.angular.io/components/table/overview)
+- [Collections](/cdk/collections)

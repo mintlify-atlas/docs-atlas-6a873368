@@ -1,0 +1,178 @@
+---
+title: 'Google Maps Installation'
+description: 'Install and configure Angular Google Maps'
+---
+
+# Installation
+
+This guide will help you install and configure the Angular Google Maps component.
+
+## Install the Package
+
+The easiest way to install is using Angular CLI:
+
+```bash
+ng add @angular/google-maps
+```
+
+Or install manually using npm:
+
+```bash
+npm install @angular/google-maps
+```
+
+## Get a Google Maps API Key
+
+You need a Google Maps API key to use the component. Follow these steps:
+
+1. Go to the [Google Maps Platform](https://developers.google.com/maps/gmp-get-started)
+2. Create a new project or select an existing one
+3. Enable the Maps JavaScript API
+4. Create credentials (API key)
+5. (Optional) Restrict your API key to prevent unauthorized use
+
+## Load the Google Maps API
+
+### Recommended: Dynamic Library Import
+
+Add the Dynamic Library Import script to your `index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My App</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <app-root></app-root>
+  
+  <script>
+    (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({{
+      v: "weekly",
+      key: "YOUR_API_KEY_HERE"
+    }});
+  </script>
+</body>
+</html>
+```
+
+Replace `YOUR_API_KEY_HERE` with your actual API key.
+
+### Alternative: Legacy Script Tag
+
+You can also use the legacy script tag, though it's not recommended:
+
+```html
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE"></script>
+```
+
+The legacy approach loads all Google Maps JavaScript up-front, which can impact performance.
+
+## Import Components
+
+### Standalone Components
+
+For standalone components, import what you need:
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap, MapMarker} from '@angular/google-maps';
+
+@Component({
+  selector: 'app-map',
+  imports: [GoogleMap, MapMarker],
+  template: `
+    <google-map
+      height="400px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom">
+      <map-marker [position]="markerPosition" />
+    </google-map>
+  `
+})
+export class MapComponent {
+  center = {lat: 40, lng: -20};
+  zoom = 4;
+  markerPosition = {lat: 40, lng: -20};
+}
+```
+
+### NgModule
+
+For NgModule-based apps, import `GoogleMapsModule`:
+
+```typescript
+import {NgModule} from '@angular/core';
+import {GoogleMapsModule} from '@angular/google-maps';
+
+@NgModule({
+  imports: [GoogleMapsModule],
+  // ...
+})
+export class AppModule {}
+```
+
+## Verify Installation
+
+Create a simple map to verify everything is working:
+
+```typescript
+import {Component} from '@angular/core';
+import {GoogleMap} from '@angular/google-maps';
+
+@Component({
+  selector: 'app-root',
+  imports: [GoogleMap],
+  template: `
+    <h1>My First Map</h1>
+    <google-map
+      height="500px"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom" />
+  `
+})
+export class AppComponent {
+  center: google.maps.LatLngLiteral = {lat: 37.7749, lng: -122.4194}; // San Francisco
+  zoom = 12;
+}
+```
+
+If you see a map centered on San Francisco, you're all set!
+
+## Troubleshooting
+
+### Map Not Displaying
+
+1. **Check API Key**: Ensure your API key is valid and has the Maps JavaScript API enabled
+2. **Check Console**: Look for errors in the browser console
+3. **Check Billing**: Ensure billing is enabled on your Google Cloud project
+4. **Check Restrictions**: If you've restricted your API key, ensure your domain is allowed
+
+### TypeScript Errors
+
+If you get TypeScript errors about `google.maps` types:
+
+```bash
+npm install @types/google.maps
+```
+
+Add to your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "types": ["google.maps"]
+  }
+}
+```
+
+## Next Steps
+
+- Learn about the [GoogleMap component](/google-maps/map)
+- Add [markers](/google-maps/markers) to your map
+- Explore [overlays](/google-maps/overlays) like polylines and polygons

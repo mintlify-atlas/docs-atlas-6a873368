@@ -1,0 +1,162 @@
+---
+title: 'ARIA Accordion'
+description: 'Accessible accordion component for expandable content panels'
+---
+
+# ARIA Accordion
+
+The ARIA Accordion provides an accessible, expandable/collapsible content panel system following WAI-ARIA patterns.
+
+## Installation
+
+```bash
+npm install @angular/aria
+```
+
+## Components
+
+### AccordionGroup
+
+A container for a group of accordion items that manages overall state and interactions.
+
+**Selector**: `[ngAccordionGroup]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/accordion/accordion-group.ts:72`
+
+#### Inputs
+
+- `multiExpandable` (boolean) - Whether multiple accordion items can be expanded simultaneously. Default: `true`
+- `disabled` (boolean) - Whether the entire accordion group is disabled. Default: `false`
+- `softDisabled` (boolean) - Whether disabled items can receive focus. When `true`, disabled items are focusable but not interactive. Default: `true`
+- `wrap` (boolean) - Whether keyboard navigation wraps from last to first item. Default: `false`
+
+#### Methods
+
+- `expandAll()` - Expands all accordion panels (if multi-expandable)
+- `collapseAll()` - Collapses all accordion panels
+
+### AccordionPanel
+
+The content panel that is conditionally visible based on trigger state.
+
+**Selector**: `[ngAccordionPanel]`
+
+**Source**: `/home/daytona/workspace/source/src/aria/accordion/accordion-panel.ts:42`
+
+#### Inputs
+
+- `panelId` (string, required) - A local unique identifier that matches the corresponding trigger's `panelId`
+- `id` (string) - A global unique identifier for the panel. Auto-generated if not provided
+- `preserveContent` (boolean) - Whether to preserve content when collapsed
+
+#### Properties
+
+- `visible` (signal) - Whether the accordion panel is visible
+
+#### Methods
+
+- `expand()` - Expands this panel
+- `collapse()` - Collapses this panel
+- `toggle()` - Toggles the expansion state
+
+### AccordionTrigger
+
+Button element that toggles panel visibility.
+
+**Selector**: `[ngAccordionTrigger]`
+
+#### Inputs
+
+- `panelId` (string, required) - Identifier matching the corresponding panel's `panelId`
+- `disabled` (boolean) - Whether this trigger is disabled
+
+### AccordionContent
+
+Directive for lazy-loaded accordion content.
+
+**Selector**: `[ngAccordionContent]`
+
+## Basic Usage
+
+```typescript
+import {Component} from '@angular/core';
+import {AccordionGroup, AccordionPanel, AccordionTrigger, AccordionContent} from '@angular/aria';
+
+@Component({
+  selector: 'app-accordion-example',
+  imports: [AccordionGroup, AccordionPanel, AccordionTrigger, AccordionContent],
+  template: `
+    <div ngAccordionGroup [multiExpandable]="true">
+      <div class="accordion-item">
+        <h3>
+          <button ngAccordionTrigger panelId="item-1">Item 1</button>
+        </h3>
+        <div ngAccordionPanel panelId="item-1">
+          <ng-template ngAccordionContent>
+            <p>Content for Item 1.</p>
+          </ng-template>
+        </div>
+      </div>
+      
+      <div class="accordion-item">
+        <h3>
+          <button ngAccordionTrigger panelId="item-2">Item 2</button>
+        </h3>
+        <div ngAccordionPanel panelId="item-2">
+          <ng-template ngAccordionContent>
+            <p>Content for Item 2.</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class AccordionExample {}
+```
+
+## Single Expansion Mode
+
+```html
+<div ngAccordionGroup [multiExpandable]="false">
+  <!-- Only one panel can be open at a time -->
+  <div class="accordion-item">
+    <h3>
+      <button ngAccordionTrigger panelId="section-1">Section 1</button>
+    </h3>
+    <div ngAccordionPanel panelId="section-1">
+      <ng-template ngAccordionContent>
+        <p>Only one section can be expanded at a time.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
+```
+
+## Keyboard Navigation
+
+- **Arrow Keys** - Navigate between accordion triggers
+- **Enter/Space** - Toggle the focused accordion panel
+- **Home** - Focus first accordion trigger
+- **End** - Focus last accordion trigger
+
+## Accessibility Features
+
+- Implements ARIA accordion pattern
+- Proper roles: `button` for triggers, `region` for panels
+- `aria-expanded` state management
+- `aria-controls` and `aria-labelledby` associations
+- `inert` attribute for hidden content
+- Full keyboard navigation support
+- Screen reader announcements
+
+## Developer Preview
+
+This component is in developer preview as of Angular 21.0.
+
+## Source Code
+
+View the source code:
+- [accordion-group.ts](https://github.com/angular/components/tree/main/src/aria/accordion/accordion-group.ts)
+- [accordion-panel.ts](https://github.com/angular/components/tree/main/src/aria/accordion/accordion-panel.ts)
+- [accordion-trigger.ts](https://github.com/angular/components/tree/main/src/aria/accordion/accordion-trigger.ts)
+- [accordion-content.ts](https://github.com/angular/components/tree/main/src/aria/accordion/accordion-content.ts)
